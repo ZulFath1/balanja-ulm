@@ -1,0 +1,11 @@
+# Android
+*.apk
+*.aab
+/build
+/.idea
+/local.properties
+google-services.json
+
+# OS
+.DS_Store
+Thumbs.db
