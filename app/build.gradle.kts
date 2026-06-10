@@ -57,7 +57,7 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:2.6.0")
 
-    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
 
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
@@ -70,7 +70,6 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-database-ktx")
-    implementation("com.google.firebase:firebase-storage-ktx")
 
     implementation("androidx.core:core-ktx:1.18.0")
     testImplementation("junit:junit:4.13.2")

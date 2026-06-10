@@ -1,4 +1,4 @@
-package com.ulm.balanja
+package com.example.balanja
 
 import android.app.Application
 
