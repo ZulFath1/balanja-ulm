@@ -3,14 +3,15 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("kotlin-kapt")
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.ulm.balanja"
+    namespace = "com.example.balanja"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.ulm.balanja"
+        applicationId = "com.example.balanja"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -68,6 +69,11 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
+
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-database-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
 
     implementation("androidx.core:core-ktx:1.18.0")
     testImplementation("junit:junit:4.13.2")
