@@ -1,4 +1,4 @@
-package com.example.balanja.ui.theme
+package com.ulm.balanja.ui.theme
 
 import android.app.Activity
 import android.os.Build

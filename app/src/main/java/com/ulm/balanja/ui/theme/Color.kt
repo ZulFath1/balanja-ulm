@@ -1,4 +1,4 @@
-package com.example.balanja.ui.theme
+package com.ulm.balanja.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
