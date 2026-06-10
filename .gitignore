@@ -27,3 +27,5 @@ google-services.json
 Thumbs.db
 
 app/google-services.json
+apikeys.properties
+secrets.properties
