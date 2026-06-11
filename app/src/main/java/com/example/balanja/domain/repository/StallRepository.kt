@@ -7,4 +7,5 @@ interface StallRepository {
     fun getAllStalls(): Flow<List<Stall>>
     fun getStallById(stallId: String): Flow<Stall?>
     suspend fun updateStallStatus(stallId: String, isOpen: Boolean): Result<Unit>
+    suspend fun updateStallRating(stallId: String, averageRating: Double, reviewCount: Int): Result<Unit>
 }

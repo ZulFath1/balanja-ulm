@@ -46,6 +46,16 @@ class AuthRepositoryImpl(
         return firebaseAuth.currentUser?.uid
     }
     
+    override fun getCurrentUser(): User? {
+        val fbUser = firebaseAuth.currentUser ?: return null
+        return User(
+            id = fbUser.uid,
+            email = fbUser.email ?: "",
+            name = fbUser.displayName ?: fbUser.email?.split("@")?.get(0) ?: "Pengguna",
+            createdAt = fbUser.metadata?.creationTimestamp ?: 0L
+        )
+    }
+    
     override fun isLoggedIn(): Boolean {
         return firebaseAuth.currentUser != null
     }

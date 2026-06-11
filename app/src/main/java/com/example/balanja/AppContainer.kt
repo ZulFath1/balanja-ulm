@@ -43,14 +43,29 @@ object AppContainer {
     val stallRepository: StallRepository by lazy { StallRepositoryImpl() }
     val reviewRepository: ReviewRepository by lazy { ReviewRepositoryImpl() }
     val weatherRepository: WeatherRepository by lazy { WeatherRepositoryImpl(weatherApiService) }
-    val favoriteRepository: FavoriteRepository by lazy { FavoriteRepositoryImpl() }
+    lateinit var favoriteRepository: FavoriteRepository
+        private set
+
+    fun init(context: android.content.Context) {
+        val database = com.example.balanja.data.local.BalanjaLocalDatabase.getInstance(context)
+        favoriteRepository = FavoriteRepositoryImpl(database.favoriteStallDao())
+    }
 
     // ─── Use Cases ────────────────────────────────────────────────────────────
 
     val signInUseCase by lazy { SignInUseCase(authRepository) }
     val getAllStallsUseCase by lazy { GetAllStallsUseCase(stallRepository) }
+    val getStallDetailUseCase by lazy { GetStallDetailUseCase(stallRepository) }
+    val toggleStallStatusUseCase by lazy { ToggleStallStatusUseCase(stallRepository) }
     val getCampusWeatherUseCase by lazy { GetCampusWeatherUseCase(weatherRepository) }
     val addFavoriteUseCase by lazy { AddFavoriteUseCase(favoriteRepository) }
     val getFavoritesUseCase by lazy { GetFavoritesUseCase(favoriteRepository) }
     val deleteFavoriteUseCase by lazy { DeleteFavoriteUseCase(favoriteRepository) }
+    
+    val addReviewUseCase by lazy { AddReviewUseCase(reviewRepository) }
+    val editReviewUseCase by lazy { EditReviewUseCase(reviewRepository) }
+    val deleteReviewUseCase by lazy { DeleteReviewUseCase(reviewRepository) }
+    val getReviewsUseCase by lazy { GetReviewsUseCase(reviewRepository) }
+    val getMyReviewsUseCase by lazy { GetMyReviewsUseCase(reviewRepository) }
+    val recalculateStallRatingUseCase by lazy { RecalculateStallRatingUseCase(stallRepository, reviewRepository) }
 }

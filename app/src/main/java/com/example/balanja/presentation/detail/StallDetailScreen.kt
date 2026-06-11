@@ -176,7 +176,6 @@ fun StallDetailScreen(
                             }
                         }
 
-                        // --- Bagian List Menu ---
                         val menuList = stall.menu.values.toList()
                         if (menuList.isEmpty()) {
                             item {
@@ -191,6 +190,90 @@ fun StallDetailScreen(
                             items(menuList) { menuItem ->
                                 MenuItemRow(menuItem)
                             }
+                        }
+                        
+                        item {
+                            Spacer(modifier = Modifier.height(24.dp))
+                            Text(
+                                text = "Ulasan Komunitas",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                        
+                        val reviewsList = (uiState as StallDetailUiState.Success).reviews
+                        if (reviewsList.isEmpty()) {
+                            item {
+                                Text(
+                                    text = "Jadilah yang pertama mengulas stan ini!",
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                    color = Color.Gray,
+                                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                                )
+                            }
+                        } else {
+                            items(reviewsList) { review ->
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                                ) {
+                                    Column(modifier = Modifier.padding(16.dp)) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = review.userName,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 14.sp
+                                            )
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Star,
+                                                    contentDescription = "Rating",
+                                                    tint = Color(0xFFF59E0B),
+                                                    modifier = Modifier.size(14.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text(
+                                                    text = review.rating.toString(),
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 14.sp
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            text = review.comment,
+                                            fontSize = 14.sp,
+                                            color = Color.DarkGray
+                                        )
+                                        if (review.attributes.isNotEmpty()) {
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                review.attributes.forEach { attr ->
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .background(Color(0xFFFEF3C7), RoundedCornerShape(4.dp))
+                                                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                                                    ) {
+                                                        Text(text = attr, fontSize = 10.sp, color = Color(0xFF870500))
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(80.dp))
                         }
                     }
                 }

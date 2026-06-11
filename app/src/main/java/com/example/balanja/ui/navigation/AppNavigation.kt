@@ -25,8 +25,19 @@ import com.example.balanja.AppContainer
 import com.example.balanja.domain.usecase.SignInUseCase
 import com.example.balanja.presentation.auth.AuthViewModel
 import com.example.balanja.presentation.auth.LoginScreen
-//import com.example.balanja.presentation.review.WriteReviewScreen
+import com.example.balanja.presentation.review.WriteReviewScreen
+import com.example.balanja.presentation.review.WriteReviewViewModel
+import com.example.balanja.presentation.review.MyReviewsScreen
+import com.example.balanja.presentation.review.MyReviewsViewModel
 import com.example.balanja.presentation.search.AddStallScreen
+import com.example.balanja.presentation.map.MapScreen
+import com.example.balanja.presentation.map.MapViewModel
+import com.example.balanja.presentation.profile.ProfileScreen
+import com.example.balanja.presentation.profile.ProfileViewModel
+import com.example.balanja.presentation.favorite.FavoriteStallsScreen
+import com.example.balanja.presentation.favorite.FavoriteStallsViewModel
+import com.example.balanja.presentation.detail.StallDetailScreen
+import com.example.balanja.presentation.detail.StallDetailViewModel
 
 // Factory untuk inject SignInUseCase ke AuthViewModel
 class AuthViewModelFactory(
@@ -82,19 +93,59 @@ fun AppNavigation() {
             }
 
             composable(Screen.Home.route) {
-                PlaceholderScreen("Home Screen")
+                val viewModel: com.example.balanja.presentation.home.HomeViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return com.example.balanja.presentation.home.HomeViewModel(
+                                AppContainer.getAllStallsUseCase,
+                                AppContainer.getCampusWeatherUseCase
+                            ) as T
+                        }
+                    }
+                )
+                com.example.balanja.presentation.home.HomeScreen(
+                    viewModel = viewModel,
+                    onNavigateToDetail = { stallId ->
+                        navController.navigate(Screen.StallDetail.createRoute(stallId))
+                    }
+                )
             }
             composable(Screen.Search.route) {
-                PlaceholderScreen("Search Screen")
+                val viewModel: MapViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return MapViewModel(AppContainer.getAllStallsUseCase) as T
+                        }
+                    }
+                )
+                MapScreen(viewModel)
             }
             composable(Screen.AddStall.route) {
                 AddStallScreen()
             }
             composable(Screen.Profile.route) {
-                PlaceholderScreen("Profile Screen")
+                val viewModel: ProfileViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return ProfileViewModel(AppContainer.authRepository) as T
+                        }
+                    }
+                )
+                ProfileScreen(navController, viewModel)
             }
             composable(Screen.Favorites.route) {
-                PlaceholderScreen("Favorites Screen")
+                val viewModel: FavoriteStallsViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return FavoriteStallsViewModel(AppContainer.getFavoritesUseCase, AppContainer.deleteFavoriteUseCase) as T
+                        }
+                    }
+                )
+                FavoriteStallsScreen(navController, viewModel)
             }
 
             composable(
@@ -102,7 +153,20 @@ fun AppNavigation() {
                 arguments = listOf(navArgument("stallId") { type = NavType.StringType })
             ) { backStackEntry ->
                 val stallId = backStackEntry.arguments?.getString("stallId") ?: ""
-                PlaceholderScreen("Stall Detail — $stallId")
+                val viewModel: StallDetailViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return StallDetailViewModel(AppContainer.getStallDetailUseCase, AppContainer.toggleStallStatusUseCase, AppContainer.getReviewsUseCase) as T
+                        }
+                    }
+                )
+                StallDetailScreen(
+                    viewModel = viewModel,
+                    stallId = stallId,
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateToReview = { id -> navController.navigate(Screen.WriteReview.createRoute(id)) }
+                )
             }
             composable(
                 route = "community_review/{stallId}",
@@ -111,19 +175,47 @@ fun AppNavigation() {
                 val stallId = backStackEntry.arguments?.getString("stallId") ?: ""
                 PlaceholderScreen("Community Review — $stallId")
             }
-//            composable(
-//                route = "write_review/{stallId}?reviewId={reviewId}",
-//                arguments = listOf(
-//                    navArgument("stallId")  { type = NavType.StringType },
-//                    navArgument("reviewId") { type = NavType.StringType; nullable = true; defaultValue = null }
-//                )
-//            ) { backStackEntry ->
-//                val stallId  = backStackEntry.arguments?.getString("stallId") ?: ""
-//                val reviewId = backStackEntry.arguments?.getString("reviewId")
-//                WriteReviewScreen(navController, stallId, reviewId)
-//            }
+            composable(
+                route = "write_review/{stallId}?reviewId={reviewId}",
+                arguments = listOf(
+                    navArgument("stallId")  { type = NavType.StringType },
+                    navArgument("reviewId") { type = NavType.StringType; nullable = true; defaultValue = null }
+                )
+            ) { backStackEntry ->
+                val stallId  = backStackEntry.arguments?.getString("stallId") ?: ""
+                val reviewId = backStackEntry.arguments?.getString("reviewId")
+                val viewModel: WriteReviewViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return WriteReviewViewModel(
+                                savedStateHandle = backStackEntry.savedStateHandle,
+                                addReviewUseCase = AppContainer.addReviewUseCase,
+                                editReviewUseCase = AppContainer.editReviewUseCase,
+                                getReviewsUseCase = AppContainer.getReviewsUseCase,
+                                recalculateStallRatingUseCase = AppContainer.recalculateStallRatingUseCase,
+                                authRepository = AppContainer.authRepository
+                            ) as T
+                        }
+                    }
+                )
+                WriteReviewScreen(navController, stallId, reviewId, viewModel)
+            }
             composable(Screen.MyReviews.route) {
-                PlaceholderScreen("My Reviews Screen")
+                val viewModel: MyReviewsViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return MyReviewsViewModel(
+                                getMyReviewsUseCase = AppContainer.getMyReviewsUseCase,
+                                deleteReviewUseCase = AppContainer.deleteReviewUseCase,
+                                recalculateStallRatingUseCase = AppContainer.recalculateStallRatingUseCase,
+                                authRepository = AppContainer.authRepository
+                            ) as T
+                        }
+                    }
+                )
+                MyReviewsScreen(navController, viewModel)
             }
         }
     }
