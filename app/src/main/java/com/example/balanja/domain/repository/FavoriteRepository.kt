@@ -7,5 +7,5 @@ interface FavoriteRepository {
     fun observeFavorites(): Flow<List<FavoriteStall>>
     suspend fun addFavorite(stall: FavoriteStall): Result<Unit>
     suspend fun deleteFavorite(stallId: String): Result<Unit>
-    suspend fun isFavorite(stallId: String): Boolean
+    fun isFavorite(stallId: String): Flow<Boolean>
 }

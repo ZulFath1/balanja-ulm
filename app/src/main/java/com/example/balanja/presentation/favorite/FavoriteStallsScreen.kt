@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,10 +50,14 @@ fun FavoriteStallsScreen(
         ) {
             when {
                 uiState.isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Color(0xFF870500)
-                    )
+                    LazyColumn(
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(5) {
+                            com.example.balanja.ui.component.StallCardSkeleton()
+                        }
+                    }
                 }
                 uiState.error != null -> {
                     Text(
@@ -62,24 +67,13 @@ fun FavoriteStallsScreen(
                     )
                 }
                 uiState.favorites.isEmpty() -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Belum ada stan favorit",
-                            fontSize = 16.sp,
-                            color = Color.Gray,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(
-                            onClick = { navController.navigate(Screen.Home.route) },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF870500))
-                        ) {
-                            Text("Jelajahi Balanja")
-                        }
-                    }
+                    com.example.balanja.ui.component.EmptyStateComponent(
+                        icon = Icons.Default.FavoriteBorder,
+                        title = "Belum Ada Favorit",
+                        subtitle = "Tambahkan stan favorit Anda dengan menekan ikon hati.",
+                        actionLabel = "Jelajahi Balanja",
+                        onAction = { navController.navigate(Screen.Home.route) }
+                    )
                 }
                 else -> {
                     LazyColumn(

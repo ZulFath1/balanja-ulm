@@ -36,11 +36,11 @@ class FavoriteRepositoryImpl(
         }
     }
 
-    override suspend fun isFavorite(stallId: String): Boolean {
+    override fun isFavorite(stallId: String): Flow<Boolean> {
         return try {
-            favoriteStallDao.isFavorite(stallId).first()
+            favoriteStallDao.isFavorite(stallId)
         } catch (e: Exception) {
-            false
+            kotlinx.coroutines.flow.flowOf(false)
         }
     }
 

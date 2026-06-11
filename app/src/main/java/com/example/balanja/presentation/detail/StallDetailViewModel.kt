@@ -20,15 +20,28 @@ sealed interface StallDetailUiState {
 class StallDetailViewModel(
     private val getStallDetailUseCase: GetStallDetailUseCase,
     private val toggleStallStatusUseCase: ToggleStallStatusUseCase,
-    private val getReviewsUseCase: com.example.balanja.domain.usecase.GetReviewsUseCase
+    private val getReviewsUseCase: com.example.balanja.domain.usecase.GetReviewsUseCase,
+    private val isFavoriteUseCase: com.example.balanja.domain.usecase.IsFavoriteUseCase,
+    private val addFavoriteUseCase: com.example.balanja.domain.usecase.AddFavoriteUseCase,
+    private val deleteFavoriteUseCase: com.example.balanja.domain.usecase.DeleteFavoriteUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<StallDetailUiState>(StallDetailUiState.Loading)
     val uiState: StateFlow<StallDetailUiState> = _uiState.asStateFlow()
 
+    private val _isFavorite = MutableStateFlow(false)
+    val isFavorite: StateFlow<Boolean> = _isFavorite.asStateFlow()
+
     fun loadStall(stallId: String) {
         viewModelScope.launch {
             _uiState.value = StallDetailUiState.Loading
+
+            // Listen to favorite status
+            launch {
+                isFavoriteUseCase(stallId).collect { fav ->
+                    _isFavorite.value = fav
+                }
+            }
 
             getStallDetailUseCase(stallId)
                 .catch { exception ->
@@ -43,6 +56,31 @@ class StallDetailViewModel(
                         _uiState.value = StallDetailUiState.Error("Stan tidak ditemukan.")
                     }
                 }
+        }
+    }
+
+    fun toggleFavorite() {
+        val currentState = _uiState.value
+        if (currentState is StallDetailUiState.Success) {
+            val stall = currentState.stall
+            viewModelScope.launch {
+                if (_isFavorite.value) {
+                    deleteFavoriteUseCase(stall.id)
+                } else {
+                    val fav = com.example.balanja.domain.model.FavoriteStall(
+                        stallId = stall.id,
+                        name = stall.name,
+                        imageUrl = stall.imageUrl,
+                        location = stall.location,
+                        ratingAverage = stall.rating,
+                        priceMin = stall.priceMin.toInt(),
+                        priceMax = stall.priceMax.toInt(),
+                        isOpen = stall.isOpen,
+                        savedAt = System.currentTimeMillis()
+                    )
+                    addFavoriteUseCase(fav)
+                }
+            }
         }
     }
 

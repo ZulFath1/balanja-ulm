@@ -61,6 +61,7 @@ object AppContainer {
     val addFavoriteUseCase by lazy { AddFavoriteUseCase(favoriteRepository) }
     val getFavoritesUseCase by lazy { GetFavoritesUseCase(favoriteRepository) }
     val deleteFavoriteUseCase by lazy { DeleteFavoriteUseCase(favoriteRepository) }
+    val isFavoriteUseCase by lazy { IsFavoriteUseCase(favoriteRepository) }
     
     val addReviewUseCase by lazy { AddReviewUseCase(reviewRepository) }
     val editReviewUseCase by lazy { EditReviewUseCase(reviewRepository) }

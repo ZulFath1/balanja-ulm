@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.balanja.ui.component.StallCard
+import com.example.balanja.ui.component.EmptyStateComponent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,8 +68,12 @@ fun SearchScreen(
 
             when {
                 uiState.isLoading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Color(0xFF870500))
+                    LazyColumn(
+                        contentPadding = PaddingValues(bottom = 80.dp)
+                    ) {
+                        items(5) {
+                            com.example.balanja.ui.component.StallCardSkeleton()
+                        }
                     }
                 }
                 uiState.error != null -> {
@@ -77,22 +82,18 @@ fun SearchScreen(
                     }
                 }
                 uiState.searchQuery.isBlank() -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Silakan masukkan nama warung untuk mencari.",
-                            color = Color.Gray,
-                            fontSize = 14.sp
-                        )
-                    }
+                    EmptyStateComponent(
+                        icon = Icons.Default.Search,
+                        title = "Mulai Pencarian",
+                        subtitle = "Ketik nama warung atau pedagang yang ingin Anda cari di atas."
+                    )
                 }
                 uiState.filteredStalls.isEmpty() -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Warung tidak ditemukan.",
-                            color = Color.Gray,
-                            fontSize = 14.sp
-                        )
-                    }
+                    EmptyStateComponent(
+                        icon = Icons.Default.Search,
+                        title = "Warung Tidak Ditemukan",
+                        subtitle = "Coba gunakan kata kunci lain yang lebih umum."
+                    )
                 }
                 else -> {
                     LazyColumn(
