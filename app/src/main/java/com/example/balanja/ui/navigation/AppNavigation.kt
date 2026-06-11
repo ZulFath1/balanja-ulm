@@ -12,15 +12,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.balanja.presentation.search.AddStallScreen
+import com.example.balanja.AppContainer
+import com.example.balanja.domain.usecase.SignInUseCase
+import com.example.balanja.presentation.auth.AuthViewModel
 import com.example.balanja.presentation.auth.LoginScreen
-import com.example.balanja.presentation.review.WriteReviewScreen
+//import com.example.balanja.presentation.review.WriteReviewScreen
+import com.example.balanja.presentation.search.AddStallScreen
+
+// Factory untuk inject SignInUseCase ke AuthViewModel
+class AuthViewModelFactory(
+    private val signInUseCase: SignInUseCase
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        @Suppress("UNCHECKED_CAST")
+        return AuthViewModel(signInUseCase) as T
+    }
+}
 
 val screensWithoutBottomNav = listOf(
     Screen.Login.route,
@@ -52,7 +68,17 @@ fun AppNavigation() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Login.route) {
-                LoginScreen(navController)
+                val authViewModel: AuthViewModel = viewModel(
+                    factory = AuthViewModelFactory(AppContainer.signInUseCase)
+                )
+                LoginScreen(
+                    viewModel = authViewModel,
+                    onNavigateToHome = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    }
+                )
             }
 
             composable(Screen.Home.route) {
@@ -85,17 +111,17 @@ fun AppNavigation() {
                 val stallId = backStackEntry.arguments?.getString("stallId") ?: ""
                 PlaceholderScreen("Community Review — $stallId")
             }
-            composable(
-                route = "write_review/{stallId}?reviewId={reviewId}",
-                arguments = listOf(
-                    navArgument("stallId")  { type = NavType.StringType },
-                    navArgument("reviewId") { type = NavType.StringType; nullable = true; defaultValue = null }
-                )
-            ) { backStackEntry ->
-                val stallId  = backStackEntry.arguments?.getString("stallId") ?: ""
-                val reviewId = backStackEntry.arguments?.getString("reviewId")
-                WriteReviewScreen(navController, stallId, reviewId)
-            }
+//            composable(
+//                route = "write_review/{stallId}?reviewId={reviewId}",
+//                arguments = listOf(
+//                    navArgument("stallId")  { type = NavType.StringType },
+//                    navArgument("reviewId") { type = NavType.StringType; nullable = true; defaultValue = null }
+//                )
+//            ) { backStackEntry ->
+//                val stallId  = backStackEntry.arguments?.getString("stallId") ?: ""
+//                val reviewId = backStackEntry.arguments?.getString("reviewId")
+//                WriteReviewScreen(navController, stallId, reviewId)
+//            }
             composable(Screen.MyReviews.route) {
                 PlaceholderScreen("My Reviews Screen")
             }

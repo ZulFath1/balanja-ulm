@@ -218,8 +218,8 @@ fun BalanjaTextField(
         keyboardActions = keyboardActions,
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Color(0xFF870500),
+        colors = TextFieldDefaults.colors(
+            focusedIndicatorColor = Color(0xFF870500),
             cursorColor = Color(0xFF870500)
         ),
         modifier = Modifier.fillMaxWidth()
