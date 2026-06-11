@@ -3,12 +3,27 @@ package com.example.balanja.presentation.map
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
+import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -34,7 +49,7 @@ import org.osmdroid.views.overlay.Marker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen(viewModel: MapViewModel) {
+fun MapScreen(viewModel: MapViewModel, onNavigateBack: () -> Unit = {}) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -62,6 +77,9 @@ fun MapScreen(viewModel: MapViewModel) {
             // Default location to ULM Banjarmasin approx: -3.298, 114.587
             val ulmGeoPoint = GeoPoint(-3.298, 114.587)
             controller.setCenter(ulmGeoPoint)
+            
+            // Hide the ugly default zoom controls
+            zoomController.setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER)
         }
     }
 
@@ -89,9 +107,27 @@ fun MapScreen(viewModel: MapViewModel) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Peta Lokasi Pedagang", fontSize = 18.sp, fontWeight = FontWeight.SemiBold) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF9F8))
+            androidx.compose.material3.TopAppBar(
+                title = { 
+                    Text(
+                        "Peta Lokasi Pedagang", 
+                        fontSize = 20.sp, 
+                        fontWeight = FontWeight.Bold,
+                        color = BalanjaColor.Primary
+                    ) 
+                },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Kembali",
+                            tint = BalanjaColor.Primary
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White
+                )
             )
         },
         containerColor = Color(0xFFFBF9F8)
@@ -111,12 +147,15 @@ fun MapScreen(viewModel: MapViewModel) {
                     modifier = Modifier.fillMaxSize(),
                     update = { view ->
                         view.overlays.removeAll { it is Marker }
+                        val customIcon = androidx.core.content.ContextCompat.getDrawable(context, com.example.balanja.R.drawable.ic_map_pin)
+                        
                         uiState.stalls.forEach { stall ->
                             if (stall.latitude != 0.0 && stall.longitude != 0.0) {
                                 val marker = Marker(view)
                                 marker.position = GeoPoint(stall.latitude, stall.longitude)
                                 marker.title = stall.name
                                 marker.snippet = stall.location
+                                marker.icon = customIcon
                                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                                 view.overlays.add(marker)
                             }
@@ -125,6 +164,53 @@ fun MapScreen(viewModel: MapViewModel) {
                         view.invalidate()
                     }
                 )
+
+                // Floating Info Card Overlay at the bottom
+                androidx.compose.material3.Card(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                    colors = androidx.compose.material3.CardDefaults.cardColors(
+                        containerColor = Color.White
+                    ),
+                    elevation = androidx.compose.material3.CardDefaults.cardElevation(
+                        defaultElevation = 8.dp
+                    )
+                ) {
+                    androidx.compose.foundation.layout.Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        androidx.compose.foundation.layout.Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(Color(0xFFFFEBEE), shape = androidx.compose.foundation.shape.CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            androidx.compose.material3.Icon(
+                                imageVector = androidx.compose.material.icons.Icons.Default.LocationOn,
+                                contentDescription = "Location",
+                                tint = BalanjaColor.Primary
+                            )
+                        }
+                        androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(16.dp))
+                        androidx.compose.foundation.layout.Column {
+                            Text(
+                                text = "Temukan Jajanan",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = Color(0xFF333333)
+                            )
+                            Text(
+                                text = "${uiState.stalls.count { it.latitude != 0.0 && it.longitude != 0.0 }} pedagang ada di peta",
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                }
             }
         }
     }

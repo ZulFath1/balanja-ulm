@@ -175,7 +175,10 @@ fun AppNavigation() {
                         }
                     }
                 )
-                MapScreen(viewModel)
+                MapScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
             composable(Screen.AddStall.route) {
                 AddStallScreen()
