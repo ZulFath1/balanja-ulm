@@ -71,7 +71,7 @@ class StallRepositoryImpl(
     override suspend fun updateStallRating(stallId: String, averageRating: Double, reviewCount: Int): Result<Unit> {
         return try {
             val updates = mapOf(
-                "averageRating" to averageRating,
+                "rating" to averageRating,
                 "reviewCount" to reviewCount
             )
             stallsRef.child(stallId).updateChildren(updates).await()
