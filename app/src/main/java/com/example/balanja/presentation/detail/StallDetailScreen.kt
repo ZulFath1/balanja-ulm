@@ -1,9 +1,11 @@
 package com.example.balanja.presentation.detail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -11,20 +13,29 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.RateReview
+import androidx.compose.material.icons.outlined.Restaurant
+import androidx.compose.material.icons.outlined.LocalDrink
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.balanja.domain.model.MenuItem
+import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,7 +44,8 @@ fun StallDetailScreen(
     stallId: String,
     onNavigateBack: () -> Unit,
     onNavigateToReview: (String) -> Unit,
-    onNavigateToMap: (String) -> Unit
+    onNavigateToMap: (String) -> Unit,
+    onNavigateToCommunityReview: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle()
@@ -45,10 +57,17 @@ fun StallDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (uiState is StallDetailUiState.Success) (uiState as StallDetailUiState.Success).stall.name else "Detail Stan", fontSize = 18.sp, fontWeight = FontWeight.SemiBold) },
+                title = { 
+                    Text(
+                        text = "Detail Tempat", 
+                        fontSize = 18.sp, 
+                        fontWeight = FontWeight.Bold, 
+                        color = Color(0xFF870500)
+                    ) 
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali", tint = Color(0xFF870500))
                     }
                 },
                 actions = {
@@ -62,30 +81,23 @@ fun StallDetailScreen(
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF9F8))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         },
-        bottomBar = {
+        floatingActionButton = {
             if (uiState is StallDetailUiState.Success) {
-                Surface(
-                    color = Color.White,
-                    shadowElevation = 8.dp
-                ) {
-                    PaddingValues(16.dp)
-                    Button(
-                        onClick = { onNavigateToReview(stallId) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF870500)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Tulis Ulasan", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
+                ExtendedFloatingActionButton(
+                    onClick = { onNavigateToReview(stallId) },
+                    containerColor = Color(0xFF870500),
+                    contentColor = Color.White,
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 6.dp),
+                    icon = { Icon(Icons.Default.RateReview, "Tulis Ulasan") },
+                    text = { Text("Tulis Ulasan", fontWeight = FontWeight.Bold) }
+                )
             }
         },
+        floatingActionButtonPosition = FabPosition.Center,
         containerColor = Color(0xFFFBF9F8)
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
@@ -109,215 +121,192 @@ fun StallDetailScreen(
                     val reviewsList = currentState.reviews
 
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 100.dp) // space for FAB
                     ) {
                         item {
-                            StallStatusToggle(
-                                isOpen = stall.isOpen,
-                                onToggle = { newStatus ->
-                                    viewModel.toggleStatus(stall.id, stall.isOpen)
-                                }
-                            )
-                            AsyncImage(
-                                model = stall.imageUrl,
-                                contentDescription = "Foto ${stall.name}",
-                                contentScale = ContentScale.Crop,
+                            // Hero Image with Floating Card
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(250.dp)
-                                    .background(Color.LightGray)
-                            )
-
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                                    .wrapContentHeight()
+                            ) {
+                                // Background Image & Gradient overlay
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(300.dp)
                                 ) {
-                                    Text(
-                                        text = stall.name,
-                                        fontSize = 24.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        color = Color(0xFF111111),
-                                        modifier = Modifier.weight(1f)
+                                    AsyncImage(
+                                        model = stall.imageUrl,
+                                        contentDescription = "Foto ${stall.name}",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize()
                                     )
-
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
+                                    // Gradient overlay from transparent to dark
+                                    Box(
                                         modifier = Modifier
-                                            .background(Color(0xFFFEF3C7), RoundedCornerShape(100.dp))
-                                            .padding(horizontal = 10.dp, vertical = 6.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Star,
-                                            contentDescription = "Rating",
-                                            tint = Color(0xFFF59E0B),
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Text(
-                                            text = "${stall.rating} (${stall.reviewCount})",
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color(0xFF111111)
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-                                
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text(
-                                        text = stall.location.uppercase(),
-                                        fontSize = 14.sp,
-                                        color = Color.Gray,
-                                        fontWeight = FontWeight.SemiBold,
-                                        modifier = Modifier.weight(1f)
+                                            .fillMaxSize()
+                                            .background(
+                                                Brush.verticalGradient(
+                                                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f)),
+                                                    startY = 100f
+                                                )
+                                            )
                                     )
-                                    
-                                    OutlinedButton(
-                                        onClick = { onNavigateToMap(stall.id) },
-                                        shape = RoundedCornerShape(8.dp),
-                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF870500)),
-                                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF870500)),
-                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                                        modifier = Modifier.height(32.dp)
+                                    // Overlaid Text
+                                    Column(
+                                        modifier = Modifier
+                                            .align(Alignment.BottomStart)
+                                            .padding(start = 24.dp, end = 24.dp, bottom = 80.dp) // Leave space for floating card
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Place,
-                                            contentDescription = "Map",
-                                            modifier = Modifier.size(16.dp),
-                                            tint = Color(0xFF870500)
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Icon(Icons.Default.Place, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(stall.location.uppercase(), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+                                        }
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = stall.name,
+                                            color = Color.White,
+                                            fontSize = 36.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            lineHeight = 40.sp
                                         )
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Text("Cek Lokasi", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
 
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Text(
-                                    text = "Deskripsi",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = stall.description,
-                                    fontSize = 14.sp,
-                                    color = Color.DarkGray,
-                                    lineHeight = 20.sp
-                                )
+                                // Floating Card
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 24.dp)
+                                        .align(Alignment.BottomCenter)
+                                        .offset(y = 40.dp), // Move it down to overlap the bottom edge
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                                ) {
+                                    Column(modifier = Modifier.padding(20.dp)) {
+                                        // Actions Row
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            // Tag "BUKA" / "TUTUP"
+                                            Box(
+                                                modifier = Modifier
+                                                    .background(
+                                                        color = if (stall.isOpen) Color(0xFFE8F5E9) else Color(0xFFFFEBEE),
+                                                        shape = RoundedCornerShape(8.dp)
+                                                    )
+                                                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                                            ) {
+                                                Text(
+                                                    text = if (stall.isOpen) "BUKA" else "TUTUP",
+                                                    color = if (stall.isOpen) Color(0xFF2E7D32) else Color(0xFFC62828),
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 12.sp
+                                                )
+                                            }
+                                            
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            
+                                            // Rating Button -> Scroll to bottom
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier
+                                                    .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+                                                    .clip(RoundedCornerShape(8.dp))
+                                                    .clickable { onNavigateToCommunityReview(stall.id) }
+                                                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                                            ) {
+                                                Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(14.dp))
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text("${stall.rating} (${stall.reviewCount})", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                            }
 
-                                Spacer(modifier = Modifier.height(24.dp))
-                                Text(
-                                    text = "Daftar Menu",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
+                                            Spacer(modifier = Modifier.width(8.dp))
+
+                                            // Map Button
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier
+                                                    .background(Color(0xFFFFEBEE), RoundedCornerShape(8.dp))
+                                                    .clip(RoundedCornerShape(8.dp))
+                                                    .clickable { onNavigateToMap(stall.id) }
+                                                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                                            ) {
+                                                Icon(Icons.Default.Place, contentDescription = null, tint = Color(0xFF870500), modifier = Modifier.size(14.dp))
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text("Lokasi", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF870500))
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(16.dp))
+                                        Text("ABOUT THE STALL", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Color.Gray, letterSpacing = 1.sp)
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            text = "\"${stall.description}\"",
+                                            fontSize = 14.sp,
+                                            fontStyle = FontStyle.Italic,
+                                            fontFamily = FontFamily.Serif,
+                                            color = Color(0xFF555555),
+                                            lineHeight = 20.sp
+                                        )
+                                    }
+                                }
+                            }
+                            // Spacer to account for the overlapping card's offset
+                            Spacer(modifier = Modifier.height(64.dp))
+                        }
+
+                        // Menu Categories
+                        val menuList = stall.menu.values.toList()
+                        val drinkKeywords = listOf("es", "teh", "kopi", "jus", "air", "minuman", "milk", "boba", "nutrisari", "sirup", "soda")
+                        val (drinks, foods) = menuList.partition { item -> 
+                            drinkKeywords.any { item.name.lowercase().contains(it) }
+                        }
+
+                        if (foods.isNotEmpty()) {
+                            item {
+                                MenuSectionHeader("Menu")
+                            }
+                            items(foods) { item ->
+                                MenuItemRow(item, isDrink = false)
                             }
                         }
 
-                        val menuList = stall.menu.values.toList()
+                        if (drinks.isNotEmpty()) {
+                            item {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                MenuSectionHeader("Refreshments")
+                            }
+                            items(drinks) { item ->
+                                MenuItemRow(item, isDrink = true)
+                            }
+                        }
+                        
                         if (menuList.isEmpty()) {
                             item {
                                 Text(
                                     text = "Belum ada menu yang ditambahkan.",
-                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 24.dp),
                                     color = Color.Gray,
-                                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                                    fontStyle = FontStyle.Italic
                                 )
                             }
-                        } else {
-                            items(menuList) { menuItem ->
-                                MenuItemRow(menuItem)
-                            }
                         }
-                        
+
                         item {
                             Spacer(modifier = Modifier.height(24.dp))
-                            Text(
-                                text = "Ulasan Komunitas",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 16.dp)
+                            StallStatusToggle(
+                                isOpen = stall.isOpen,
+                                onToggle = { newStatus -> viewModel.toggleStatus(stall.id, stall.isOpen) }
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                        
-                        if (reviewsList.isEmpty()) {
-                            item {
-                                Text(
-                                    text = "Jadilah yang pertama mengulas stan ini!",
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                                    color = Color.Gray,
-                                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                                )
-                            }
-                        } else {
-                            items(reviewsList) { review ->
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp, vertical = 6.dp),
-                                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                                ) {
-                                    Column(modifier = Modifier.padding(16.dp)) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            modifier = Modifier.fillMaxWidth()
-                                        ) {
-                                            Text(
-                                                text = review.userName,
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 14.sp
-                                            )
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Star,
-                                                    contentDescription = "Rating",
-                                                    tint = Color(0xFFF59E0B),
-                                                    modifier = Modifier.size(14.dp)
-                                                )
-                                                Spacer(modifier = Modifier.width(4.dp))
-                                                Text(
-                                                    text = review.rating.toString(),
-                                                    fontWeight = FontWeight.Bold,
-                                                    fontSize = 14.sp
-                                                )
-                                            }
-                                        }
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Text(
-                                            text = review.comment,
-                                            fontSize = 14.sp,
-                                            color = Color.DarkGray
-                                        )
-                                        if (review.attributes.isNotEmpty()) {
-                                            Spacer(modifier = Modifier.height(8.dp))
-                                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                                review.attributes.forEach { attr ->
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .background(Color(0xFFFEF3C7), RoundedCornerShape(4.dp))
-                                                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                                                    ) {
-                                                        Text(text = attr, fontSize = 10.sp, color = Color(0xFF870500))
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        item {
-                            Spacer(modifier = Modifier.height(80.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
                     }
                 }
@@ -327,61 +316,96 @@ fun StallDetailScreen(
 }
 
 @Composable
-fun MenuItemRow(menuItem: MenuItem) {
-    Card(
+fun MenuSectionHeader(title: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
-        Row(
+        Text(
+            text = title,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Color(0xFF111111)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .weight(1f)
+                .height(1.dp)
+                .background(Color.LightGray.copy(alpha = 0.5f))
+        )
+    }
+}
+
+@Composable
+fun MenuItemRow(menuItem: MenuItem, isDrink: Boolean = false) {
+    val priceStr = "Rp" + NumberFormat.getNumberInstance(Locale("id", "ID")).format(menuItem.price)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Image or Placeholder
+        Box(
+            modifier = Modifier
+                .size(64.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFFF3F4F6)),
+            contentAlignment = Alignment.Center
         ) {
             if (menuItem.imageUrl.isNotBlank()) {
                 AsyncImage(
                     model = menuItem.imageUrl,
                     contentDescription = menuItem.name,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.LightGray)
+                    modifier = Modifier.fillMaxSize()
                 )
-                Spacer(modifier = Modifier.width(16.dp))
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = menuItem.name,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+            } else {
+                Icon(
+                    imageVector = if (isDrink) Icons.Outlined.LocalDrink else Icons.Outlined.Restaurant,
+                    contentDescription = null,
+                    tint = Color.LightGray,
+                    modifier = Modifier.size(24.dp)
                 )
-                if (menuItem.description.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = menuItem.description,
-                        fontSize = 12.sp,
-                        color = Color.Gray,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
             }
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(
-                text = "Rp${menuItem.price / 1000}k",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFF870500)
-            )
         }
+        
+        Spacer(modifier = Modifier.width(16.dp))
+        
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = menuItem.name,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF111111),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (menuItem.description.isNotBlank()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = menuItem.description,
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 16.sp
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.width(16.dp))
+        
+        Text(
+            text = priceStr,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF870500)
+        )
     }
 }
 
@@ -394,8 +418,8 @@ fun StallStatusToggle(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .background(Color(0xFFF3F4F6), RoundedCornerShape(12.dp))
+            .padding(horizontal = 24.dp)
+            .background(Color.White, RoundedCornerShape(12.dp))
             .padding(16.dp)
     ) {
         Text(
@@ -405,7 +429,11 @@ fun StallStatusToggle(
         )
         Switch(
             checked = isOpen,
-            onCheckedChange = { onToggle(it) }
+            onCheckedChange = { onToggle(it) },
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = Color(0xFF2E7D32)
+            )
         )
     }
 }

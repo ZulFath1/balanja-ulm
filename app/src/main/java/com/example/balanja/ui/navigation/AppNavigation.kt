@@ -223,7 +223,8 @@ fun AppNavigation() {
                     stallId = stallId,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateToReview = { id -> navController.navigate(Screen.WriteReview.createRoute(id)) },
-                    onNavigateToMap = { id -> navController.navigate(Screen.Map.createRoute(id)) }
+                    onNavigateToMap = { id -> navController.navigate(Screen.Map.createRoute(id)) },
+                    onNavigateToCommunityReview = { id -> navController.navigate(Screen.CommunityReview.createRoute(id)) }
                 )
             }
             composable(
@@ -231,7 +232,21 @@ fun AppNavigation() {
                 arguments = listOf(navArgument("stallId") { type = NavType.StringType })
             ) { backStackEntry ->
                 val stallId = backStackEntry.arguments?.getString("stallId") ?: ""
-                PlaceholderScreen("Community Review — $stallId")
+                val viewModel: com.example.balanja.presentation.review.CommunityReviewViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return com.example.balanja.presentation.review.CommunityReviewViewModel(
+                                AppContainer.getReviewsUseCase
+                            ) as T
+                        }
+                    }
+                )
+                com.example.balanja.presentation.review.CommunityReviewScreen(
+                    viewModel = viewModel,
+                    stallId = stallId,
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
             composable(
                 route = "write_review/{stallId}?reviewId={reviewId}",
