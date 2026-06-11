@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.border
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -71,189 +73,196 @@ fun WriteReviewScreen(
     }
 
     val attributeOptions = listOf(
-        "Harga Terjangkau",
+        "Porsi Banyak",
+        "Rasa Mantap",
+        "Cepat",
+        "Sesuai harga",
         "Pelayanan Baik",
-        "Rasa Enak",
-        "Lokasi Strategis",
-        "Bersih",
-        "Porsi Besar"
+        "Lokasi Strategis"
     )
+
+    val primaryColor = Color(0xFF870500)
+    val goldStarColor = Color(0xFFFFC107) // Golden yellow stars
+    val lightBackgroundColor = Color(0xFFFCF9F8)
+    val textColor = Color(0xFF222222)
+    val labelColor = Color(0xFF9E847C)
+    val selectedAttributeColor = Color(0xFFD32F2F) // Red secondary color
+    val selectedAttributeBg = Color(0xFFFFEBEE)
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Tulis Ulasan") },
+                title = { Text("Tulis Ulasan", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali", tint = primaryColor)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = BalanjaColor.Primary
+                    containerColor = lightBackgroundColor,
+                    titleContentColor = textColor
                 )
             )
         },
-        containerColor = Color(0xFFFBF9F8)
+        containerColor = lightBackgroundColor
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
-                .padding(20.dp)
+                .padding(horizontal = 24.dp)
         ) {
-            // Star Rating Section
-            Text(
-                text = "Rating Bintang",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF333333),
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            // Header Section
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                repeat(5) { index ->
-                    val starRating = index + 1
-                    IconButton(
-                        onClick = { viewModel.updateRating(starRating) },
-                        modifier = Modifier
-                            .weight(1f)
-                            .background(
-                                color = if (uiState.rating >= starRating)
-                                    Color(0xFFFFC107)
-                                else
-                                    Color(0xFFE0E0E0),
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
-                            )
-                    ) {
+                Text(
+                    text = "Ulasan",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Normal,
+                    color = textColor
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Penilaian anda akan mempermudah orang lain",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Star Rating
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    repeat(5) { index ->
+                        val starRating = index + 1
+                        val isSelected = uiState.rating >= starRating
                         Icon(
-                            Icons.Filled.Star,
+                            imageVector = Icons.Filled.Star,
                             contentDescription = "Star $starRating",
-                            tint = Color.White
+                            tint = if (isSelected) goldStarColor else Color(0xFFE8C6C3),
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clickable { viewModel.updateRating(starRating) }
                         )
                     }
                 }
             }
 
-            if (uiState.rating > 0) {
-                Text(
-                    text = "Rating: ${uiState.rating} dari 5 bintang",
-                    fontSize = 12.sp,
-                    color = Color(0xFF666666),
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             // Comment Section
             Text(
-                text = "Ulasan Anda",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF333333),
+                text = "DETAILKAN PENGALAMAN ANDA",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = labelColor,
+                letterSpacing = 1.sp,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
             OutlinedTextField(
                 value = uiState.comment,
                 onValueChange = { viewModel.updateComment(it) },
-                placeholder = { Text("Tulis pengalaman Anda...") },
+                placeholder = { Text("ketikkan di dalam sini", color = Color.LightGray) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp)
-                    .padding(bottom = 24.dp),
+                    .height(180.dp),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = BalanjaColor.Primary,
-                    unfocusedBorderColor = Color(0xFFDDDDDD)
+                    focusedBorderColor = primaryColor,
+                    unfocusedBorderColor = Color(0xFFEFE8E6),
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
                 )
             )
 
+            Spacer(modifier = Modifier.height(32.dp))
+
             // Attributes Section
             Text(
-                text = "Pilih Atribut (Opsional)",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF333333),
+                text = "QUICK ATTRIBUTES",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = labelColor,
+                letterSpacing = 1.sp,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
-            repeat((attributeOptions.size + 1) / 2) { row ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    repeat(2) { col ->
-                        val index = row * 2 + col
-                        if (index < attributeOptions.size) {
-                            val attribute = attributeOptions[index]
-                            val isSelected = uiState.selectedAttributes.contains(attribute)
+            @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+            androidx.compose.foundation.layout.FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                attributeOptions.forEach { attribute ->
+                    val isSelected = uiState.selectedAttributes.contains(attribute)
+                    Box(
+                        modifier = Modifier
+                            .clickable { viewModel.toggleAttribute(attribute) }
+                            .background(
+                                color = if (isSelected) selectedAttributeBg else Color.White,
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = if (isSelected) selectedAttributeColor else Color(0xFFEFE8E6),
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
+                            )
+                            .padding(horizontal = 16.dp, vertical = 10.dp)
+                    ) {
+                        Text(
+                            text = attribute,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isSelected) selectedAttributeColor else Color(0xFF333333)
+                        )
+                    }
+                }
+            }
 
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .background(
-                                        color = if (isSelected) Color(0xFFE8F5E9) else Color(0xFFF5F5F5),
-                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
-                                    )
-                                    .padding(12.dp)
-                            ) {
-                                Text(
-                                    text = attribute,
-                                    fontSize = 12.sp,
-                                    color = if (isSelected) BalanjaColor.Primary else Color(0xFF666666),
-                                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                                    modifier = Modifier
-                                        .align(Alignment.Center)
-                                        .let {
-                                            it.also {
-                                                // Make it clickable
-                                            }.clickable {
-                                                viewModel.toggleAttribute(attribute)
-                                            }
-                                        }
-                                )
-                            }
-                        } else {
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
+            Spacer(modifier = Modifier.height(48.dp))
+
+            // Error Message
+            if (uiState.error != null) {
+                Text(
+                    text = uiState.error!!,
+                    fontSize = 12.sp,
+                    color = Color.Red,
+                    modifier = Modifier.padding(bottom = 16.dp).align(Alignment.CenterHorizontally)
+                )
+            }
+
+            // Submit Button
+            androidx.compose.material3.Button(
+                onClick = { viewModel.submitReview() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = primaryColor
+                ),
+                enabled = !uiState.isSaving && uiState.rating > 0 && uiState.comment.isNotBlank()
+            ) {
+                if (uiState.isSaving) {
+                    androidx.compose.material3.CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = "Kirim Ulasan", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "▷", fontSize = 18.sp, fontWeight = FontWeight.Bold) // A simple play/arrow symbol
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-
-            // Error Message
-            if (uiState.error != null) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFFFEBEE), shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
-                        .padding(12.dp)
-                ) {
-                    Text(
-                        text = uiState.error!!,
-                        fontSize = 12.sp,
-                        color = Color(0xFFC62828)
-                    )
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-
-            // Submit Button
-            PrimaryButton(
-                text = "Simpan Ulasan",
-                onClick = { viewModel.submitReview() },
-                isLoading = uiState.isSaving,
-                enabled = !uiState.isSaving && uiState.rating > 0 && uiState.comment.isNotBlank()
-            )
         }
     }
 }
