@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,6 +24,8 @@ import com.example.balanja.domain.model.Stall
 @Composable
 fun StallCard(
     stall: Stall,
+    isFavorite: Boolean = false,
+    onToggleFavorite: ((String) -> Unit)? = null,
     onClick: (String) -> Unit
 ) {
     Card(
@@ -64,6 +68,24 @@ fun StallCard(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
+                }
+                // Tombol Favorit diletakkan di pojok kanan atas foto
+                if (onToggleFavorite != null) {
+                    IconButton(
+                        onClick = { onToggleFavorite(stall.id) },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                            .background(Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)
+                            .size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = "Favorit",
+                            tint = if (isFavorite) Color.Red else Color.Gray,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
 

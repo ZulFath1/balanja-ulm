@@ -1,253 +1,118 @@
-//package com.example.balanja.presentation.review
-//
-//import androidx.compose.foundation.background
-//import androidx.compose.foundation.layout.Arrangement
-//import androidx.compose.foundation.layout.Box
-//import androidx.compose.foundation.layout.Column
-//import androidx.compose.foundation.layout.Row
-//import androidx.compose.foundation.layout.Spacer
-//import androidx.compose.foundation.layout.fillMaxSize
-//import androidx.compose.foundation.layout.fillMaxWidth
-//import androidx.compose.foundation.layout.height
-//import androidx.compose.foundation.layout.padding
-//import androidx.compose.foundation.layout.width
-//import androidx.compose.foundation.rememberScrollState
-//import androidx.compose.foundation.verticalScroll
-//import androidx.compose.material.icons.Icons
-//import androidx.compose.material.icons.filled.ArrowBack
-//import androidx.compose.material.icons.filled.Star
-//import androidx.compose.material3.ExperimentalMaterial3Api
-//import androidx.compose.material3.Icon
-//import androidx.compose.material3.IconButton
-//import androidx.compose.material3.OutlinedTextField
-//import androidx.compose.material3.Scaffold
-//import androidx.compose.material3.Text
-//import androidx.compose.material3.TextFieldDefaults
-//import androidx.compose.material3.TopAppBar
-//import androidx.compose.material3.TopAppBarDefaults
-//import androidx.compose.runtime.Composable
-//import androidx.compose.runtime.collectAsState
-//import androidx.compose.runtime.getValue
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.graphics.Color
-//import androidx.compose.ui.text.font.FontWeight
-//import androidx.compose.ui.unit.dp
-//import androidx.compose.ui.unit.sp
-//import androidx.lifecycle.SavedStateHandle
-//import androidx.navigation.NavController
-//import com.example.balanja.ui.component.PrimaryButton
-//import com.example.balanja.ui.theme.BalanjaColor
-//
-///**
-// * BLJA-03: ULASAN/REVIEW Screen (Write Review)
-// *
-// * Allows users to submit text-based reviews with star ratings.
-// *
-// * Requirements:
-// * - Star rating selection (1-5)
-// * - Comment/review text input
-// * - Optional attribute tags
-// * - NO photo upload button
-// * - Save directly to Firebase Realtime Database
-// */
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun WriteReviewScreen(
-//    navController: NavController,
-//    stallId: String,
-//    reviewId: String? = null,
-//    viewModel: WriteReviewView  Model = WriteReviewViewModel(
-//        savedStateHandle = androidx.lifecycle.SavedStateHandle().apply {
-//            set("stallId", stallId)
-//            set("reviewId", reviewId)
-//        }
-//    )
-//) {
-//    val uiState by viewModel.uiState.collectAsState()
-//
-//    val attributeOptions = listOf(
-//        "Harga Terjangkau",
-//        "Pelayanan Baik",
-//        "Rasa Enak",
-//        "Lokasi Strategis",
-//        "Bersih",
-//        "Porsi Besar"
-//    )
-//
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = { Text("Tulis Ulasan") },
-//                navigationIcon = {
-//                    IconButton(onClick = { navController.popBackStack() }) {
-//                        Icon(Icons.Filled.ArrowBack, contentDescription = "Kembali")
-//                    }
-//                },
-//                colors = TopAppBarDefaults.topAppBarColors(
-//                    containerColor = BalanjaColor.Primary
-//                )
-//            )
-//        },
-//        containerColor = Color(0xFFFBF9F8)
-//    ) { innerPadding ->
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .verticalScroll(rememberScrollState())
-//                .padding(innerPadding)
-//                .padding(20.dp)
-//        ) {
-//            // Star Rating Section
-//            Text(
-//                text = "Rating Bintang",
-//                fontSize = 14.sp,
-//                fontWeight = FontWeight.SemiBold,
-//                color = Color(0xFF333333),
-//                modifier = Modifier.padding(bottom = 12.dp)
-//            )
-//
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(bottom = 24.dp),
-//                horizontalArrangement = Arrangement.spacedBy(8.dp)
-//            ) {
-//                repeat(5) { index ->
-//                    val starRating = index + 1
-//                    IconButton(
-//                        onClick = { viewModel.updateRating(starRating) },
-//                        modifier = Modifier
-//                            .weight(1f)
-//                            .background(
-//                                color = if (uiState.rating >= starRating)
-//                                    Color(0xFFFFC107)
-//                                else
-//                                    Color(0xFFE0E0E0),
-//                                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
-//                            )
-//                    ) {
-//                        Icon(
-//                            Icons.Filled.Star,
-//                            contentDescription = "Star $starRating",
-//                            tint = Color.White
-//                        )
-//                    }
-//                }
-//            }
-//
-//            if (uiState.rating > 0) {
-//                Text(
-//                    text = "Rating: ${uiState.rating} dari 5 bintang",
-//                    fontSize = 12.sp,
-//                    color = Color(0xFF666666),
-//                    modifier = Modifier.padding(bottom = 16.dp)
-//                )
-//            }
-//
-//            Spacer(modifier = Modifier.height(8.dp))
-//
-//            // Comment Section
-//            Text(
-//                text = "Ulasan Anda",
-//                fontSize = 14.sp,
-//                fontWeight = FontWeight.SemiBold,
-//                color = Color(0xFF333333),
-//                modifier = Modifier.padding(bottom = 12.dp)
-//            )
-//
-//            OutlinedTextField(
-//                value = uiState.comment,
-//                onValueChange = { viewModel.updateComment(it) },
-//                placeholder = { Text("Tulis pengalaman Anda...") },
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(140.dp)
-//                    .padding(bottom = 24.dp),
-//                colors = TextFieldDefaults.colors(
-//                    focusedIndicatorColor = BalanjaColor.Primary,
-//                    unfocusedIndicatorColor = Color(0xFFDDDDDD)
-//                )
-//            )
-//
-//            // Attributes Section
-//            Text(
-//                text = "Pilih Atribut (Opsional)",
-//                fontSize = 14.sp,
-//                fontWeight = FontWeight.SemiBold,
-//                color = Color(0xFF333333),
-//                modifier = Modifier.padding(bottom = 12.dp)
-//            )
-//
-//            repeat((attributeOptions.size + 1) / 2) { row ->
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(bottom = 12.dp),
-//                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-//                ) {
-//                    repeat(2) { col ->
-//                        val index = row * 2 + col
-//                        if (index < attributeOptions.size) {
-//                            val attribute = attributeOptions[index]
-//                            val isSelected = uiState.selectedAttributes.contains(attribute)
-//
-//                            Box(
-//                                modifier = Modifier
-//                                    .weight(1f)
-//                                    .background(
-//                                        color = if (isSelected) Color(0xFFE8F5E9) else Color(0xFFF5F5F5),
-//                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
-//                                    )
-//                                    .padding(12.dp)
-//                            ) {
-//                                Text(
-//                                    text = attribute,
-//                                    fontSize = 12.sp,
-//                                    color = if (isSelected) BalanjaColor.Primary else Color(0xFF666666),
-//                                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-//                                    modifier = Modifier
-//                                        .align(Alignment.Center)
-//                                        .let {
-//                                            it.also {
-//                                                // Make it clickable
-//                                            }
-//                                        }
-//                                )
-//                            }
-//                        } else {
-//                            Spacer(modifier = Modifier.weight(1f))
-//                        }
-//                    }
-//                }
-//            }
-//
-//            Spacer(modifier = Modifier.height(24.dp))
-//
-//            // Error Message
-//            if (uiState.error != null) {
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .background(Color(0xFFFFEBEE), shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
-//                        .padding(12.dp)
-//                ) {
-//                    Text(
-//                        text = uiState.error!!,
-//                        fontSize = 12.sp,
-//                        color = Color(0xFFC62828)
-//                    )
-//                }
-//                Spacer(modifier = Modifier.height(12.dp))
-//            }
-//
-//            // Submit Button
-//            PrimaryButton(
-//                text = "Simpan Ulasan",
-//                onClick = { viewModel.submitReview() },
-//                isLoading = uiState.isSaving,
-//                enabled = !uiState.isSaving && uiState.rating > 0 && uiState.comment.isNotBlank()
-//            )
-//        }
-//    }
-//}
+package com.example.balanja.presentation.review
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.balanja.domain.model.Review
+import com.example.balanja.domain.repository.AuthRepository
+import com.example.balanja.domain.usecase.AddReviewUseCase
+import com.example.balanja.domain.usecase.EditReviewUseCase
+import com.example.balanja.domain.usecase.GetReviewsUseCase
+import com.example.balanja.domain.usecase.RecalculateStallRatingUseCase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+data class WriteReviewUiState(
+    val rating: Int = 0,
+    val comment: String = "",
+    val selectedAttributes: List<String> = emptyList(),
+    val isSaving: Boolean = false,
+    val error: String? = null,
+    val isSuccess: Boolean = false
+)
+
+class WriteReviewViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val addReviewUseCase: AddReviewUseCase,
+    private val editReviewUseCase: EditReviewUseCase,
+    private val getReviewsUseCase: GetReviewsUseCase,
+    private val recalculateStallRatingUseCase: RecalculateStallRatingUseCase,
+    private val authRepository: AuthRepository
+) : ViewModel() {
+
+    private val stallId: String = checkNotNull(savedStateHandle["stallId"])
+    private val reviewId: String? = savedStateHandle["reviewId"]
+
+    private val _uiState = MutableStateFlow(WriteReviewUiState())
+    val uiState: StateFlow<WriteReviewUiState> = _uiState.asStateFlow()
+
+    init {
+        if (reviewId != null) {
+            loadExistingReview(stallId, reviewId)
+        }
+    }
+
+    private fun loadExistingReview(stallId: String, reviewId: String) {
+        viewModelScope.launch {
+            val reviews = getReviewsUseCase(stallId).firstOrNull()
+            val review = reviews?.find { it.id == reviewId }
+            review?.let {
+                _uiState.update { state ->
+                    state.copy(
+                        rating = it.rating,
+                        comment = it.comment,
+                        selectedAttributes = it.attributes
+                    )
+                }
+            }
+        }
+    }
+
+    fun updateRating(rating: Int) {
+        _uiState.update { it.copy(rating = rating) }
+    }
+
+    fun updateComment(comment: String) {
+        _uiState.update { it.copy(comment = comment) }
+    }
+
+    fun toggleAttribute(attribute: String) {
+        _uiState.update { state ->
+            val current = state.selectedAttributes.toMutableList()
+            if (current.contains(attribute)) {
+                current.remove(attribute)
+            } else {
+                current.add(attribute)
+            }
+            state.copy(selectedAttributes = current)
+        }
+    }
+
+    fun submitReview() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true, error = null) }
+            val currentUserUid = authRepository.getCurrentUserId()
+            if (currentUserUid == null) {
+                _uiState.update { it.copy(isSaving = false, error = "User not logged in") }
+                return@launch
+            }
+            
+            val review = Review(
+                userId = currentUserUid,
+                userName = "Pengguna", // Or fetch from profile
+                rating = _uiState.value.rating,
+                comment = _uiState.value.comment,
+                attributes = _uiState.value.selectedAttributes,
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis()
+            )
+
+            val result = if (reviewId != null) {
+                editReviewUseCase(stallId, reviewId, review)
+            } else {
+                addReviewUseCase(stallId, review)
+            }
+
+            result.onSuccess {
+                recalculateStallRatingUseCase(stallId)
+                _uiState.update { it.copy(isSaving = false, isSuccess = true) }
+            }.onFailure { e ->
+                _uiState.update { it.copy(isSaving = false, error = e.message ?: "Failed to save review") }
+            }
+        }
+    }
+}

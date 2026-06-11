@@ -13,13 +13,14 @@ import kotlinx.coroutines.launch
 
 sealed interface StallDetailUiState {
     object Loading : StallDetailUiState
-    data class Success(val stall: Stall) : StallDetailUiState
+    data class Success(val stall: Stall, val reviews: List<com.example.balanja.domain.model.Review> = emptyList()) : StallDetailUiState
     data class Error(val message: String) : StallDetailUiState
 }
 
 class StallDetailViewModel(
     private val getStallDetailUseCase: GetStallDetailUseCase,
-    private val toggleStallStatusUseCase: ToggleStallStatusUseCase
+    private val toggleStallStatusUseCase: ToggleStallStatusUseCase,
+    private val getReviewsUseCase: com.example.balanja.domain.usecase.GetReviewsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<StallDetailUiState>(StallDetailUiState.Loading)
@@ -35,7 +36,9 @@ class StallDetailViewModel(
                 }
                 .collect { stall ->
                     if (stall != null) {
-                        _uiState.value = StallDetailUiState.Success(stall)
+                        getReviewsUseCase(stallId).collect { reviews ->
+                            _uiState.value = StallDetailUiState.Success(stall, reviews)
+                        }
                     } else {
                         _uiState.value = StallDetailUiState.Error("Stan tidak ditemukan.")
                     }

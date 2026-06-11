@@ -125,14 +125,27 @@ fun HomeScreen(
                     }
                     is HomeUiState.Success -> {
                         val stalls = (uiState as HomeUiState.Success).stalls
-                        LazyColumn(
-                            contentPadding = PaddingValues(bottom = 80.dp)
-                        ) {
-                            items(stalls) { stall ->
-                                StallCard(
-                                    stall = stall,
-                                    onClick = { stallId -> onNavigateToDetail(stallId) }
+                        if (stalls.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Belum ada pedagang yang terdaftar.",
+                                    color = Color.Gray,
+                                    fontSize = 16.sp
                                 )
+                            }
+                        } else {
+                            LazyColumn(
+                                contentPadding = PaddingValues(bottom = 80.dp)
+                            ) {
+                                items(stalls) { stall ->
+                                    StallCard(
+                                        stall = stall,
+                                        onClick = { stallId -> onNavigateToDetail(stallId) }
+                                    )
+                                }
                             }
                         }
                     }
