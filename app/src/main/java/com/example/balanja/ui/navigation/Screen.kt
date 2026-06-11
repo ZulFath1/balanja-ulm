@@ -3,6 +3,7 @@ package com.example.balanja.ui.navigation
 sealed class Screen(val route: String) {
     // Layar tanpa bottom nav
     object Login : Screen("login")
+    object Register : Screen("register")
 
     // Layar dengan bottom nav (4 tab utama)
     object Home      : Screen("home")

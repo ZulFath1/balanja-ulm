@@ -51,6 +51,7 @@ class AuthViewModelFactory(
 
 val screensWithoutBottomNav = listOf(
     Screen.Login.route,
+    Screen.Register.route,
     Screen.StallDetail.route,
     Screen.CommunityReview.route,
     Screen.WriteReview.route,
@@ -89,6 +90,31 @@ fun AppNavigation() {
                         navController.navigate(Screen.Home.route) {
                             popUpTo(Screen.Login.route) { inclusive = true }
                         }
+                    },
+                    onNavigateToRegister = {
+                        navController.navigate(Screen.Register.route)
+                    }
+                )
+            }
+
+            composable(Screen.Register.route) {
+                val registerViewModel: com.example.balanja.presentation.auth.RegisterViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return com.example.balanja.presentation.auth.RegisterViewModel(AppContainer.signUpUseCase) as T
+                        }
+                    }
+                )
+                com.example.balanja.presentation.auth.RegisterScreen(
+                    viewModel = registerViewModel,
+                    onNavigateToHome = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateToLogin = {
+                        navController.popBackStack()
                     }
                 )
             }
