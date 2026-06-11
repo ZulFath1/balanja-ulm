@@ -39,11 +39,26 @@ fun HomeScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
+    @OptIn(ExperimentalMaterial3Api::class)
+    androidx.compose.material3.pulltorefresh.PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            isRefreshing = true
+            viewModel.onRefresh()
+        },
+        modifier = Modifier.fillMaxSize()
+    ) {
+            val favoritesList by viewModel.favorites.collectAsStateWithLifecycle()
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
+            ) {
+                // Header
+                item {
+                    Column(modifier = Modifier.padding(bottom = 16.dp)) {
                         Text(
                             text = "Selamat Pagi!",
                             fontWeight = FontWeight.Bold,
@@ -64,95 +79,69 @@ fun HomeScreen(
                             fontSize = 20.sp
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF9F8))
-            )
-        },
-        containerColor = Color(0xFFFBF9F8)
-    ) { paddingValues ->
+                }
 
-        @OptIn(ExperimentalMaterial3Api::class)
-        androidx.compose.material3.pulltorefresh.PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = {
-                isRefreshing = true
-                viewModel.onRefresh()
-            },
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-            ) {
-                // ── Widget Cuaca aktif (menggantikan placeholder BLJA-09) ─────
-                Spacer(modifier = Modifier.height(8.dp))
-                WeatherWidget(
-                    uiState = weatherState,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                // Weather Widget
+                item {
+                    WeatherWidget(
+                        uiState = weatherState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    )
+                }
 
-                // ── Daftar Stan (tidak berubah) ───────────────────────────────
-                when (uiState) {
+                when (val state = uiState) {
                     is HomeUiState.Loading -> {
-                        LazyColumn(
-                            contentPadding = PaddingValues(bottom = 80.dp)
-                        ) {
-                            items(5) { // Show 5 skeletons while loading
-                                com.example.balanja.ui.component.StallCardSkeleton()
-                            }
+                        items(5) {
+                            com.example.balanja.ui.component.StallCardSkeleton()
                         }
                     }
                     is HomeUiState.Error -> {
-                        val errorMessage = (uiState as HomeUiState.Error).message
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            com.example.balanja.ui.component.EmptyStateComponent(
-                                icon = androidx.compose.material.icons.Icons.Default.Search,
-                                title = "Gagal Memuat",
-                                subtitle = errorMessage,
-                                actionLabel = "Coba Lagi",
-                                onAction = { viewModel.fetchStalls() }
-                            )
-                        }
-                    }
-                    is HomeUiState.Success -> {
-                        val stalls = (uiState as HomeUiState.Success).stalls
-                        if (stalls.isEmpty()) {
+                        item {
                             Box(
-                                modifier = Modifier.fillMaxSize(),
+                                modifier = Modifier.fillParentMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
                                 com.example.balanja.ui.component.EmptyStateComponent(
                                     icon = androidx.compose.material.icons.Icons.Default.Search,
-                                    title = "Belum Ada Stan",
-                                    subtitle = "Belum ada pedagang yang terdaftar."
+                                    title = "Gagal Memuat",
+                                    subtitle = state.message,
+                                    actionLabel = "Coba Lagi",
+                                    onAction = { viewModel.fetchStalls() }
                                 )
                             }
-                        } else {
-                            val favoritesList by viewModel.favorites.collectAsStateWithLifecycle()
-                            LazyColumn(
-                                contentPadding = PaddingValues(bottom = 80.dp)
-                            ) {
-                                items(stalls) { stall ->
-                                    val isFavorite = favoritesList.any { it.stallId == stall.id }
-                                    StallCard(
-                                        stall = stall,
-                                        isFavorite = isFavorite,
-                                        onToggleFavorite = { viewModel.toggleFavorite(stall) },
-                                        onClick = { stallId -> onNavigateToDetail(stallId) }
+                        }
+                    }
+                    is HomeUiState.Success -> {
+                        val stalls = state.stalls
+                        if (stalls.isEmpty()) {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillParentMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    com.example.balanja.ui.component.EmptyStateComponent(
+                                        icon = androidx.compose.material.icons.Icons.Default.Search,
+                                        title = "Belum Ada Stan",
+                                        subtitle = "Belum ada pedagang yang terdaftar."
                                     )
                                 }
+                            }
+                        } else {
+                            items(stalls) { stall ->
+                                val isFavorite = favoritesList.any { it.stallId == stall.id }
+                                StallCard(
+                                    stall = stall,
+                                    isFavorite = isFavorite,
+                                    onToggleFavorite = { viewModel.toggleFavorite(stall) },
+                                    onClick = { stallId -> onNavigateToDetail(stallId) }
+                                )
                             }
                         }
                     }
                 }
             }
-        }
+
     }
 }
