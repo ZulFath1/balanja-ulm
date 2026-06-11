@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -79,6 +80,13 @@ fun MapScreen(viewModel: MapViewModel) {
         }
     }
 
+    LaunchedEffect(uiState.selectedStallLocation) {
+        val selectedStall = uiState.selectedStallLocation
+        if (selectedStall != null && selectedStall.latitude != 0.0 && selectedStall.longitude != 0.0) {
+            mapView.controller.animateTo(GeoPoint(selectedStall.latitude, selectedStall.longitude), 18.0, 1000L)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -112,12 +120,6 @@ fun MapScreen(viewModel: MapViewModel) {
                                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                                 view.overlays.add(marker)
                             }
-                        }
-
-                        // Center on selected stall if it has valid coordinates
-                        val selectedStall = uiState.selectedStallLocation
-                        if (selectedStall != null && selectedStall.latitude != 0.0 && selectedStall.longitude != 0.0) {
-                            view.controller.animateTo(GeoPoint(selectedStall.latitude, selectedStall.longitude), 18.0, 1000L)
                         }
 
                         view.invalidate()
