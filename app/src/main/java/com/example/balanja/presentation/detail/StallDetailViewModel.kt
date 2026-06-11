@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.balanja.domain.model.Stall
 import com.example.balanja.domain.usecase.GetStallDetailUseCase
+import com.example.balanja.domain.usecase.ToggleStallStatusUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +18,8 @@ sealed interface StallDetailUiState {
 }
 
 class StallDetailViewModel(
-    private val getStallDetailUseCase: GetStallDetailUseCase
+    private val getStallDetailUseCase: GetStallDetailUseCase,
+    private val toggleStallStatusUseCase: ToggleStallStatusUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<StallDetailUiState>(StallDetailUiState.Loading)
@@ -37,6 +39,24 @@ class StallDetailViewModel(
                     } else {
                         _uiState.value = StallDetailUiState.Error("Stan tidak ditemukan.")
                     }
+                }
+        }
+    }
+
+    fun toggleStatus(stallId: String, currentStatus: Boolean) {
+        viewModelScope.launch {
+            val newStatus = !currentStatus
+            toggleStallStatusUseCase(stallId, newStatus)
+                .onSuccess {
+                    val currentState = _uiState.value
+                    if (currentState is StallDetailUiState.Success) {
+                        _uiState.value = StallDetailUiState.Success(
+                            currentState.stall.copy(isOpen = newStatus)
+                        )
+                    }
+                }
+                .onFailure {
+                    // Jika gagal, Anda bisa menambahkan logika notifikasi error di sini
                 }
         }
     }

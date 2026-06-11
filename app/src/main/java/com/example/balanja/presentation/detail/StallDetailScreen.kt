@@ -92,6 +92,12 @@ fun StallDetailScreen(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         item {
+                            StallStatusToggle(
+                                isOpen = stall.isOpen,
+                                onToggle = { newStatus ->
+                                    viewModel.toggleStatus(stall.id, stall.isOpen)
+                                }
+                            )
                             AsyncImage(
                                 model = stall.imageUrl,
                                 contentDescription = "Foto ${stall.name}",
@@ -237,5 +243,30 @@ fun MenuItemRow(menuItem: MenuItem) {
                 color = Color(0xFF870500)
             )
         }
+    }
+}
+
+@Composable
+fun StallStatusToggle(
+    isOpen: Boolean,
+    onToggle: (Boolean) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .background(Color(0xFFF3F4F6), RoundedCornerShape(12.dp))
+            .padding(16.dp)
+    ) {
+        Text(
+            text = if (isOpen) "Warung Sedang BUKA" else "Warung Sedang TUTUP",
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
+        Switch(
+            checked = isOpen,
+            onCheckedChange = { onToggle(it) }
+        )
     }
 }

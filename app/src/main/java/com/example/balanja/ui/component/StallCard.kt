@@ -34,6 +34,7 @@ fun StallCard(
         onClick = { onClick(stall.id) }
     ) {
         Column {
+            // --- Foto Stan & Badge Status ---
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -45,8 +46,28 @@ fun StallCard(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
+
+                // Badge BUKA / TUTUP diletakkan di pojok kiri atas foto
+                val badgeColor = if (stall.isOpen) Color(0xFF10B981) else Color(0xFFEF4444) // Hijau jika Buka, Merah jika Tutup
+                val badgeText = if (stall.isOpen) "BUKA" else "TUTUP"
+
+                Box(
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .background(badgeColor, RoundedCornerShape(8.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .align(Alignment.TopStart)
+                ) {
+                    Text(
+                        text = badgeText,
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
             }
 
+            // --- Informasi Stan ---
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
