@@ -21,7 +21,10 @@ sealed interface HomeUiState {
 
 class HomeViewModel(
     private val getAllStallsUseCase: GetAllStallsUseCase,
-    private val getCampusWeatherUseCase: GetCampusWeatherUseCase
+    private val getCampusWeatherUseCase: GetCampusWeatherUseCase,
+    private val getFavoritesUseCase: com.example.balanja.domain.usecase.GetFavoritesUseCase,
+    private val addFavoriteUseCase: com.example.balanja.domain.usecase.AddFavoriteUseCase,
+    private val deleteFavoriteUseCase: com.example.balanja.domain.usecase.DeleteFavoriteUseCase
 ) : ViewModel() {
 
     // ─── Stall state ──────────────────────────────────────────────────────────
@@ -37,6 +40,7 @@ class HomeViewModel(
     init {
         fetchStalls()
         fetchWeather()
+        fetchFavorites()
     }
 
     // ─── Stall ────────────────────────────────────────────────────────────────
@@ -68,6 +72,41 @@ class HomeViewModel(
                         error.message ?: "Gagal memuat data cuaca"
                     )
                 }
+        }
+    }
+
+    // ─── Favorites ────────────────────────────────────────────────────────────
+
+    private val _favorites = MutableStateFlow<List<com.example.balanja.domain.model.FavoriteStall>>(emptyList())
+    val favorites: StateFlow<List<com.example.balanja.domain.model.FavoriteStall>> = _favorites.asStateFlow()
+
+    private fun fetchFavorites() {
+        viewModelScope.launch {
+            getFavoritesUseCase().collect { favs ->
+                _favorites.value = favs
+            }
+        }
+    }
+
+    fun toggleFavorite(stall: Stall) {
+        viewModelScope.launch {
+            val isFav = _favorites.value.any { it.stallId == stall.id }
+            if (isFav) {
+                deleteFavoriteUseCase(stall.id)
+            } else {
+                val fav = com.example.balanja.domain.model.FavoriteStall(
+                    stallId = stall.id,
+                    name = stall.name,
+                    imageUrl = stall.imageUrl,
+                    location = stall.location,
+                    ratingAverage = stall.rating,
+                    priceMin = stall.priceMin.toInt(),
+                    priceMax = stall.priceMax.toInt(),
+                    isOpen = stall.isOpen,
+                    savedAt = System.currentTimeMillis()
+                )
+                addFavoriteUseCase(fav)
+            }
         }
     }
 

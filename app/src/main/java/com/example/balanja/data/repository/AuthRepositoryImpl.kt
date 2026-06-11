@@ -11,6 +11,31 @@ class AuthRepositoryImpl(
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
 ) : AuthRepository {
     
+    override suspend fun signUp(email: String, password: String): Result<User> {
+        return try {
+            val authResult = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+            val firebaseUser = authResult.user
+            
+            if (firebaseUser != null) {
+                val user = User(
+                    id = firebaseUser.uid,
+                    email = firebaseUser.email ?: "",
+                    name = firebaseUser.displayName ?: email.split("@")[0],
+                    createdAt = firebaseUser.metadata?.creationTimestamp ?: System.currentTimeMillis()
+                )
+                Result.success(user)
+            } else {
+                Result.failure(Exception("Registrasi gagal: User tidak dapat dibuat"))
+            }
+        } catch (e: com.google.firebase.auth.FirebaseAuthUserCollisionException) {
+            Result.failure(Exception("Email sudah terdaftar. Silakan gunakan email lain atau login."))
+        } catch (e: com.google.firebase.auth.FirebaseAuthWeakPasswordException) {
+            Result.failure(Exception("Kata sandi terlalu lemah. Minimal 6 karakter."))
+        } catch (e: Exception) {
+            Result.failure(Exception("Gagal mendaftar: ${e.message}"))
+        }
+    }
+
     override suspend fun signIn(email: String, password: String): Result<User> {
         return try {
             val authResult = firebaseAuth.signInWithEmailAndPassword(email, password).await()

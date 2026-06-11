@@ -9,46 +9,36 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun LoginScreen(
-    viewModel: AuthViewModel,
+fun RegisterScreen(
+    viewModel: RegisterViewModel,
     onNavigateToHome: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    onNavigateToLogin: () -> Unit
 ) {
-    // Membaca state dari ViewModel
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // State lokal untuk input form
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
+    var isConfirmPasswordVisible by remember { mutableStateOf(false) }
 
-    // Warna dari Design Guideline
     val primaryColor = Color(0xFF870500)
     val goldColor = Color(0xFF836F1E)
     val backgroundColor = Color(0xFFFBF9F8)
 
-    // Efek navigasi ketika login berhasil
-    LaunchedEffect(uiState) {
-        if (uiState is AuthUiState.Success) {
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
             onNavigateToHome()
         }
     }
@@ -63,9 +53,8 @@ fun LoginScreen(
     ) {
         Spacer(modifier = Modifier.weight(1f))
 
-        // --- Bagian Header ---
         Text(
-            text = "Balanja",
+            text = "Daftar Akun",
             fontSize = 32.sp,
             fontWeight = FontWeight.ExtraBold,
             color = primaryColor
@@ -80,13 +69,13 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Selamat Datang Civitas ULM",
+            text = "Bergabung Bersama Kami",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
         )
         Text(
-            text = "Akses kuliner terbaik di lingkungan kampus teknik dengan akun Anda.",
+            text = "Hanya gunakan email @mhs.ulm.ac.id atau @ulm.ac.id",
             fontSize = 14.sp,
             color = Color.DarkGray,
             textAlign = TextAlign.Center,
@@ -95,12 +84,11 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- Bagian Form Input ---
         BalanjaTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = "Email Pengguna",
-            placeholder = "Masukkan email",
+            value = uiState.email,
+            onValueChange = { viewModel.updateEmail(it) },
+            label = "Email ULM",
+            placeholder = "Masukkan email ULM Anda",
             leadingIcon = Icons.Default.School,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
@@ -111,31 +99,47 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         BalanjaTextField(
-            value = password,
-            onValueChange = { password = it },
+            value = uiState.password,
+            onValueChange = { viewModel.updatePassword(it) },
             label = "Kata Sandi",
-            placeholder = "Masukkan kata sandi",
+            placeholder = "Buat kata sandi baru",
             leadingIcon = Icons.Default.Lock,
             isPassword = true,
             isPasswordVisible = isPasswordVisible,
             onVisibilityToggle = { isPasswordVisible = !isPasswordVisible },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Next
+            )
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        BalanjaTextField(
+            value = uiState.confirmPassword,
+            onValueChange = { viewModel.updateConfirmPassword(it) },
+            label = "Konfirmasi Kata Sandi",
+            placeholder = "Ulangi kata sandi",
+            leadingIcon = Icons.Default.Lock,
+            isPassword = true,
+            isPasswordVisible = isConfirmPasswordVisible,
+            onVisibilityToggle = { isConfirmPasswordVisible = !isConfirmPasswordVisible },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    if (email.isNotBlank() && password.isNotBlank()) {
-                        viewModel.signIn(email, password)
+                    if (uiState.email.isNotBlank() && uiState.password.isNotBlank() && uiState.confirmPassword.isNotBlank()) {
+                        viewModel.register()
                     }
                 }
             )
         )
 
-        // Menampilkan pesan error jika login gagal
-        if (uiState is AuthUiState.Error) {
+        if (uiState.error != null) {
             Text(
-                text = (uiState as AuthUiState.Error).message,
+                text = uiState.error!!,
                 color = Color.Red,
                 fontSize = 12.sp,
                 modifier = Modifier
@@ -147,39 +151,37 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- Tombol Utama ---
         Button(
-            onClick = { viewModel.signIn(email, password) },
+            onClick = { viewModel.register() },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
-            enabled = uiState !is AuthUiState.Loading && email.isNotBlank() && password.isNotBlank()
+            enabled = !uiState.isLoading && uiState.email.isNotBlank() && uiState.password.isNotBlank() && uiState.confirmPassword.isNotBlank()
         ) {
-            if (uiState is AuthUiState.Loading) {
+            if (uiState.isLoading) {
                 CircularProgressIndicator(
                     color = Color.White,
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp
                 )
             } else {
-                Text(text = "Login →", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Daftar Akun →", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Belum punya akun? Daftar di sini",
+            text = "Sudah punya akun? Login di sini",
             color = primaryColor,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.clickable { onNavigateToRegister() }
+            modifier = Modifier.clickable { onNavigateToLogin() }
         )
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // --- Footer ---
         Text(
             text = "PRIVACY · TERMS · HELP",
             fontSize = 12.sp,
@@ -194,46 +196,4 @@ fun LoginScreen(
             modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
         )
     }
-}
-
-// --- Komponen Reusable Text Field ---
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun BalanjaTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    placeholder: String,
-    leadingIcon: ImageVector,
-    isPassword: Boolean = false,
-    isPasswordVisible: Boolean = false,
-    onVisibilityToggle: () -> Unit = {},
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        placeholder = { Text(placeholder) },
-        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = Color.Gray) },
-        trailingIcon = {
-            if (isPassword) {
-                IconButton(onClick = onVisibilityToggle) {
-                    val icon = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                    Icon(imageVector = icon, contentDescription = "Toggle Password Visibility", tint = Color.Gray)
-                }
-            }
-        },
-        visualTransformation = if (isPassword && !isPasswordVisible) PasswordVisualTransformation() else VisualTransformation.None,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp),
-        colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color(0xFF870500),
-            cursorColor = Color(0xFF870500)
-        ),
-        modifier = Modifier.fillMaxWidth()
-    )
 }

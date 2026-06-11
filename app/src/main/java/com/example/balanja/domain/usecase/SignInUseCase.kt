@@ -15,6 +15,11 @@ class SignInUseCase(
             return Result.failure(Exception("Email dan kata sandi tidak boleh kosong."))
         }
 
+        // Validasi domain email ULM
+        if (!email.endsWith("@mhs.ulm.ac.id") && !email.endsWith("@ulm.ac.id")) {
+            return Result.failure(Exception("Hanya email dengan domain @mhs.ulm.ac.id atau @ulm.ac.id yang diizinkan untuk masuk."))
+        }
+
         return authRepository.signIn(email, password)
     }
 }

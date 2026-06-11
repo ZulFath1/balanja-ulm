@@ -54,6 +54,7 @@ object AppContainer {
     // ─── Use Cases ────────────────────────────────────────────────────────────
 
     val signInUseCase by lazy { SignInUseCase(authRepository) }
+    val signUpUseCase by lazy { com.example.balanja.domain.usecase.SignUpUseCase(authRepository) }
     val getAllStallsUseCase by lazy { GetAllStallsUseCase(stallRepository) }
     val getStallDetailUseCase by lazy { GetStallDetailUseCase(stallRepository) }
     val toggleStallStatusUseCase by lazy { ToggleStallStatusUseCase(stallRepository) }
@@ -61,6 +62,7 @@ object AppContainer {
     val addFavoriteUseCase by lazy { AddFavoriteUseCase(favoriteRepository) }
     val getFavoritesUseCase by lazy { GetFavoritesUseCase(favoriteRepository) }
     val deleteFavoriteUseCase by lazy { DeleteFavoriteUseCase(favoriteRepository) }
+    val isFavoriteUseCase by lazy { IsFavoriteUseCase(favoriteRepository) }
     
     val addReviewUseCase by lazy { AddReviewUseCase(reviewRepository) }
     val editReviewUseCase by lazy { EditReviewUseCase(reviewRepository) }

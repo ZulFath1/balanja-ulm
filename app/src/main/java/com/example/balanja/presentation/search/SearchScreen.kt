@@ -4,41 +4,32 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.balanja.ui.component.FilterChipRow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.balanja.ui.component.StallCard
-import com.example.balanja.ui.component.BudgetFilterRow
+import com.example.balanja.ui.component.EmptyStateComponent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel,
-    onNavigateBack: () -> Unit,
     onNavigateToDetail: (String) -> Unit
 ) {
-    val query by viewModel.searchQuery.collectAsState()
-    val stalls by viewModel.filteredStalls.collectAsState()
-    val selectedRating by viewModel.selectedRating.collectAsState()
-    val maxPrice by viewModel.maxPrice.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Cari Warung", fontSize = 18.sp, fontWeight = FontWeight.SemiBold) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Kembali")
-                    }
-                },
+                title = { Text("Pencarian", fontSize = 18.sp, fontWeight = FontWeight.SemiBold) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF9F8))
             )
         },
@@ -46,60 +37,74 @@ fun SearchScreen(
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(paddingValues)
                 .fillMaxSize()
+                .padding(paddingValues)
                 .padding(horizontal = 16.dp)
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Search Input Field
             OutlinedTextField(
-                value = query,
+                value = uiState.searchQuery,
                 onValueChange = { viewModel.onSearchQueryChange(it) },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Cari warung, menu, atau lokasi...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                singleLine = true,
+                placeholder = { Text("Ketik nama warung...") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Ikon Cari",
+                        tint = Color.Gray
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
                 shape = MaterialTheme.shapes.medium,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
-                )
-            )
-
-
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            FilterChipRow(
-                selectedRating = selectedRating,
-                onFilterChange = { viewModel.onRatingFilterChange(it) }
+                    focusedBorderColor = Color(0xFF870500),
+                    focusedLabelColor = Color(0xFF870500),
+                    cursorColor = Color(0xFF870500)
+                ),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            BudgetFilterRow(
-                maxPrice = maxPrice,
-                onPriceChange = { viewModel.onPriceFilterChange(it) }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Hasil Pencarian
-            if (stalls.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Warung tidak ditemukan", color = Color.Gray)
+            when {
+                uiState.isLoading -> {
+                    LazyColumn(
+                        contentPadding = PaddingValues(bottom = 80.dp)
+                    ) {
+                        items(5) {
+                            com.example.balanja.ui.component.StallCardSkeleton()
+                        }
+                    }
                 }
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(bottom = 16.dp)
-                ) {
-                    items(stalls, key = { it.id }) { stall ->
-                        StallCard(
-                            stall = stall,
-                            onClick = { onNavigateToDetail(stall.id) }
-                        )
+                uiState.error != null -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = uiState.error!!, color = Color.Red)
+                    }
+                }
+                uiState.searchQuery.isBlank() -> {
+                    EmptyStateComponent(
+                        icon = Icons.Default.Search,
+                        title = "Mulai Pencarian",
+                        subtitle = "Ketik nama warung atau pedagang yang ingin Anda cari di atas."
+                    )
+                }
+                uiState.filteredStalls.isEmpty() -> {
+                    EmptyStateComponent(
+                        icon = Icons.Default.Search,
+                        title = "Warung Tidak Ditemukan",
+                        subtitle = "Coba gunakan kata kunci lain yang lebih umum."
+                    )
+                }
+                else -> {
+                    LazyColumn(
+                        contentPadding = PaddingValues(bottom = 80.dp)
+                    ) {
+                        items(uiState.filteredStalls) { stall ->
+                            StallCard(
+                                stall = stall,
+                                onClick = { onNavigateToDetail(it) }
+                            )
+                        }
                     }
                 }
             }

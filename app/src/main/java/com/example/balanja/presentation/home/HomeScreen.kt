@@ -3,6 +3,8 @@ package com.example.balanja.presentation.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,7 +28,7 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToDetail: (String) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val weatherState by viewModel.weatherState.collectAsStateWithLifecycle()
 
     // Pull-to-refresh state — selesai saat kedua state bukan Loading
@@ -96,11 +98,12 @@ fun HomeScreen(
                 // ── Daftar Stan (tidak berubah) ───────────────────────────────
                 when (uiState) {
                     is HomeUiState.Loading -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
+                        LazyColumn(
+                            contentPadding = PaddingValues(bottom = 80.dp)
                         ) {
-                            CircularProgressIndicator(color = Color(0xFF870500))
+                            items(5) { // Show 5 skeletons while loading
+                                com.example.balanja.ui.component.StallCardSkeleton()
+                            }
                         }
                     }
                     is HomeUiState.Error -> {
@@ -109,18 +112,13 @@ fun HomeScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(text = errorMessage, color = Color.Red)
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Button(
-                                    onClick = { viewModel.fetchStalls() },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(0xFF870500)
-                                    )
-                                ) {
-                                    Text("Coba Lagi")
-                                }
-                            }
+                            com.example.balanja.ui.component.EmptyStateComponent(
+                                icon = androidx.compose.material.icons.Icons.Default.Search,
+                                title = "Gagal Memuat",
+                                subtitle = errorMessage,
+                                actionLabel = "Coba Lagi",
+                                onAction = { viewModel.fetchStalls() }
+                            )
                         }
                     }
                     is HomeUiState.Success -> {
@@ -130,19 +128,23 @@ fun HomeScreen(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = "Belum ada pedagang yang terdaftar.",
-                                    color = Color.Gray,
-                                    fontSize = 16.sp
+                                com.example.balanja.ui.component.EmptyStateComponent(
+                                    icon = androidx.compose.material.icons.Icons.Default.Search,
+                                    title = "Belum Ada Stan",
+                                    subtitle = "Belum ada pedagang yang terdaftar."
                                 )
                             }
                         } else {
+                            val favoritesList by viewModel.favorites.collectAsStateWithLifecycle()
                             LazyColumn(
                                 contentPadding = PaddingValues(bottom = 80.dp)
                             ) {
                                 items(stalls) { stall ->
+                                    val isFavorite = favoritesList.any { it.stallId == stall.id }
                                     StallCard(
                                         stall = stall,
+                                        isFavorite = isFavorite,
+                                        onToggleFavorite = { viewModel.toggleFavorite(stall) },
                                         onClick = { stallId -> onNavigateToDetail(stallId) }
                                     )
                                 }

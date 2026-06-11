@@ -6,12 +6,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -27,9 +31,11 @@ fun StallDetailScreen(
     viewModel: StallDetailViewModel,
     stallId: String,
     onNavigateBack: () -> Unit,
-    onNavigateToReview: (String) -> Unit
+    onNavigateToReview: (String) -> Unit,
+    onNavigateToMap: (String) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle()
 
     LaunchedEffect(stallId) {
         viewModel.loadStall(stallId)
@@ -38,10 +44,21 @@ fun StallDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detail Warung", fontSize = 18.sp, fontWeight = FontWeight.SemiBold) },
+                title = { Text(if (uiState is StallDetailUiState.Success) (uiState as StallDetailUiState.Success).stall.name else "Detail Stan", fontSize = 18.sp, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Kembali")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
+                    }
+                },
+                actions = {
+                    if (uiState is StallDetailUiState.Success) {
+                        IconButton(onClick = { viewModel.toggleFavorite() }) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = "Favorit",
+                                tint = if (isFavorite) Color.Red else Color.Gray
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF9F8))
@@ -71,7 +88,8 @@ fun StallDetailScreen(
         containerColor = Color(0xFFFBF9F8)
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-            when (uiState) {
+            val currentState = uiState
+            when (currentState) {
                 is StallDetailUiState.Loading -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
@@ -80,13 +98,14 @@ fun StallDetailScreen(
                 }
                 is StallDetailUiState.Error -> {
                     Text(
-                        text = (uiState as StallDetailUiState.Error).message,
+                        text = currentState.message,
                         color = Color.Red,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
                 is StallDetailUiState.Success -> {
-                    val stall = (uiState as StallDetailUiState.Success).stall
+                    val stall = currentState.stall
+                    val reviewsList = currentState.reviews
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
@@ -145,12 +164,37 @@ fun StallDetailScreen(
                                 }
 
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = stall.location.uppercase(),
-                                    fontSize = 14.sp,
-                                    color = Color.Gray,
-                                    fontWeight = FontWeight.SemiBold
-                                )
+                                
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = stall.location.uppercase(),
+                                        fontSize = 14.sp,
+                                        color = Color.Gray,
+                                        fontWeight = FontWeight.SemiBold,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    
+                                    OutlinedButton(
+                                        onClick = { onNavigateToMap(stall.id) },
+                                        shape = RoundedCornerShape(8.dp),
+                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF870500)),
+                                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF870500)),
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                        modifier = Modifier.height(32.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Place,
+                                            contentDescription = "Map",
+                                            modifier = Modifier.size(16.dp),
+                                            tint = Color(0xFF870500)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("Cek Lokasi", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
 
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Text(
@@ -203,7 +247,6 @@ fun StallDetailScreen(
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                         
-                        val reviewsList = (uiState as StallDetailUiState.Success).reviews
                         if (reviewsList.isEmpty()) {
                             item {
                                 Text(
