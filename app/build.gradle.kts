@@ -80,6 +80,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-database-ktx")
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
 
     implementation("androidx.core:core-ktx:1.18.0")
     testImplementation("junit:junit:4.13.2")

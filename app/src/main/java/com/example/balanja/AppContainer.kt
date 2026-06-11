@@ -54,6 +54,7 @@ object AppContainer {
     // ─── Use Cases ────────────────────────────────────────────────────────────
 
     val signInUseCase by lazy { SignInUseCase(authRepository) }
+    val signInWithGoogleUseCase by lazy { com.example.balanja.domain.usecase.SignInWithGoogleUseCase(authRepository) }
     val signUpUseCase by lazy { com.example.balanja.domain.usecase.SignUpUseCase(authRepository) }
     val getAllStallsUseCase by lazy { GetAllStallsUseCase(stallRepository) }
     val getStallDetailUseCase by lazy { GetStallDetailUseCase(stallRepository) }

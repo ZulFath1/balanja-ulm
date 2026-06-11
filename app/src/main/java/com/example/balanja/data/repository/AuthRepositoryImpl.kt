@@ -61,7 +61,27 @@ class AuthRepositoryImpl(
         }
     }
 
-    
+    override suspend fun signInWithGoogle(idToken: String): Result<User> {
+        return try {
+            val credential = com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, null)
+            val authResult = firebaseAuth.signInWithCredential(credential).await()
+            val firebaseUser = authResult.user
+            
+            if (firebaseUser != null) {
+                val user = User(
+                    id = firebaseUser.uid,
+                    email = firebaseUser.email ?: "",
+                    name = firebaseUser.displayName ?: firebaseUser.email?.split("@")?.get(0) ?: "Pengguna",
+                    createdAt = firebaseUser.metadata?.creationTimestamp ?: 0L
+                )
+                Result.success(user)
+            } else {
+                Result.failure(Exception("Autentikasi Google gagal: User tidak ditemukan"))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Gagal login dengan Google: ${e.message}"))
+        }
+    }
     
     override fun signOut() {
         firebaseAuth.signOut()

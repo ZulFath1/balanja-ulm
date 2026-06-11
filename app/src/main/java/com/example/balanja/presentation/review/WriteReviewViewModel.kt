@@ -83,15 +83,17 @@ class WriteReviewViewModel(
     fun submitReview() {
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, error = null) }
-            val currentUserUid = authRepository.getCurrentUserId()
-            if (currentUserUid == null) {
+            val currentUser = authRepository.getCurrentUser()
+            if (currentUser == null) {
                 _uiState.update { it.copy(isSaving = false, error = "User not logged in") }
                 return@launch
             }
             
+            val userNameToSave = if (currentUser.name.isNotBlank()) currentUser.name else "Mahasiswa ULM"
+            
             val review = Review(
-                userId = currentUserUid,
-                userName = "Pengguna", // Or fetch from profile
+                userId = currentUser.id,
+                userName = userNameToSave,
                 rating = _uiState.value.rating,
                 comment = _uiState.value.comment,
                 attributes = _uiState.value.selectedAttributes,

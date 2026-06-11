@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Visibility
@@ -33,20 +34,15 @@ fun LoginScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
-    // Membaca state dari ViewModel
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    // State lokal untuk input form
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
 
-    // Warna dari Design Guideline
     val primaryColor = Color(0xFF870500)
     val goldColor = Color(0xFF836F1E)
     val backgroundColor = Color(0xFFFBF9F8)
 
-    // Efek navigasi ketika login berhasil
     LaunchedEffect(uiState) {
         if (uiState is AuthUiState.Success) {
             onNavigateToHome()
@@ -63,108 +59,90 @@ fun LoginScreen(
     ) {
         Spacer(modifier = Modifier.weight(1f))
 
-        // --- Bagian Header ---
         Text(
             text = "Balanja",
-            fontSize = 32.sp,
+            fontSize = 42.sp,
             fontWeight = FontWeight.ExtraBold,
             color = primaryColor
         )
-        Box(
-            modifier = Modifier
-                .width(60.dp)
-                .height(4.dp)
-                .background(goldColor, RoundedCornerShape(2.dp))
-        )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "Email Mahasiswa/Dosen",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF555555)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            BalanjaTextField(
+                value = email,
+                onValueChange = { email = it },
+                placeholder = "@ulm.ac.id atau @mhs.ulm.ac.id",
+                leadingIcon = Icons.Default.School,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "G U N A K A N  E M A I L  I N S T I T U S I  A K T I F",
+                fontSize = 10.sp,
+                color = Color.Gray,
+                fontWeight = FontWeight.Medium
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(
-            text = "Selamat Datang Civitas ULM",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Text(
-            text = "Akses kuliner terbaik di lingkungan kampus teknik dengan akun Anda.",
-            fontSize = 14.sp,
-            color = Color.DarkGray,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // --- Bagian Form Input ---
-        BalanjaTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = "Email Pengguna",
-            placeholder = "Masukkan email",
-            leadingIcon = Icons.Default.School,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "Kata Sandi",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF555555)
             )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        BalanjaTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = "Kata Sandi",
-            placeholder = "Masukkan kata sandi",
-            leadingIcon = Icons.Default.Lock,
-            isPassword = true,
-            isPasswordVisible = isPasswordVisible,
-            onVisibilityToggle = { isPasswordVisible = !isPasswordVisible },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    if (email.isNotBlank() && password.isNotBlank()) {
-                        viewModel.signIn(email, password)
+            Spacer(modifier = Modifier.height(8.dp))
+            BalanjaTextField(
+                value = password,
+                onValueChange = { password = it },
+                placeholder = "Kata Sandi",
+                leadingIcon = Icons.Default.Lock,
+                isPassword = true,
+                isPasswordVisible = isPasswordVisible,
+                onVisibilityToggle = { isPasswordVisible = !isPasswordVisible },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (email.isNotBlank() && password.isNotBlank()) viewModel.signIn(email, password)
                     }
-                }
+                )
             )
-        )
+        }
 
-        // Menampilkan pesan error jika login gagal
         if (uiState is AuthUiState.Error) {
             Text(
                 text = (uiState as AuthUiState.Error).message,
                 color = Color.Red,
                 fontSize = 12.sp,
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .fillMaxWidth(),
+                modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
                 textAlign = TextAlign.Start
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // --- Tombol Utama ---
         Button(
             onClick = { viewModel.signIn(email, password) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
+            modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
             enabled = uiState !is AuthUiState.Loading && email.isNotBlank() && password.isNotBlank()
         ) {
             if (uiState is AuthUiState.Loading) {
-                CircularProgressIndicator(
-                    color = Color.White,
-                    modifier = Modifier.size(24.dp),
-                    strokeWidth = 2.dp
-                )
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
             } else {
-                Text(text = "Login →", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Login", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -179,30 +157,36 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // --- Footer ---
         Text(
-            text = "PRIVACY · TERMS · HELP",
-            fontSize = 12.sp,
-            color = Color.Gray,
-            fontWeight = FontWeight.SemiBold
-        )
-        Text(
-            text = "© 2026 Balanja ULM. Designed for the Academic Lambung Mangkurat.",
+            text = "HANYA UNTUK CIVITAS AKADEMIKA ULM",
             fontSize = 10.sp,
-            color = Color.LightGray,
+            color = Color(0xFFDCA8A6),
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "PRIVACY  •  TERMS  •  HELP",
+            fontSize = 12.sp,
+            color = Color(0xFFDCA8A6),
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "© 2024 Balanja ULM. Designed for the Academic Lambung Mangkurat",
+            fontSize = 10.sp,
+            color = Color.Gray,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
+            modifier = Modifier.padding(bottom = 24.dp)
         )
     }
 }
 
-// --- Komponen Reusable Text Field ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BalanjaTextField(
     value: String,
     onValueChange: (String) -> Unit,
-    label: String,
     placeholder: String,
     leadingIcon: ImageVector,
     isPassword: Boolean = false,
@@ -214,9 +198,8 @@ fun BalanjaTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
-        placeholder = { Text(placeholder) },
-        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = Color.Gray) },
+        placeholder = { Text(placeholder, color = Color.LightGray) },
+        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = Color(0xFF870500).copy(alpha = 0.7f)) },
         trailingIcon = {
             if (isPassword) {
                 IconButton(onClick = onVisibilityToggle) {
@@ -230,8 +213,11 @@ fun BalanjaTextField(
         keyboardActions = keyboardActions,
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
-        colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color(0xFF870500),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color(0xFF870500),
+            unfocusedBorderColor = Color(0xFFE8D3D1),
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
             cursorColor = Color(0xFF870500)
         ),
         modifier = Modifier.fillMaxWidth()

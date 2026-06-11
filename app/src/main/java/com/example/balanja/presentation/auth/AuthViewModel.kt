@@ -21,7 +21,8 @@ sealed interface AuthUiState {
 }
 
 class AuthViewModel(
-    private val signInUseCase: SignInUseCase
+    private val signInUseCase: SignInUseCase,
+    private val signInWithGoogleUseCase: com.example.balanja.domain.usecase.SignInWithGoogleUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
@@ -42,6 +43,20 @@ class AuthViewModel(
                 _uiState.value = AuthUiState.Success(user)
             }.onFailure { exception ->
                 _uiState.value = AuthUiState.Error(exception.message ?: "Terjadi kesalahan yang tidak diketahui")
+            }
+        }
+    }
+
+    fun signInWithGoogle(idToken: String) {
+        _uiState.value = AuthUiState.Loading
+
+        viewModelScope.launch {
+            val result = signInWithGoogleUseCase(idToken)
+
+            result.onSuccess { user ->
+                _uiState.value = AuthUiState.Success(user)
+            }.onFailure { exception ->
+                _uiState.value = AuthUiState.Error(exception.message ?: "Terjadi kesalahan saat login Google")
             }
         }
     }

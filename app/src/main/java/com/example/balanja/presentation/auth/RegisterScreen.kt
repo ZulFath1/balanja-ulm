@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.*
@@ -29,7 +30,6 @@ fun RegisterScreen(
     onNavigateToLogin: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isConfirmPasswordVisible by remember { mutableStateOf(false) }
 
@@ -54,97 +54,88 @@ fun RegisterScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         Text(
-            text = "Daftar Akun",
-            fontSize = 32.sp,
+            text = "Balanja",
+            fontSize = 42.sp,
             fontWeight = FontWeight.ExtraBold,
             color = primaryColor
         )
-        Box(
-            modifier = Modifier
-                .width(60.dp)
-                .height(4.dp)
-                .background(goldColor, RoundedCornerShape(2.dp))
-        )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(48.dp))
 
-        Text(
-            text = "Bergabung Bersama Kami",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Text(
-            text = "Hanya gunakan email @mhs.ulm.ac.id atau @ulm.ac.id",
-            fontSize = 14.sp,
-            color = Color.DarkGray,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        BalanjaTextField(
-            value = uiState.email,
-            onValueChange = { viewModel.updateEmail(it) },
-            label = "Email ULM",
-            placeholder = "Masukkan email ULM Anda",
-            leadingIcon = Icons.Default.School,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "Email Mahasiswa/Dosen",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF555555)
             )
-        )
+            Spacer(modifier = Modifier.height(8.dp))
+            BalanjaTextField(
+                value = uiState.email,
+                onValueChange = { viewModel.updateEmail(it) },
+                placeholder = "@ulm.ac.id atau @mhs.ulm.ac.id",
+                leadingIcon = Icons.Default.School,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        BalanjaTextField(
-            value = uiState.password,
-            onValueChange = { viewModel.updatePassword(it) },
-            label = "Kata Sandi",
-            placeholder = "Buat kata sandi baru",
-            leadingIcon = Icons.Default.Lock,
-            isPassword = true,
-            isPasswordVisible = isPasswordVisible,
-            onVisibilityToggle = { isPasswordVisible = !isPasswordVisible },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "Kata Sandi",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF555555)
             )
-        )
+            Spacer(modifier = Modifier.height(8.dp))
+            BalanjaTextField(
+                value = uiState.password,
+                onValueChange = { viewModel.updatePassword(it) },
+                placeholder = "Buat kata sandi baru",
+                leadingIcon = Icons.Default.Lock,
+                isPassword = true,
+                isPasswordVisible = isPasswordVisible,
+                onVisibilityToggle = { isPasswordVisible = !isPasswordVisible },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next)
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        BalanjaTextField(
-            value = uiState.confirmPassword,
-            onValueChange = { viewModel.updateConfirmPassword(it) },
-            label = "Konfirmasi Kata Sandi",
-            placeholder = "Ulangi kata sandi",
-            leadingIcon = Icons.Default.Lock,
-            isPassword = true,
-            isPasswordVisible = isConfirmPasswordVisible,
-            onVisibilityToggle = { isConfirmPasswordVisible = !isConfirmPasswordVisible },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    if (uiState.email.isNotBlank() && uiState.password.isNotBlank() && uiState.confirmPassword.isNotBlank()) {
-                        viewModel.register()
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "Konfirmasi Kata Sandi",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF555555)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            BalanjaTextField(
+                value = uiState.confirmPassword,
+                onValueChange = { viewModel.updateConfirmPassword(it) },
+                placeholder = "Ulangi kata sandi",
+                leadingIcon = Icons.Default.Lock,
+                isPassword = true,
+                isPasswordVisible = isConfirmPasswordVisible,
+                onVisibilityToggle = { isConfirmPasswordVisible = !isConfirmPasswordVisible },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (uiState.email.isNotBlank() && uiState.password.isNotBlank() && uiState.confirmPassword.isNotBlank()) {
+                            viewModel.register()
+                        }
                     }
-                }
+                )
             )
-        )
+        }
 
         if (uiState.error != null) {
             Text(
                 text = uiState.error!!,
                 color = Color.Red,
                 fontSize = 12.sp,
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .fillMaxWidth(),
+                modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
                 textAlign = TextAlign.Start
             )
         }
@@ -153,21 +144,15 @@ fun RegisterScreen(
 
         Button(
             onClick = { viewModel.register() },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
+            modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
             enabled = !uiState.isLoading && uiState.email.isNotBlank() && uiState.password.isNotBlank() && uiState.confirmPassword.isNotBlank()
         ) {
             if (uiState.isLoading) {
-                CircularProgressIndicator(
-                    color = Color.White,
-                    modifier = Modifier.size(24.dp),
-                    strokeWidth = 2.dp
-                )
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
             } else {
-                Text(text = "Daftar Akun →", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Daftar Akun", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -183,17 +168,26 @@ fun RegisterScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         Text(
-            text = "PRIVACY · TERMS · HELP",
-            fontSize = 12.sp,
-            color = Color.Gray,
-            fontWeight = FontWeight.SemiBold
-        )
-        Text(
-            text = "© 2026 Balanja ULM. Designed for the Academic Lambung Mangkurat.",
+            text = "HANYA UNTUK CIVITAS AKADEMIKA ULM",
             fontSize = 10.sp,
-            color = Color.LightGray,
+            color = Color(0xFFDCA8A6),
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "PRIVACY  •  TERMS  •  HELP",
+            fontSize = 12.sp,
+            color = Color(0xFFDCA8A6),
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "© 2024 Balanja ULM. Designed for the Academic Lambung Mangkurat",
+            fontSize = 10.sp,
+            color = Color.Gray,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
+            modifier = Modifier.padding(bottom = 24.dp)
         )
     }
 }

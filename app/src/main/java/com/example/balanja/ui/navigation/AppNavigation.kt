@@ -41,11 +41,12 @@ import com.example.balanja.presentation.detail.StallDetailViewModel
 
 // Factory untuk inject SignInUseCase ke AuthViewModel
 class AuthViewModelFactory(
-    private val signInUseCase: SignInUseCase
+    private val signInUseCase: SignInUseCase,
+    private val signInWithGoogleUseCase: com.example.balanja.domain.usecase.SignInWithGoogleUseCase
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return AuthViewModel(signInUseCase) as T
+        return AuthViewModel(signInUseCase, signInWithGoogleUseCase) as T
     }
 }
 
@@ -69,6 +70,10 @@ fun AppNavigation() {
         currentRoute?.startsWith(pattern.substringBefore("{")) == true
     }
 
+    val startDestination = androidx.compose.runtime.remember {
+        if (AppContainer.authRepository.isLoggedIn()) Screen.Home.route else Screen.Login.route
+    }
+
     Scaffold(
         containerColor = Color(0xFFFBF9F8),
         bottomBar = {
@@ -77,12 +82,12 @@ fun AppNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Login.route,
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Login.route) {
                 val authViewModel: AuthViewModel = viewModel(
-                    factory = AuthViewModelFactory(AppContainer.signInUseCase)
+                    factory = AuthViewModelFactory(AppContainer.signInUseCase, AppContainer.signInWithGoogleUseCase)
                 )
                 LoginScreen(
                     viewModel = authViewModel,
@@ -170,7 +175,10 @@ fun AppNavigation() {
                         }
                     }
                 )
-                MapScreen(viewModel)
+                MapScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
             composable(Screen.AddStall.route) {
                 AddStallScreen()
@@ -213,7 +221,8 @@ fun AppNavigation() {
                                 AppContainer.getReviewsUseCase,
                                 AppContainer.isFavoriteUseCase,
                                 AppContainer.addFavoriteUseCase,
-                                AppContainer.deleteFavoriteUseCase
+                                AppContainer.deleteFavoriteUseCase,
+                                AppContainer.authRepository
                             ) as T
                         }
                     }
@@ -223,7 +232,8 @@ fun AppNavigation() {
                     stallId = stallId,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateToReview = { id -> navController.navigate(Screen.WriteReview.createRoute(id)) },
-                    onNavigateToMap = { id -> navController.navigate(Screen.Map.createRoute(id)) }
+                    onNavigateToMap = { id -> navController.navigate(Screen.Map.createRoute(id)) },
+                    onNavigateToCommunityReview = { id -> navController.navigate(Screen.CommunityReview.createRoute(id)) }
                 )
             }
             composable(
@@ -231,7 +241,21 @@ fun AppNavigation() {
                 arguments = listOf(navArgument("stallId") { type = NavType.StringType })
             ) { backStackEntry ->
                 val stallId = backStackEntry.arguments?.getString("stallId") ?: ""
-                PlaceholderScreen("Community Review — $stallId")
+                val viewModel: com.example.balanja.presentation.review.CommunityReviewViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return com.example.balanja.presentation.review.CommunityReviewViewModel(
+                                AppContainer.getReviewsUseCase
+                            ) as T
+                        }
+                    }
+                )
+                com.example.balanja.presentation.review.CommunityReviewScreen(
+                    viewModel = viewModel,
+                    stallId = stallId,
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
             composable(
                 route = "write_review/{stallId}?reviewId={reviewId}",
