@@ -41,11 +41,12 @@ import com.example.balanja.presentation.detail.StallDetailViewModel
 
 // Factory untuk inject SignInUseCase ke AuthViewModel
 class AuthViewModelFactory(
-    private val signInUseCase: SignInUseCase
+    private val signInUseCase: SignInUseCase,
+    private val signInWithGoogleUseCase: com.example.balanja.domain.usecase.SignInWithGoogleUseCase
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return AuthViewModel(signInUseCase) as T
+        return AuthViewModel(signInUseCase, signInWithGoogleUseCase) as T
     }
 }
 
@@ -69,6 +70,10 @@ fun AppNavigation() {
         currentRoute?.startsWith(pattern.substringBefore("{")) == true
     }
 
+    val startDestination = androidx.compose.runtime.remember {
+        if (AppContainer.authRepository.isLoggedIn()) Screen.Home.route else Screen.Login.route
+    }
+
     Scaffold(
         containerColor = Color(0xFFFBF9F8),
         bottomBar = {
@@ -77,12 +82,12 @@ fun AppNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Login.route,
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Login.route) {
                 val authViewModel: AuthViewModel = viewModel(
-                    factory = AuthViewModelFactory(AppContainer.signInUseCase)
+                    factory = AuthViewModelFactory(AppContainer.signInUseCase, AppContainer.signInWithGoogleUseCase)
                 )
                 LoginScreen(
                     viewModel = authViewModel,
