@@ -19,6 +19,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.balanja.presentation.search.AddStallScreen
+import com.example.balanja.presentation.auth.LoginScreen
 import com.example.balanja.presentation.review.WriteReviewScreen
 
 val screensWithoutBottomNav = listOf(
@@ -51,7 +52,7 @@ fun AppNavigation() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Login.route) {
-                PlaceholderScreen("Login Screen")
+                LoginScreen(navController)
             }
 
             composable(Screen.Home.route) {

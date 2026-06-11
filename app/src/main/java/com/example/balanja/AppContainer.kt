@@ -13,12 +13,15 @@ object AppContainer {
         FirebaseDatabase.getInstance().reference
     }
 
+    // Repositories
+    val authRepository: AuthRepository by lazy { AuthRepositoryImpl(firebaseAuth) }
     val stallRepository: StallRepository by lazy { StallRepositoryImpl() }
     val reviewRepository: ReviewRepository by lazy { ReviewRepositoryImpl() }
-    val authRepository: AuthRepository by lazy { AuthRepositoryImpl() }
     val weatherRepository: WeatherRepository by lazy { WeatherRepositoryImpl() }
     val favoriteRepository: FavoriteRepository by lazy { FavoriteRepositoryImpl() }
 
+    // Use Cases
+    val signInUseCase by lazy { SignInUseCase(authRepository) }
     val getStallsUseCase by lazy { GetStallsUseCase(stallRepository) }
     val getCampusWeatherUseCase by lazy { GetCampusWeatherUseCase(weatherRepository) }
     val addFavoriteUseCase by lazy { AddFavoriteUseCase(favoriteRepository) }
