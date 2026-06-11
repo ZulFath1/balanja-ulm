@@ -221,7 +221,8 @@ fun AppNavigation() {
                                 AppContainer.getReviewsUseCase,
                                 AppContainer.isFavoriteUseCase,
                                 AppContainer.addFavoriteUseCase,
-                                AppContainer.deleteFavoriteUseCase
+                                AppContainer.deleteFavoriteUseCase,
+                                AppContainer.authRepository
                             ) as T
                         }
                     }

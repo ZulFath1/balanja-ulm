@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.outlined.Restaurant
 import androidx.compose.material.icons.outlined.LocalDrink
+import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -302,11 +303,13 @@ fun StallDetailScreen(
 
                         item {
                             Spacer(modifier = Modifier.height(24.dp))
-                            StallStatusToggle(
-                                isOpen = stall.isOpen,
-                                onToggle = { newStatus -> viewModel.toggleStatus(stall.id, stall.isOpen) }
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            if (currentState.isOwner) {
+                                StallStatusToggle(
+                                    isOpen = stall.isOpen,
+                                    onToggle = { newStatus -> viewModel.toggleStatus(stall.id, stall.isOpen) }
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
                         }
                     }
                 }
@@ -414,26 +417,59 @@ fun StallStatusToggle(
     isOpen: Boolean,
     onToggle: (Boolean) -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .background(Color.White, RoundedCornerShape(12.dp))
-            .padding(16.dp)
+            .padding(horizontal = 24.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isOpen) Color(0xFFF1F8E9) else Color(0xFFFFEBEE)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // Subtle flat look
     ) {
-        Text(
-            text = if (isOpen) "Warung Sedang BUKA" else "Warung Sedang TUTUP",
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f)
-        )
-        Switch(
-            checked = isOpen,
-            onCheckedChange = { onToggle(it) },
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White,
-                checkedTrackColor = Color(0xFF2E7D32)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(if (isOpen) Color(0xFFC8E6C9) else Color(0xFFFFCDD2), shape = RoundedCornerShape(8.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Storefront,
+                    contentDescription = null,
+                    tint = if (isOpen) Color(0xFF2E7D32) else Color(0xFFC62828),
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = if (isOpen) "Warung Sedang BUKA" else "Warung Sedang TUTUP",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 15.sp,
+                    color = if (isOpen) Color(0xFF2E7D32) else Color(0xFFB71C1C)
+                )
+                Text(
+                    text = "Sebagai pemilik, Anda bisa mengubah status warung.",
+                    fontSize = 11.sp,
+                    color = Color.Gray,
+                    lineHeight = 14.sp
+                )
+            }
+            Switch(
+                checked = isOpen,
+                onCheckedChange = { onToggle(it) },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.White,
+                    checkedTrackColor = Color(0xFF2E7D32),
+                    uncheckedThumbColor = Color.White,
+                    uncheckedTrackColor = Color(0xFFC62828),
+                    uncheckedBorderColor = Color.Transparent
+                )
             )
-        )
+        }
     }
 }
