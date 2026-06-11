@@ -26,8 +26,7 @@ import com.example.balanja.ui.component.WeatherWidget
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onNavigateToDetail: (String) -> Unit,
-    onNavigateToSearch: () -> Unit
+    onNavigateToDetail: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val weatherState by viewModel.weatherState.collectAsStateWithLifecycle()
@@ -63,15 +62,6 @@ fun HomeScreen(
                                 append(" apa hari ini?")
                             },
                             fontSize = 20.sp
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = onNavigateToSearch) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = Color(0xFF870500)
                         )
                     }
                 },

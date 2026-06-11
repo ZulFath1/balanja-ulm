@@ -109,9 +109,6 @@ fun AppNavigation() {
                     viewModel = viewModel,
                     onNavigateToDetail = { stallId ->
                         navController.navigate(Screen.StallDetail.createRoute(stallId))
-                    },
-                    onNavigateToSearch = {
-                        navController.navigate(Screen.Search.route)
                     }
                 )
             }
