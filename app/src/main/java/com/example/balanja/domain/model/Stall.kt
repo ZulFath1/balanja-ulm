@@ -5,14 +5,13 @@ data class Stall(
     val name: String = "",
     val description: String = "",
     val location: String = "",
-    val imageUrl: String = "",
     val priceMin: Int = 0,
     val priceMax: Int = 0,
-    val ratingAverage: Double = 0.0,
+    val rating: Double = 0.0,
     val reviewCount: Int = 0,
     val isOpen: Boolean = false,
+    val imageUrl: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
-    val ownerId: String = "",
-    val createdAt: Long = 0L
+    val menu: Map<String, MenuItem> = emptyMap()
 )
