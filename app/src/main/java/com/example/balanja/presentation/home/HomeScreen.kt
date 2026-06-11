@@ -15,7 +15,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.balanja.presentation.util.UiState
 import com.example.balanja.ui.component.StallCard
+import com.example.balanja.ui.component.WeatherWidget
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,27 +26,37 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToDetail: (String) -> Unit
 ) {
-    // Membaca state dari ViewModel (survive rotasi layar)
     val uiState by viewModel.uiState.collectAsState()
+    val weatherState by viewModel.weatherState.collectAsStateWithLifecycle()
+
+    // Pull-to-refresh state — selesai saat kedua state bukan Loading
+    var isRefreshing by remember { mutableStateOf(false) }
+    LaunchedEffect(uiState, weatherState) {
+        if (uiState !is HomeUiState.Loading && weatherState !is UiState.Loading) {
+            isRefreshing = false
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Column {
-                        // Sapaan
                         Text(
                             text = "Selamat Pagi!",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
                         )
-                        // Headline dengan kata "Balanja" yang di-styling khusus
                         Text(
                             text = buildAnnotatedString {
                                 append("Mau ")
-                                withStyle(style = SpanStyle(color = Color(0xFF870500), fontWeight = FontWeight.ExtraBold, fontStyle = FontStyle.Italic)) {
-                                    append("Balanja")
-                                }
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = Color(0xFF870500),
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontStyle = FontStyle.Italic
+                                    )
+                                ) { append("Balanja") }
                                 append(" apa hari ini?")
                             },
                             fontSize = 20.sp
@@ -55,62 +68,72 @@ fun HomeScreen(
         },
         containerColor = Color(0xFFFBF9F8)
     ) { paddingValues ->
-        Column(
+
+        @OptIn(ExperimentalMaterial3Api::class)
+        androidx.compose.material3.pulltorefresh.PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                isRefreshing = true
+                viewModel.onRefresh()
+            },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp)
         ) {
-            // --- Slot Placeholder Widget Cuaca (Tugas BLJA-09) ---
-            Card(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
-                    .padding(vertical = 8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFEEEEEE))
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
             ) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Memuat cuaca kampus...", color = Color.Gray)
-                }
-            }
+                // ── Widget Cuaca aktif (menggantikan placeholder BLJA-09) ─────
+                Spacer(modifier = Modifier.height(8.dp))
+                WeatherWidget(
+                    uiState = weatherState,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // --- Menampilkan Konten Berdasarkan State ---
-            when (uiState) {
-                is HomeUiState.Loading -> {
-                    // Tampilan saat data sedang diambil dari Firebase
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Color(0xFF870500))
+                // ── Daftar Stan (tidak berubah) ───────────────────────────────
+                when (uiState) {
+                    is HomeUiState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = Color(0xFF870500))
+                        }
                     }
-                }
-                is HomeUiState.Error -> {
-                    // Tampilan jika terjadi error (koneksi terputus, dll)
-                    val errorMessage = (uiState as HomeUiState.Error).message
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = errorMessage, color = Color.Red)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Button(
-                                onClick = { viewModel.fetchStalls() },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF870500))
-                            ) {
-                                Text("Coba Lagi")
+                    is HomeUiState.Error -> {
+                        val errorMessage = (uiState as HomeUiState.Error).message
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(text = errorMessage, color = Color.Red)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Button(
+                                    onClick = { viewModel.fetchStalls() },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF870500)
+                                    )
+                                ) {
+                                    Text("Coba Lagi")
+                                }
                             }
                         }
                     }
-                }
-                is HomeUiState.Success -> {
-                    // Tampilan daftar stan jika berhasil dimuat
-                    val stalls = (uiState as HomeUiState.Success).stalls
-                    LazyColumn(
-                        contentPadding = PaddingValues(bottom = 80.dp) // Memberi jarak agar tidak tertutup Bottom Navigation nanti
-                    ) {
-                        items(stalls) { stall ->
-                            StallCard(
-                                stall = stall,
-                                onClick = { stallId -> onNavigateToDetail(stallId) }
-                            )
+                    is HomeUiState.Success -> {
+                        val stalls = (uiState as HomeUiState.Success).stalls
+                        LazyColumn(
+                            contentPadding = PaddingValues(bottom = 80.dp)
+                        ) {
+                            items(stalls) { stall ->
+                                StallCard(
+                                    stall = stall,
+                                    onClick = { stallId -> onNavigateToDetail(stallId) }
+                                )
+                            }
                         }
                     }
                 }
