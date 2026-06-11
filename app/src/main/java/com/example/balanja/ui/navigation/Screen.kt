@@ -26,4 +26,9 @@ sealed class Screen(val route: String) {
             else "write_review/$stallId"
     }
     object MyReviews : Screen("my_reviews")
+
+    // Peta khusus untuk detail warung
+    object Map : Screen("map/{stallId}") {
+        fun createRoute(stallId: String) = "map/$stallId"
+    }
 }

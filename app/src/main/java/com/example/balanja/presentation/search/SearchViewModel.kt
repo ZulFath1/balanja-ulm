@@ -4,31 +4,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.balanja.domain.model.Stall
 import com.example.balanja.domain.usecase.GetAllStallsUseCase
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+data class SearchUiState(
+    val isLoading: Boolean = true,
+    val searchQuery: String = "",
+    val allStalls: List<Stall> = emptyList(),
+    val filteredStalls: List<Stall> = emptyList(),
+    val error: String? = null
+)
 
 class SearchViewModel(
     private val getAllStallsUseCase: GetAllStallsUseCase
 ) : ViewModel() {
-    private val _selectedRating = MutableStateFlow<Float?>(null)
-    val selectedRating = _selectedRating.asStateFlow()
 
-    private val _maxPrice = MutableStateFlow<Int>(Int.MAX_VALUE)
-    val maxPrice = _maxPrice.asStateFlow()
-
-    private val _allStalls = MutableStateFlow<List<Stall>>(emptyList())
-
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery = _searchQuery.asStateFlow()
-
-    val filteredStalls = combine(_allStalls, _searchQuery, _selectedRating, _maxPrice) { stalls, query, rating, price ->
-        stalls.filter { stall ->
-            val matchesQuery = query.isBlank() || stall.name.contains(query, ignoreCase = true)
-            val matchesRating = rating == null || stall.rating >= rating
-            val matchesPrice = stall.priceMin <= price
-            matchesQuery && matchesRating && matchesPrice
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    private val _uiState = MutableStateFlow(SearchUiState())
+    val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     init {
         loadStalls()
@@ -36,19 +31,35 @@ class SearchViewModel(
 
     private fun loadStalls() {
         viewModelScope.launch {
-            getAllStallsUseCase().collect { _allStalls.value = it }
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            try {
+                getAllStallsUseCase().collect { stalls ->
+                    _uiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            allStalls = stalls,
+                            filteredStalls = filterStalls(stalls, state.searchQuery)
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = e.message ?: "Failed to load stalls") }
+            }
         }
     }
 
-    fun onSearchQueryChange(newQuery: String) {
-        _searchQuery.value = newQuery
+    fun onSearchQueryChange(query: String) {
+        _uiState.update { state ->
+            state.copy(
+                searchQuery = query,
+                filteredStalls = filterStalls(state.allStalls, query)
+            )
+        }
     }
 
-    fun onRatingFilterChange(rating: Float?) {
-        _selectedRating.value = if (_selectedRating.value == rating) null else rating
-    }
-
-    fun onPriceFilterChange(price: Int) {
-        _maxPrice.value = if (_maxPrice.value == price) Int.MAX_VALUE else price
+    private fun filterStalls(stalls: List<Stall>, query: String): List<Stall> {
+        if (query.isBlank()) return emptyList() // or return allStalls if you want to show all initially
+        val lowerCaseQuery = query.lowercase()
+        return stalls.filter { it.name.lowercase().contains(lowerCaseQuery) }
     }
 }

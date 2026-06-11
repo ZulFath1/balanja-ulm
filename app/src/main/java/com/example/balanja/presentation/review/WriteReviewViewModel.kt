@@ -26,16 +26,14 @@ data class WriteReviewUiState(
 )
 
 class WriteReviewViewModel(
-    savedStateHandle: SavedStateHandle,
+    private val stallId: String,
+    private val reviewId: String?,
     private val addReviewUseCase: AddReviewUseCase,
     private val editReviewUseCase: EditReviewUseCase,
     private val getReviewsUseCase: GetReviewsUseCase,
     private val recalculateStallRatingUseCase: RecalculateStallRatingUseCase,
     private val authRepository: AuthRepository
 ) : ViewModel() {
-
-    private val stallId: String = checkNotNull(savedStateHandle["stallId"])
-    private val reviewId: String? = savedStateHandle["reviewId"]
 
     private val _uiState = MutableStateFlow(WriteReviewUiState())
     val uiState: StateFlow<WriteReviewUiState> = _uiState.asStateFlow()

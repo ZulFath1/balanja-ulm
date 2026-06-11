@@ -12,10 +12,12 @@ import kotlinx.coroutines.launch
 data class MapUiState(
     val isLoading: Boolean = true,
     val stalls: List<Stall> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val selectedStallLocation: Stall? = null
 )
 
 class MapViewModel(
+    private val stallId: String,
     private val getAllStallsUseCase: GetAllStallsUseCase
 ) : ViewModel() {
 
@@ -31,9 +33,12 @@ class MapViewModel(
             _uiState.value = MapUiState(isLoading = true)
             try {
                 getAllStallsUseCase().collect { stallList ->
-                    // Filter out stalls that don't have valid coordinates if needed
-                    // For now we'll just include all stalls and hope they have coordinates or a way to get them.
-                    _uiState.value = MapUiState(isLoading = false, stalls = stallList)
+                    val selectedStall = stallList.find { it.id == stallId }
+                    _uiState.value = MapUiState(
+                        isLoading = false,
+                        stalls = stallList,
+                        selectedStallLocation = selectedStall
+                    )
                 }
             } catch (e: Exception) {
                 _uiState.value = MapUiState(isLoading = false, error = e.message ?: "Failed to load stalls")

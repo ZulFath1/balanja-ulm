@@ -55,6 +55,7 @@ val screensWithoutBottomNav = listOf(
     Screen.CommunityReview.route,
     Screen.WriteReview.route,
     Screen.MyReviews.route,
+    Screen.Map.route
 )
 
 @Composable
@@ -108,15 +109,38 @@ fun AppNavigation() {
                     viewModel = viewModel,
                     onNavigateToDetail = { stallId ->
                         navController.navigate(Screen.StallDetail.createRoute(stallId))
+                    },
+                    onNavigateToSearch = {
+                        navController.navigate(Screen.Search.route)
                     }
                 )
             }
             composable(Screen.Search.route) {
+                val viewModel: com.example.balanja.presentation.search.SearchViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return com.example.balanja.presentation.search.SearchViewModel(AppContainer.getAllStallsUseCase) as T
+                        }
+                    }
+                )
+                com.example.balanja.presentation.search.SearchScreen(
+                    viewModel = viewModel,
+                    onNavigateToDetail = { stallId ->
+                        navController.navigate(Screen.StallDetail.createRoute(stallId))
+                    }
+                )
+            }
+            composable(
+                route = Screen.Map.route,
+                arguments = listOf(navArgument("stallId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val stallId = backStackEntry.arguments?.getString("stallId") ?: ""
                 val viewModel: MapViewModel = viewModel(
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             @Suppress("UNCHECKED_CAST")
-                            return MapViewModel(AppContainer.getAllStallsUseCase) as T
+                            return MapViewModel(stallId, AppContainer.getAllStallsUseCase) as T
                         }
                     }
                 )
@@ -165,7 +189,8 @@ fun AppNavigation() {
                     viewModel = viewModel,
                     stallId = stallId,
                     onNavigateBack = { navController.popBackStack() },
-                    onNavigateToReview = { id -> navController.navigate(Screen.WriteReview.createRoute(id)) }
+                    onNavigateToReview = { id -> navController.navigate(Screen.WriteReview.createRoute(id)) },
+                    onNavigateToMap = { id -> navController.navigate(Screen.Map.createRoute(id)) }
                 )
             }
             composable(
@@ -189,7 +214,8 @@ fun AppNavigation() {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             @Suppress("UNCHECKED_CAST")
                             return WriteReviewViewModel(
-                                savedStateHandle = backStackEntry.savedStateHandle,
+                                stallId = stallId,
+                                reviewId = reviewId,
                                 addReviewUseCase = AppContainer.addReviewUseCase,
                                 editReviewUseCase = AppContainer.editReviewUseCase,
                                 getReviewsUseCase = AppContainer.getReviewsUseCase,
