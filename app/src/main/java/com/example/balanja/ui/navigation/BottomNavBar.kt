@@ -1,6 +1,12 @@
 package com.example.balanja.ui.navigation
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
@@ -12,12 +18,11 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -51,49 +56,105 @@ fun BalanjaBottomNav(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    NavigationBar(
-        containerColor = Color.White,
-        tonalElevation = 8.dp,
+    Box(
         modifier = modifier
-            .shadow(
-                elevation = 16.dp, 
-                spotColor = Color(0x1A000000), 
-                ambientColor = Color(0x1A000000)
-            )
-            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .padding(bottom = 24.dp)
+            .height(80.dp)
     ) {
-        items.forEach { item ->
-            val selected = currentRoute == item.screen.route
-            NavigationBarItem(
-                selected = selected,
-                onClick = {
-                    navController.navigate(item.screen.route) {
-                        popUpTo(Screen.Home.route) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                icon = { 
-                    Icon(
-                        imageVector = if (selected) item.selectedIcon else item.unselectedIcon, 
-                        contentDescription = item.label
-                    ) 
-                },
-                label = { 
-                    Text(
-                        text = item.label, 
-                        fontSize = 12.sp,
-                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
-                    ) 
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor   = Color(0xFF870500),
-                    selectedTextColor   = Color(0xFF870500),
-                    unselectedIconColor = Color(0xFF9CA3AF),
-                    unselectedTextColor = Color(0xFF9CA3AF),
-                    indicatorColor      = Color(0xFFFEE2E2)
+        // The White Background Bar
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
+                .align(Alignment.BottomCenter)
+                .shadow(
+                    elevation = 16.dp, 
+                    spotColor = Color(0x1A000000), 
+                    ambientColor = Color(0x1A000000),
+                    shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
                 )
-            )
+                .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                .background(Color.White)
+        )
+
+        // The Navigation Items
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items.forEach { item ->
+                val selected = currentRoute == item.screen.route
+                
+                val iconYOffset by animateDpAsState(
+                    targetValue = if (selected) (-16).dp else 10.dp,
+                    animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessLow),
+                    label = "iconYOffset"
+                )
+                val iconColor by animateColorAsState(
+                    targetValue = if (selected) Color(0xFF870500) else Color(0xFF9CA3AF),
+                    label = "iconColor"
+                )
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = {
+                                navController.navigate(item.screen.route) {
+                                    popUpTo(Screen.Home.route) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        // Icon with Animated Circle Background
+                        Box(
+                            modifier = Modifier
+                                .offset(y = iconYOffset)
+                                .size(48.dp)
+                                .shadow(if (selected) 8.dp else 0.dp, CircleShape)
+                                .background(if (selected) Color.White else Color.Transparent, CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
+                                contentDescription = item.label,
+                                tint = iconColor,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        
+                        // Animated Text
+                        AnimatedVisibility(
+                            visible = selected,
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically()
+                        ) {
+                            Text(
+                                text = item.label,
+                                color = Color(0xFF870500),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.offset(y = (-8).dp)
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
