@@ -2,7 +2,7 @@ package com.example.balanja.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.balanja.domain.usecase.SignUpUseCase
+import com.example.balanja.domain.usecase.auth.SignUpUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -49,3 +49,4 @@ class RegisterViewModel(
         }
     }
 }
+

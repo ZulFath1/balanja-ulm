@@ -1,5 +1,24 @@
 package com.example.balanja.ui.navigation
 
+import com.example.balanja.domain.usecase.search.GetRecentSearchesUseCase
+import com.example.balanja.domain.usecase.weather.GetCampusWeatherUseCase
+import com.example.balanja.domain.usecase.review.DeleteReviewUseCase
+import com.example.balanja.domain.usecase.review.AddReviewUseCase
+import com.example.balanja.domain.usecase.search.AddRecentSearchUseCase
+import com.example.balanja.domain.usecase.review.RecalculateStallRatingUseCase
+import com.example.balanja.domain.usecase.stall.GetAllStallsUseCase
+import com.example.balanja.domain.usecase.review.GetReviewsUseCase
+import com.example.balanja.domain.usecase.favorite.GetFavoritesUseCase
+import com.example.balanja.domain.usecase.search.ClearRecentSearchesUseCase
+import com.example.balanja.domain.usecase.auth.SignUpUseCase
+import com.example.balanja.domain.usecase.review.GetMyReviewsUseCase
+import com.example.balanja.domain.usecase.favorite.IsFavoriteUseCase
+import com.example.balanja.domain.usecase.auth.SignInWithGoogleUseCase
+import com.example.balanja.domain.usecase.stall.ToggleStallStatusUseCase
+import com.example.balanja.domain.usecase.stall.GetStallDetailUseCase
+import com.example.balanja.domain.usecase.favorite.AddFavoriteUseCase
+import com.example.balanja.domain.usecase.favorite.DeleteFavoriteUseCase
+import com.example.balanja.domain.usecase.review.EditReviewUseCase
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,7 +54,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import com.example.balanja.AppContainer
-import com.example.balanja.domain.usecase.SignInUseCase
+import com.example.balanja.domain.usecase.auth.SignInUseCase
 import com.example.balanja.presentation.auth.AuthViewModel
 import com.example.balanja.presentation.auth.LoginScreen
 import com.example.balanja.presentation.review.WriteReviewScreen
@@ -55,7 +74,7 @@ import com.example.balanja.presentation.detail.StallDetailViewModel
 // Factory untuk inject SignInUseCase ke AuthViewModel
 class AuthViewModelFactory(
     private val signInUseCase: SignInUseCase,
-    private val signInWithGoogleUseCase: com.example.balanja.domain.usecase.SignInWithGoogleUseCase
+    private val signInWithGoogleUseCase: com.example.balanja.domain.usecase.auth.SignInWithGoogleUseCase
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
@@ -449,3 +468,4 @@ fun PlaceholderScreen(name: String) {
         Text(name, style = MaterialTheme.typography.titleMedium)
     }
 }
+

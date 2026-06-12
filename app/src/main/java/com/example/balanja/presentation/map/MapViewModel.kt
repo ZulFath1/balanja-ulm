@@ -3,7 +3,7 @@ package com.example.balanja.presentation.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.balanja.domain.model.Stall
-import com.example.balanja.domain.usecase.GetAllStallsUseCase
+import com.example.balanja.domain.usecase.stall.GetAllStallsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,3 +46,4 @@ class MapViewModel(
         }
     }
 }
+

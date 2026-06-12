@@ -1,4 +1,4 @@
-package com.example.balanja.domain.usecase
+package com.example.balanja.domain.usecase.auth
 
 import com.example.balanja.domain.model.User
 import com.example.balanja.domain.repository.AuthRepository
@@ -17,3 +17,4 @@ class SignUpUseCase(private val authRepository: AuthRepository) {
         return authRepository.signUp(email, password)
     }
 }
+

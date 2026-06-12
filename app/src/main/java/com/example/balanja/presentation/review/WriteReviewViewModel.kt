@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.balanja.domain.model.Review
 import com.example.balanja.domain.repository.AuthRepository
-import com.example.balanja.domain.usecase.AddReviewUseCase
-import com.example.balanja.domain.usecase.EditReviewUseCase
-import com.example.balanja.domain.usecase.GetReviewsUseCase
-import com.example.balanja.domain.usecase.RecalculateStallRatingUseCase
+import com.example.balanja.domain.usecase.review.AddReviewUseCase
+import com.example.balanja.domain.usecase.review.EditReviewUseCase
+import com.example.balanja.domain.usecase.review.GetReviewsUseCase
+import com.example.balanja.domain.usecase.review.RecalculateStallRatingUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -153,3 +153,4 @@ class WriteReviewViewModel(
         }
     }
 }
+

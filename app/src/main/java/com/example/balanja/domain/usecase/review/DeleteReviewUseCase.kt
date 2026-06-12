@@ -1,4 +1,4 @@
-package com.example.balanja.domain.usecase
+package com.example.balanja.domain.usecase.review
 
 import com.example.balanja.domain.repository.ReviewRepository
 
@@ -7,3 +7,4 @@ class DeleteReviewUseCase(private val repository: ReviewRepository) {
         return repository.deleteReview(stallId, reviewId)
     }
 }
+

@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.balanja.domain.model.Review
-import com.example.balanja.domain.usecase.GetReviewsUseCase
+import com.example.balanja.domain.usecase.review.GetReviewsUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,3 +44,4 @@ class CommunityReviewViewModel(
         super.onCleared()
     }
 }
+

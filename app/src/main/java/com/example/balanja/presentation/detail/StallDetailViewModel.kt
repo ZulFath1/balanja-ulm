@@ -1,10 +1,14 @@
 package com.example.balanja.presentation.detail
 
+import com.example.balanja.domain.usecase.review.GetReviewsUseCase
+import com.example.balanja.domain.usecase.favorite.IsFavoriteUseCase
+import com.example.balanja.domain.usecase.favorite.AddFavoriteUseCase
+import com.example.balanja.domain.usecase.favorite.DeleteFavoriteUseCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.balanja.domain.model.Stall
-import com.example.balanja.domain.usecase.GetStallDetailUseCase
-import com.example.balanja.domain.usecase.ToggleStallStatusUseCase
+import com.example.balanja.domain.usecase.stall.GetStallDetailUseCase
+import com.example.balanja.domain.usecase.stall.ToggleStallStatusUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,10 +29,10 @@ sealed interface StallDetailUiState {
 class StallDetailViewModel(
     private val getStallDetailUseCase: GetStallDetailUseCase,
     private val toggleStallStatusUseCase: ToggleStallStatusUseCase,
-    private val getReviewsUseCase: com.example.balanja.domain.usecase.GetReviewsUseCase,
-    private val isFavoriteUseCase: com.example.balanja.domain.usecase.IsFavoriteUseCase,
-    private val addFavoriteUseCase: com.example.balanja.domain.usecase.AddFavoriteUseCase,
-    private val deleteFavoriteUseCase: com.example.balanja.domain.usecase.DeleteFavoriteUseCase,
+    private val getReviewsUseCase: com.example.balanja.domain.usecase.review.GetReviewsUseCase,
+    private val isFavoriteUseCase: com.example.balanja.domain.usecase.favorite.IsFavoriteUseCase,
+    private val addFavoriteUseCase: com.example.balanja.domain.usecase.favorite.AddFavoriteUseCase,
+    private val deleteFavoriteUseCase: com.example.balanja.domain.usecase.favorite.DeleteFavoriteUseCase,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -111,3 +115,4 @@ class StallDetailViewModel(
         }
     }
 }
+

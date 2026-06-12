@@ -1,9 +1,10 @@
 package com.example.balanja.presentation.auth
 
+import com.example.balanja.domain.usecase.auth.SignInWithGoogleUseCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.balanja.domain.model.User
-import com.example.balanja.domain.usecase.SignInUseCase
+import com.example.balanja.domain.usecase.auth.SignInUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +23,7 @@ sealed interface AuthUiState {
 
 class AuthViewModel(
     private val signInUseCase: SignInUseCase,
-    private val signInWithGoogleUseCase: com.example.balanja.domain.usecase.SignInWithGoogleUseCase
+    private val signInWithGoogleUseCase: com.example.balanja.domain.usecase.auth.SignInWithGoogleUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
@@ -69,3 +70,4 @@ class AuthViewModel(
         _uiState.value = AuthUiState.Idle
     }
 }
+

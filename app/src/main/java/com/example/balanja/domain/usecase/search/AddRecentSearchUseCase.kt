@@ -1,4 +1,4 @@
-package com.example.balanja.domain.usecase
+package com.example.balanja.domain.usecase.search
 
 import com.example.balanja.domain.model.RecentSearch
 import com.example.balanja.domain.repository.RecentSearchRepository
@@ -8,3 +8,4 @@ class AddRecentSearchUseCase(private val repository: RecentSearchRepository) {
         repository.addRecentSearch(recentSearch)
     }
 }
+

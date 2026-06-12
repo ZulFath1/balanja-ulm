@@ -1,4 +1,4 @@
-package com.example.balanja.domain.usecase
+package com.example.balanja.domain.usecase.review
 
 import com.example.balanja.domain.repository.StallRepository
 import com.example.balanja.domain.repository.ReviewRepository
@@ -26,3 +26,4 @@ class RecalculateStallRatingUseCase(
         }
     }
 }
+

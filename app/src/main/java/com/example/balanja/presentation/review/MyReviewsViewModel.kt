@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.balanja.domain.model.Review
 import com.example.balanja.domain.repository.AuthRepository
 import com.example.balanja.domain.repository.StallRepository
-import com.example.balanja.domain.usecase.DeleteReviewUseCase
-import com.example.balanja.domain.usecase.GetMyReviewsUseCase
-import com.example.balanja.domain.usecase.RecalculateStallRatingUseCase
+import com.example.balanja.domain.usecase.review.DeleteReviewUseCase
+import com.example.balanja.domain.usecase.review.GetMyReviewsUseCase
+import com.example.balanja.domain.usecase.review.RecalculateStallRatingUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -76,3 +76,4 @@ class MyReviewsViewModel(
         }
     }
 }
+

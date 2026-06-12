@@ -3,8 +3,8 @@ package com.example.balanja.presentation.favorite
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.balanja.domain.model.FavoriteStall
-import com.example.balanja.domain.usecase.GetFavoritesUseCase
-import com.example.balanja.domain.usecase.DeleteFavoriteUseCase
+import com.example.balanja.domain.usecase.favorite.GetFavoritesUseCase
+import com.example.balanja.domain.usecase.favorite.DeleteFavoriteUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,3 +46,4 @@ class FavoriteStallsViewModel(
         }
     }
 }
+

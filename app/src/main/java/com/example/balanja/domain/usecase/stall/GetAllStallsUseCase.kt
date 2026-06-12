@@ -1,4 +1,4 @@
-package com.example.balanja.domain.usecase
+package com.example.balanja.domain.usecase.stall
 
 import com.example.balanja.domain.model.Stall
 import com.example.balanja.domain.repository.StallRepository

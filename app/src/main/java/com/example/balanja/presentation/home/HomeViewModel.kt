@@ -1,11 +1,14 @@
 package com.example.balanja.presentation.home
 
+import com.example.balanja.domain.usecase.favorite.GetFavoritesUseCase
+import com.example.balanja.domain.usecase.favorite.AddFavoriteUseCase
+import com.example.balanja.domain.usecase.favorite.DeleteFavoriteUseCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.balanja.domain.model.Stall
 import com.example.balanja.domain.model.Weather
-import com.example.balanja.domain.usecase.GetAllStallsUseCase
-import com.example.balanja.domain.usecase.GetCampusWeatherUseCase
+import com.example.balanja.domain.usecase.stall.GetAllStallsUseCase
+import com.example.balanja.domain.usecase.weather.GetCampusWeatherUseCase
 import com.example.balanja.presentation.util.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,9 +27,9 @@ sealed interface HomeUiState {
 class HomeViewModel(
     private val getAllStallsUseCase: GetAllStallsUseCase,
     private val getCampusWeatherUseCase: GetCampusWeatherUseCase,
-    private val getFavoritesUseCase: com.example.balanja.domain.usecase.GetFavoritesUseCase,
-    private val addFavoriteUseCase: com.example.balanja.domain.usecase.AddFavoriteUseCase,
-    private val deleteFavoriteUseCase: com.example.balanja.domain.usecase.DeleteFavoriteUseCase,
+    private val getFavoritesUseCase: com.example.balanja.domain.usecase.favorite.GetFavoritesUseCase,
+    private val addFavoriteUseCase: com.example.balanja.domain.usecase.favorite.AddFavoriteUseCase,
+    private val deleteFavoriteUseCase: com.example.balanja.domain.usecase.favorite.DeleteFavoriteUseCase,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -138,3 +141,4 @@ class HomeViewModel(
         fetchWeather()
     }
 }
+

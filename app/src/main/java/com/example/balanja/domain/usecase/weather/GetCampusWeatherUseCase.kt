@@ -1,4 +1,4 @@
-package com.example.balanja.domain.usecase
+package com.example.balanja.domain.usecase.weather
 
 import com.example.balanja.domain.model.Weather
 import com.example.balanja.domain.repository.WeatherRepository
