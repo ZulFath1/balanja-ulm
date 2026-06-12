@@ -102,8 +102,6 @@ fun ProfileScreen(
             Box(
                 modifier = Modifier
                     .size(110.dp)
-                    .border(4.dp, Color(0xFFFEE2E2), CircleShape)
-                    .padding(8.dp)
                     .background(Color(0xFFE5E7EB), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
@@ -129,27 +127,13 @@ fun ProfileScreen(
             if (uiState.isLoading) {
                 CircularProgressIndicator()
             } else {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = uiState.userName,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF111111)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(
-                        onClick = { 
-                            navController.navigate(Screen.EditProfile.route)
-                        },
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit Profil",
-                            tint = Color(0xFF3B82F6),
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
@@ -169,6 +153,18 @@ fun ProfileScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column {
+                    ProfileMenuItem(
+                        icon = Icons.Default.Edit,
+                        iconContainerColor = Color(0xFFDBEAFE),
+                        iconTintColor = Color(0xFF3B82F6),
+                        title = "Edit Profil",
+                        onClick = { navController.navigate(Screen.EditProfile.route) }
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        thickness = 1.dp,
+                        color = Color(0xFFF3F4F6)
+                    )
                     ProfileMenuItem(
                         icon = Icons.Default.Star,
                         iconContainerColor = Color(0xFFFEF3C7),
