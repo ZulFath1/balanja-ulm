@@ -177,7 +177,7 @@ fun CommunityReviewScreen(
                                         Row(verticalAlignment = Alignment.Top) {
                                         // Profile Picture
                                         AsyncImage(
-                                            model = "https://ui-avatars.com/api/?name=${review.userName.replace(" ", "+")}&background=random",
+                                            model = review.userPhotoUrl ?: "https://ui-avatars.com/api/?name=${review.userName.replace(" ", "+")}&background=random",
                                             contentDescription = "Profile Picture",
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier

@@ -10,5 +10,5 @@ interface AuthRepository {
     fun getCurrentUserId(): String?
     fun getCurrentUser(): User?
     fun isLoggedIn(): Boolean
-    suspend fun updateProfileName(newName: String): Result<Unit>
+    suspend fun updateProfile(newName: String, newPhotoUrl: String?): Result<Unit>
 }

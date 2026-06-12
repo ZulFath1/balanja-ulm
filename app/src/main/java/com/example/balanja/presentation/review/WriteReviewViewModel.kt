@@ -134,7 +134,8 @@ class WriteReviewViewModel(
                 imageUrls = finalImageUrls,
                 imageUrl = finalImageUrls.firstOrNull(), // Keep for backward compatibility
                 createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                updatedAt = System.currentTimeMillis(),
+                userPhotoUrl = currentUser.photoUrl
             )
 
             val result = if (reviewId != null) {

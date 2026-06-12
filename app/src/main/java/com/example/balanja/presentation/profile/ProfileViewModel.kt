@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 data class ProfileUiState(
     val userName: String = "Pengguna",
     val email: String = "",
+    val photoUrl: String? = null,
     val ownedStalls: List<com.example.balanja.domain.model.Stall> = emptyList(),
     val isLoading: Boolean = true
 )
@@ -25,10 +26,10 @@ class ProfileViewModel(
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
     init {
-        loadUserProfile()
+        refreshProfile()
     }
 
-    private fun loadUserProfile() {
+    fun refreshProfile() {
         viewModelScope.launch {
             val user = authRepository.getCurrentUser()
             if (user != null) {
@@ -36,6 +37,7 @@ class ProfileViewModel(
                     it.copy(
                         userName = user.name ?: "Pengguna Balanja",
                         email = user.email ?: "",
+                        photoUrl = user.photoUrl,
                         isLoading = false
                     ) 
                 }
@@ -57,23 +59,4 @@ class ProfileViewModel(
         }
     }
 
-    fun updateProfileName(newName: String, onResult: (Boolean, String?) -> Unit) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            val result = authRepository.updateProfileName(newName)
-            if (result.isSuccess) {
-                // Update local UI state
-                _uiState.update { 
-                    it.copy(
-                        userName = newName,
-                        isLoading = false
-                    ) 
-                }
-                onResult(true, null)
-            } else {
-                _uiState.update { it.copy(isLoading = false) }
-                onResult(false, result.exceptionOrNull()?.message)
-            }
-        }
-    }
 }

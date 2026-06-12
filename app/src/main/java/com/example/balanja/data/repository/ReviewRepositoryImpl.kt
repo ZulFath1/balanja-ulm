@@ -57,12 +57,16 @@ class ReviewRepositoryImpl : ReviewRepository {
 
     override suspend fun updateReview(stallId: String, reviewId: String, review: Review): Result<Unit> {
         return try {
-            val updateData = mapOf(
+            val updateData = mutableMapOf<String, Any>(
                 "rating" to review.rating,
                 "comment" to review.comment,
                 "attributes" to review.attributes,
+                "imageUrls" to review.imageUrls,
                 "updatedAt" to System.currentTimeMillis()
             )
+            review.userPhotoUrl?.let { updateData["userPhotoUrl"] = it }
+            review.imageUrl?.let { updateData["imageUrl"] = it }
+            
             database.child(reviewId).updateChildren(updateData).await()
             Result.success(Unit)
         } catch (e: Exception) {

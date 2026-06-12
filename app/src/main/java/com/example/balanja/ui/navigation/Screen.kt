@@ -10,6 +10,7 @@ sealed class Screen(val route: String) {
     object Search    : Screen("search")
     object AddStall  : Screen("add_stall")
     object Profile   : Screen("profile")
+    object EditProfile : Screen("edit_profile")
 
     // Layar Favorit
     object Favorites : Screen("favorites")

@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,56 +43,10 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
-    var showEditDialog by remember { mutableStateOf(false) }
-    var newName by remember { mutableStateOf("") }
-    var editError by remember { mutableStateOf<String?>(null) }
 
-    if (showEditDialog) {
-        AlertDialog(
-            onDismissRequest = { showEditDialog = false },
-            title = { Text("Edit Nama Profil") },
-            text = {
-                Column {
-                    OutlinedTextField(
-                        value = newName,
-                        onValueChange = { newName = it },
-                        label = { Text("Nama Baru") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    if (editError != null) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = editError!!, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        if (newName.isNotBlank()) {
-                            viewModel.updateProfileName(newName) { success, error ->
-                                if (success) {
-                                    showEditDialog = false
-                                } else {
-                                    editError = error
-                                }
-                            }
-                        } else {
-                            editError = "Nama tidak boleh kosong"
-                        }
-                    }
-                ) {
-                    Text("Simpan")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showEditDialog = false }) {
-                    Text("Batal")
-                }
-            }
-        )
+    LaunchedEffect(Unit) {
+        viewModel.refreshProfile()
     }
-
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
@@ -152,12 +107,21 @@ fun ProfileScreen(
                     .background(Color(0xFFE5E7EB), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Avatar",
-                    modifier = Modifier.size(50.dp),
-                    tint = Color(0xFF9CA3AF)
-                )
+                if (uiState.photoUrl != null) {
+                    coil.compose.AsyncImage(
+                        model = uiState.photoUrl,
+                        contentDescription = "Avatar",
+                        modifier = Modifier.fillMaxSize().clip(CircleShape),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Avatar",
+                        modifier = Modifier.size(50.dp),
+                        tint = Color(0xFF9CA3AF)
+                    )
+                }
             }
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -175,9 +139,7 @@ fun ProfileScreen(
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(
                         onClick = { 
-                            newName = uiState.userName
-                            editError = null
-                            showEditDialog = true 
+                            navController.navigate(Screen.EditProfile.route)
                         },
                         modifier = Modifier.size(24.dp)
                     ) {

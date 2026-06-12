@@ -257,6 +257,23 @@ fun AppNavigation() {
                     BalanjaBottomNav(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
                 }
             }
+            composable(Screen.EditProfile.route) {
+                val viewModel: com.example.balanja.presentation.profile.EditProfileViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return com.example.balanja.presentation.profile.EditProfileViewModel(
+                                AppContainer.authRepository,
+                                AppContainer.cloudinaryApiService
+                            ) as T
+                        }
+                    }
+                )
+                com.example.balanja.presentation.profile.EditProfileScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
             composable(Screen.Favorites.route) {
                 val viewModel: FavoriteStallsViewModel = viewModel(
                     factory = object : ViewModelProvider.Factory {

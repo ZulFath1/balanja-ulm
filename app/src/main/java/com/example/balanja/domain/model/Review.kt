@@ -11,5 +11,6 @@ data class Review(
     val imageUrl: String? = null,
     val imageUrls: List<String> = emptyList(),
     val createdAt: Long = 0L,
-    val updatedAt: Long = 0L
+    val updatedAt: Long = 0L,
+    val userPhotoUrl: String? = null
 )
