@@ -54,6 +54,7 @@ fun StallDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle()
+    var showZoomedImage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(stallId) {
         viewModel.loadStall(stallId)
@@ -295,7 +296,7 @@ fun StallDetailScreen(
                                 MenuSectionHeader("Menu")
                             }
                             items(foods) { item ->
-                                MenuItemRow(item, isDrink = false)
+                                MenuItemRow(item, isDrink = false, onImageClick = { showZoomedImage = it })
                             }
                         }
 
@@ -305,7 +306,7 @@ fun StallDetailScreen(
                                 MenuSectionHeader("Refreshments")
                             }
                             items(drinks) { item ->
-                                MenuItemRow(item, isDrink = true)
+                                MenuItemRow(item, isDrink = true, onImageClick = { showZoomedImage = it })
                             }
                         }
                         
@@ -330,6 +331,39 @@ fun StallDetailScreen(
                                 Spacer(modifier = Modifier.height(16.dp))
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        showZoomedImage?.let { imageUrl ->
+            androidx.compose.ui.window.Dialog(
+                onDismissRequest = { showZoomedImage = null },
+                properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.9f))
+                        .clickable { showZoomedImage = null }
+                ) {
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = "Zoomed Image",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                            .align(Alignment.Center)
+                    )
+                    IconButton(
+                        onClick = { showZoomedImage = null },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(16.dp)
+                            .background(Color.White.copy(alpha = 0.2f), androidx.compose.foundation.shape.CircleShape)
+                    ) {
+                        Icon(imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Tutup", tint = Color.White)
                     }
                 }
             }

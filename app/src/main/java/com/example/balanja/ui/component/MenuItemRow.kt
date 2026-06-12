@@ -1,6 +1,7 @@
 package com.example.balanja.ui.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -48,8 +49,9 @@ fun MenuSectionHeader(title: String) {
     }
 }
 
+
 @Composable
-fun MenuItemRow(menuItem: MenuItem, isDrink: Boolean = false) {
+fun MenuItemRow(menuItem: MenuItem, isDrink: Boolean = false, onImageClick: ((String) -> Unit)? = null) {
     val priceStr = "Rp" + NumberFormat.getNumberInstance(Locale("id", "ID")).format(menuItem.price)
 
     Row(
@@ -63,7 +65,8 @@ fun MenuItemRow(menuItem: MenuItem, isDrink: Boolean = false) {
             modifier = Modifier
                 .size(64.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .then(if (onImageClick != null && menuItem.imageUrl.isNotBlank()) Modifier.clickable { onImageClick(menuItem.imageUrl) } else Modifier),
             contentAlignment = Alignment.Center
         ) {
             if (menuItem.imageUrl.isNotBlank()) {

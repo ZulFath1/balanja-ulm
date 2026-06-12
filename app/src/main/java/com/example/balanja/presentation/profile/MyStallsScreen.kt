@@ -94,8 +94,6 @@ fun MyStallsScreen(
                         items(uiState.stalls, key = { it.id }) { stall ->
                             StallCard(
                                 stall = stall,
-                                isFavorite = false,
-                                onToggleFavorite = { },
                                 onClick = { id -> navController.navigate(Screen.StallDetail.createRoute(id)) }
                             )
                         }

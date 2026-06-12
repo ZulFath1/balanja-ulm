@@ -335,7 +335,11 @@ fun AppNavigation() {
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             @Suppress("UNCHECKED_CAST")
-                            return FavoriteStallsViewModel(AppContainer.getFavoritesUseCase, AppContainer.deleteFavoriteUseCase) as T
+                            return FavoriteStallsViewModel(
+                                AppContainer.getFavoritesUseCase, 
+                                AppContainer.deleteFavoriteUseCase,
+                                AppContainer.getAllStallsUseCase
+                            ) as T
                         }
                     }
                 )
