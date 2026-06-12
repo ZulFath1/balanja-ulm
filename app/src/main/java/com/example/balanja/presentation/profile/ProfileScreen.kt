@@ -1,32 +1,35 @@
 package com.example.balanja.presentation.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.balanja.ui.navigation.Screen
-import com.example.balanja.ui.theme.BalanjaColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,7 +68,14 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Profil Saya", fontWeight = FontWeight.SemiBold) },
+                title = { 
+                    Text(
+                        text = "Profil Saya", 
+                        fontSize = 24.sp, 
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFF111111)
+                    ) 
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF9F8))
             )
         },
@@ -75,72 +85,119 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header Profile
-            Column(
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Header Profile Avatar
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .size(110.dp)
+                    .border(4.dp, Color(0xFFFEE2E2), CircleShape)
+                    .padding(8.dp)
+                    .background(Color(0xFFE5E7EB), CircleShape),
+                contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .background(Color(0xFFE0E0E0), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Avatar",
-                        modifier = Modifier.size(60.dp),
-                        tint = Color.Gray
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Avatar",
+                    modifier = Modifier.size(50.dp),
+                    tint = Color(0xFF9CA3AF)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            if (uiState.isLoading) {
+                CircularProgressIndicator()
+            } else {
+                Text(
+                    text = uiState.userName,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF111111)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = uiState.email,
+                    fontSize = 14.sp,
+                    color = Color(0xFF6B7280)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Menu Group 1: Ulasan, Favorit & Warung Saya
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column {
+                    ProfileMenuItem(
+                        icon = Icons.Default.Star,
+                        iconContainerColor = Color(0xFFFEF3C7),
+                        iconTintColor = Color(0xFFF59E0B),
+                        title = "Ulasan Saya",
+                        onClick = { navController.navigate(Screen.MyReviews.route) }
                     )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                if (uiState.isLoading) {
-                    CircularProgressIndicator()
-                } else {
-                    Text(
-                        text = uiState.userName,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF333333)
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        thickness = 1.dp,
+                        color = Color(0xFFF3F4F6)
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = uiState.email,
-                        fontSize = 16.sp,
-                        color = Color(0xFF666666)
+                    ProfileMenuItem(
+                        icon = Icons.Default.Favorite,
+                        iconContainerColor = Color(0xFFFCE7F3),
+                        iconTintColor = Color(0xFFEC4899),
+                        title = "Stan Favorit",
+                        onClick = { navController.navigate(Screen.Favorites.route) }
                     )
+                    
+                    if (uiState.ownedStalls.isNotEmpty()) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            thickness = 1.dp,
+                            color = Color(0xFFF3F4F6)
+                        )
+                        ProfileMenuItem(
+                            icon = Icons.Default.Settings,
+                            iconContainerColor = Color(0xFFE0E7FF),
+                            iconTintColor = Color(0xFF4F46E5),
+                            title = "Warung Saya",
+                            onClick = { 
+                                if (uiState.ownedStalls.size == 1) {
+                                    navController.navigate(Screen.StallDetail.createRoute(uiState.ownedStalls.first().id))
+                                } else {
+                                    navController.navigate("my_stalls")
+                                }
+                            }
+                        )
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Menu Options
-            ProfileMenuItem(
-                icon = Icons.Default.StarOutline,
-                title = "Ulasan Saya",
-                onClick = { navController.navigate(Screen.MyReviews.route) }
-            )
-            ProfileMenuItem(
-                icon = Icons.Default.FavoriteBorder,
-                title = "Stan Favorit",
-                onClick = { navController.navigate(Screen.Favorites.route) }
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Logout Button
-            ProfileMenuItem(
-                icon = Icons.AutoMirrored.Filled.ExitToApp,
-                title = "Keluar",
-                titleColor = MaterialTheme.colorScheme.error,
-                iconColor = MaterialTheme.colorScheme.error,
-                showArrow = false,
-                onClick = { showLogoutDialog = true }
-            )
-            Spacer(modifier = Modifier.height(32.dp))
+            // Menu Group 2: Keluar
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                ProfileMenuItem(
+                    icon = Icons.AutoMirrored.Filled.ExitToApp,
+                    iconContainerColor = Color(0xFFFEE2E2),
+                    iconTintColor = Color(0xFFEF4444),
+                    title = "Keluar",
+                    titleColor = Color(0xFFEF4444),
+                    showArrow = false,
+                    onClick = { showLogoutDialog = true }
+                )
+            }
         }
     }
 }
@@ -148,9 +205,10 @@ fun ProfileScreen(
 @Composable
 fun ProfileMenuItem(
     icon: ImageVector,
+    iconContainerColor: Color,
+    iconTintColor: Color,
     title: String,
     titleColor: Color = Color(0xFF333333),
-    iconColor: Color = Color(0xFF555555),
     showArrow: Boolean = true,
     onClick: () -> Unit
 ) {
@@ -158,15 +216,22 @@ fun ProfileMenuItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 24.dp, vertical = 16.dp),
+            .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = title,
-            tint = iconColor,
-            modifier = Modifier.size(28.dp)
-        )
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .background(iconContainerColor, RoundedCornerShape(10.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = iconTintColor,
+                modifier = Modifier.size(22.dp)
+            )
+        }
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             text = title,
@@ -179,7 +244,7 @@ fun ProfileMenuItem(
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = "Go",
-                tint = Color(0xFFCCCCCC)
+                tint = Color(0xFF9CA3AF)
             )
         }
     }

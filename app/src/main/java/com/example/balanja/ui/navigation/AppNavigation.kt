@@ -194,7 +194,7 @@ fun AppNavigation() {
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             @Suppress("UNCHECKED_CAST")
-                            return ProfileViewModel(AppContainer.authRepository) as T
+                            return ProfileViewModel(AppContainer.authRepository, AppContainer.stallRepository) as T
                         }
                     }
                 )
@@ -305,6 +305,20 @@ fun AppNavigation() {
                     }
                 )
                 MyReviewsScreen(navController, viewModel)
+            }
+            composable("my_stalls") {
+                val viewModel: com.example.balanja.presentation.profile.MyStallsViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return com.example.balanja.presentation.profile.MyStallsViewModel(
+                                authRepository = AppContainer.authRepository,
+                                stallRepository = AppContainer.stallRepository
+                            ) as T
+                        }
+                    }
+                )
+                com.example.balanja.presentation.profile.MyStallsScreen(navController, viewModel)
             }
         }
     }

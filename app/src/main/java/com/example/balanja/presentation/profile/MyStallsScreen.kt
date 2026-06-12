@@ -1,4 +1,4 @@
-package com.example.balanja.presentation.favorite
+package com.example.balanja.presentation.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,15 +18,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.balanja.domain.model.Stall
 import com.example.balanja.ui.component.StallCard
 import com.example.balanja.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoriteStallsScreen(
+fun MyStallsScreen(
     navController: NavController,
-    viewModel: FavoriteStallsViewModel
+    viewModel: MyStallsViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -35,7 +34,7 @@ fun FavoriteStallsScreen(
             TopAppBar(
                 title = { 
                     Text(
-                        text = "Stan Favorit",
+                        text = "Daftar Warung Saya",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = Color(0xFF111111)
@@ -66,7 +65,7 @@ fun FavoriteStallsScreen(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(5) {
+                        items(3) {
                             com.example.balanja.ui.component.StallCardSkeleton()
                         }
                     }
@@ -78,34 +77,25 @@ fun FavoriteStallsScreen(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
-                uiState.favorites.isEmpty() -> {
+                uiState.stalls.isEmpty() -> {
                     com.example.balanja.ui.component.EmptyStateComponent(
-                        icon = Icons.Default.FavoriteBorder,
-                        title = "Belum Ada Favorit",
-                        subtitle = "Tambahkan stan favorit Anda dengan menekan ikon hati.",
-                        actionLabel = "Jelajahi Balanja",
-                        onAction = { navController.navigate(Screen.Home.route) }
+                        icon = Icons.Default.Store,
+                        title = "Belum Ada Warung",
+                        subtitle = "Anda belum mendaftarkan warung.",
+                        actionLabel = "Kembali",
+                        onAction = { navController.popBackStack() }
                     )
                 }
                 else -> {
                     LazyColumn(
                         contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        items(uiState.favorites, key = { it.stallId }) { fav ->
-                            // Convert FavoriteStall to Stall to use StallCard
-                            val stall = Stall(
-                                id = fav.stallId,
-                                name = fav.name,
-                                location = fav.location,
-                                rating = fav.ratingAverage,
-                                isOpen = fav.isOpen,
-                                imageUrl = fav.imageUrl
-                            )
+                        items(uiState.stalls, key = { it.id }) { stall ->
                             StallCard(
                                 stall = stall,
-                                isFavorite = true,
-                                onToggleFavorite = { viewModel.removeFavorite(fav.stallId) },
+                                isFavorite = false,
+                                onToggleFavorite = { },
                                 onClick = { id -> navController.navigate(Screen.StallDetail.createRoute(id)) }
                             )
                         }
