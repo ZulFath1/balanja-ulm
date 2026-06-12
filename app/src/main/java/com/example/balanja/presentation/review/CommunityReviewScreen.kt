@@ -49,6 +49,13 @@ fun CommunityReviewScreen(
         viewModel.loadReviews(stallId)
     }
 
+    androidx.compose.runtime.DisposableEffect(stallId) {
+        android.util.Log.d("Lifecycle", "CommunityReviewScreen - ON START (stallId: $stallId)")
+        onDispose {
+            android.util.Log.d("Lifecycle", "CommunityReviewScreen - ON DISPOSE (stallId: $stallId)")
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
