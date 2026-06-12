@@ -39,9 +39,11 @@ Silakan **Copy-Paste** bagian-bagian di bawah ini untuk menimpa teks lama di dok
 - **Simpan Stan Favorit (Must have):** Sistem menyimpan data stan favorit pengguna ke dalam Room Database lokal untuk akses offline.
 
 ### 6. Revisi Bab 9.1 & 9.2 (Teknologi yang Digunakan)
-*Timpa penjelasan Osmdroid dan Retrofit/Room di PRD Anda menjadi:*
-- **Osmdroid (OpenStreetMap):** Sistem mengintegrasikan layanan peta open-source dari OpenStreetMap menggunakan pustaka Osmdroid. Ini menggantikan Google Maps SDK untuk menghindari batasan limitasi verifikasi instrumen pembayaran kartu kredit/debit internasional, memastikan pengembangan berjalan efisien dan 100% gratis.
-- **Retrofit & Gson (Open-Meteo API):** Retrofit digunakan sebagai klien HTTP untuk memanggil Open-Meteo API guna mendapatkan info cuaca terkini tanpa perlu API Key (menghindari limitasi kuota harian OpenWeatherMap). Gson memparsing respons JSON menjadi objek Kotlin.
+*Tambahkan/timpa penjelasan mengenai teknologi Cloudinary, Firebase, Osmdroid, dan Retrofit/Room di PRD Anda menjadi:*
+- **Firebase Realtime Database & Authentication:** Layanan Firebase bertugas mengelola autentikasi pengguna secara aman dan menyediakan pangkalan data *real-time* untuk sinkronisasi data warung serta ulasan antar pengguna secara instan tanpa perlu memuat ulang (*refresh*) halaman.
+- **Cloudinary:** Layanan *Cloud Storage* ini secara spesifik digunakan untuk mengelola dan menyimpan seluruh berkas gambar/foto aplikasi (foto profil, foto ulasan, foto warung). Cloudinary dipilih karena menawarkan kecepatan akses optimal via CDN dan fitur manipulasi dimensi gambar yang menghemat beban data aplikasi dibandingkan *storage* konvensional.
+- **Osmdroid (OpenStreetMap):** Sistem mengintegrasikan layanan peta open-source dari OpenStreetMap menggunakan pustaka Osmdroid. Ini menggantikan Google Maps SDK untuk menghindari batasan limitasi verifikasi instrumen pembayaran internasional, memastikan pengembangan berjalan efisien dan 100% gratis.
+- **Retrofit & Gson (Open-Meteo API):** Retrofit digunakan sebagai klien HTTP untuk memanggil Open-Meteo API guna mendapatkan info cuaca terkini tanpa perlu API Key. Gson memparsing respons JSON menjadi objek Kotlin.
 - **Room Database:** Pustaka persistensi yang memberikan lapisan abstraksi di atas SQLite, digunakan untuk memfasilitasi fitur aplikasi *offline-first* seperti menyimpan data Favorit dan Riwayat Pencarian secara lokal.
 
 ---
