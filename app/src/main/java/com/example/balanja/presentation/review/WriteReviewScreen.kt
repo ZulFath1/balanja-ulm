@@ -43,6 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.draw.clip
@@ -78,11 +80,13 @@ fun WriteReviewScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var selectedImageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri -> selectedImageUri = uri }
+        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 3),
+        onResult = { uris -> 
+            selectedImageUris = (selectedImageUris + uris).distinct().take(3)
+        }
     )
 
     LaunchedEffect(uiState.isSuccess) {
@@ -258,49 +262,63 @@ fun WriteReviewScreen(
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
-            if (selectedImageUri != null) {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    AsyncImage(
-                        model = selectedImageUri,
-                        contentDescription = "Selected Image",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 150.dp, max = 300.dp)
-                            .background(Color.LightGray, androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
-                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
-                    )
-                    IconButton(
-                        onClick = { selectedImageUri = null },
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(8.dp)
-                            .background(Color.Black.copy(alpha = 0.5f), androidx.compose.foundation.shape.CircleShape)
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Hapus", tint = Color.White, modifier = Modifier.size(16.dp)) // Using back icon as a placeholder for close, let's use a text or custom shape if needed, actually let's use Icons.Default.Close if imported, otherwise just empty
+            androidx.compose.foundation.lazy.LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(selectedImageUris) { uri ->
+                    Box {
+                        AsyncImage(
+                            model = uri,
+                            contentDescription = "Selected Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(120.dp)
+                                .background(Color.LightGray, androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                                .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                        )
+                        IconButton(
+                            onClick = { 
+                                selectedImageUris = selectedImageUris.filter { it != uri }
+                            },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(4.dp)
+                                .size(24.dp)
+                                .background(Color.Black.copy(alpha = 0.5f), androidx.compose.foundation.shape.CircleShape)
+                        ) {
+                            Icon(Icons.Default.Close, contentDescription = "Hapus", tint = Color.White, modifier = Modifier.size(16.dp))
+                        }
                     }
                 }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(120.dp)
-                        .background(Color(0xFFF3F4F6), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
-                        .border(1.dp, Color(0xFFEFE8E6), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
-                        .clickable { 
-                            photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) 
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            imageVector = Icons.Default.Star, // Replace with Add Photo icon if available
-                            contentDescription = "Upload Photo",
-                            tint = Color.Gray,
-                            modifier = Modifier.size(32.dp)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("Pilih foto dari galeri", color = Color.Gray, fontSize = 14.sp)
+                
+                if (selectedImageUris.size < 3) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .size(120.dp)
+                                .background(Color(0xFFF3F4F6), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                                .border(1.dp, Color(0xFFEFE8E6), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                                .clickable { 
+                                    photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) 
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = "Upload Photo",
+                                    tint = Color.Gray,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = if (selectedImageUris.isEmpty()) "Pilih Foto" else "Tambah Foto", 
+                                    color = Color.Gray, 
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -320,23 +338,12 @@ fun WriteReviewScreen(
             // Submit Button
             androidx.compose.material3.Button(
                 onClick = { 
-                    var imageBytes: ByteArray? = null
-                    var extension: String? = null
-                    
-                    if (selectedImageUri != null) {
-                        try {
-                            val inputStream = context.contentResolver.openInputStream(selectedImageUri!!)
-                            imageBytes = inputStream?.readBytes()
-                            inputStream?.close()
-                            
-                            val mimeType = context.contentResolver.getType(selectedImageUri!!)
-                            extension = mimeType?.substringAfterLast('/') ?: "jpg"
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
+                    val images = selectedImageUris.mapNotNull { uri ->
+                        val extension = context.contentResolver.getType(uri)?.split("/")?.lastOrNull() ?: "jpg"
+                        val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                        if (bytes != null) bytes to extension else null
                     }
-                    
-                    viewModel.submitReview(imageBytes, extension) 
+                    viewModel.submitReview(images) 
                 },
                 modifier = Modifier
                     .fillMaxWidth()

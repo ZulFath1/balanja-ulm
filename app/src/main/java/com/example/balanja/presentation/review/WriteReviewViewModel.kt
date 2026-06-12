@@ -26,7 +26,7 @@ data class WriteReviewUiState(
     val isSaving: Boolean = false,
     val error: String? = null,
     val isSuccess: Boolean = false,
-    val imageUrl: String? = null
+    val imageUrls: List<String> = emptyList()
 )
 
 class WriteReviewViewModel(
@@ -59,7 +59,7 @@ class WriteReviewViewModel(
                         rating = it.rating,
                         comment = it.comment,
                         selectedAttributes = it.attributes,
-                        imageUrl = it.imageUrl
+                        imageUrls = if (it.imageUrls.isNotEmpty()) it.imageUrls else listOfNotNull(it.imageUrl)
                     )
                 }
             }
@@ -86,7 +86,7 @@ class WriteReviewViewModel(
         }
     }
 
-    fun submitReview(imageBytes: ByteArray?, fileExtension: String?) {
+    fun submitReview(images: List<Pair<ByteArray, String>>) {
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, error = null) }
             val currentUser = authRepository.getCurrentUser()
@@ -95,21 +95,24 @@ class WriteReviewViewModel(
                 return@launch
             }
             
-            var finalImageUrl = _uiState.value.imageUrl
+            val finalImageUrls = _uiState.value.imageUrls.toMutableList()
             
-            if (imageBytes != null && fileExtension != null) {
+            if (images.isNotEmpty()) {
                 try {
-                    val mediaType = "image/$fileExtension".toMediaTypeOrNull()
-                    val requestBody = imageBytes.toRequestBody(mediaType)
-                    
-                    val multipartBody = okhttp3.MultipartBody.Builder()
-                        .setType(okhttp3.MultipartBody.FORM)
-                        .addFormDataPart("file", "upload.$fileExtension", requestBody)
-                        .addFormDataPart("upload_preset", "balanja_preset")
-                        .build()
-                    
-                    val response = cloudinaryApiService.uploadImage(multipartBody)
-                    finalImageUrl = response.secureUrl
+                    // Start uploading all images
+                    val uploadResponses = images.map { (imageBytes, fileExtension) ->
+                        val mediaType = "image/$fileExtension".toMediaTypeOrNull()
+                        val requestBody = imageBytes.toRequestBody(mediaType)
+                        
+                        val multipartBody = okhttp3.MultipartBody.Builder()
+                            .setType(okhttp3.MultipartBody.FORM)
+                            .addFormDataPart("file", "upload.$fileExtension", requestBody)
+                            .addFormDataPart("upload_preset", "balanja_preset")
+                            .build()
+                        
+                        cloudinaryApiService.uploadImage(multipartBody)
+                    }
+                    finalImageUrls.addAll(uploadResponses.map { it.secureUrl })
                 } catch (e: retrofit2.HttpException) {
                     val errorBody = e.response()?.errorBody()?.string() ?: e.message()
                     _uiState.update { it.copy(isSaving = false, error = "Gagal mengunggah gambar: $errorBody") }
@@ -128,7 +131,8 @@ class WriteReviewViewModel(
                 rating = _uiState.value.rating,
                 comment = _uiState.value.comment,
                 attributes = _uiState.value.selectedAttributes,
-                imageUrl = finalImageUrl,
+                imageUrls = finalImageUrls,
+                imageUrl = finalImageUrls.firstOrNull(), // Keep for backward compatibility
                 createdAt = System.currentTimeMillis(),
                 updatedAt = System.currentTimeMillis()
             )

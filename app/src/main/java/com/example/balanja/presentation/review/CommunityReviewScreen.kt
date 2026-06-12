@@ -227,18 +227,26 @@ fun CommunityReviewScreen(
                                                 modifier = Modifier.fillMaxWidth()
                                             )
                                             
-                                            if (review.imageUrl != null && review.imageUrl.isNotBlank()) {
+                                            val allImages = if (review.imageUrls.isNotEmpty()) review.imageUrls else listOfNotNull(review.imageUrl).filter { it.isNotBlank() }
+                                            if (allImages.isNotEmpty()) {
                                                 Spacer(modifier = Modifier.height(12.dp))
-                                                AsyncImage(
-                                                    model = review.imageUrl,
-                                                    contentDescription = "Foto Review",
-                                                    contentScale = ContentScale.Crop,
-                                                    modifier = Modifier
-                                                        .width(120.dp)
-                                                        .height(120.dp)
-                                                        .clip(RoundedCornerShape(12.dp))
-                                                        .clickable { showZoomedImage = review.imageUrl }
-                                                )
+                                                androidx.compose.foundation.lazy.LazyRow(
+                                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                    modifier = Modifier.fillMaxWidth()
+                                                ) {
+                                                    items(allImages) { imgUrl ->
+                                                        AsyncImage(
+                                                            model = imgUrl,
+                                                            contentDescription = "Foto Review",
+                                                            contentScale = ContentScale.Crop,
+                                                            modifier = Modifier
+                                                                .width(120.dp)
+                                                                .height(120.dp)
+                                                                .clip(RoundedCornerShape(12.dp))
+                                                                .clickable { showZoomedImage = imgUrl }
+                                                        )
+                                                    }
+                                                }
                                             }
                                             
                                             if (review.attributes.isNotEmpty()) {

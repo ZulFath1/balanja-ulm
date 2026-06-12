@@ -108,7 +108,7 @@ fun MyReviewsScreen(
                                 review = review,
                                 onEdit = { navController.navigate("write_review/${review.stallId}?reviewId=${review.id}") },
                                 onDelete = { viewModel.deleteReview(review.stallId, review.id) },
-                                onImageClick = { showZoomedImage = review.imageUrl }
+                                onImageClick = { imageUrl -> showZoomedImage = imageUrl }
                             )
                         }
                     }
@@ -152,7 +152,7 @@ fun MyReviewsScreen(
 }
 
 @Composable
-fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit, onImageClick: () -> Unit) {
+fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit, onImageClick: (String) -> Unit) {
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     if (showDeleteDialog) {
@@ -208,18 +208,26 @@ fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit, onIma
                 lineHeight = 22.sp
             )
             
-            if (review.imageUrl != null && review.imageUrl.isNotBlank()) {
+            val allImages = if (review.imageUrls.isNotEmpty()) review.imageUrls else listOfNotNull(review.imageUrl).filter { it.isNotBlank() }
+            if (allImages.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
-                AsyncImage(
-                    model = review.imageUrl,
-                    contentDescription = "Foto Review Saya",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .width(120.dp)
-                        .height(120.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .clickable { onImageClick() }
-                )
+                androidx.compose.foundation.lazy.LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(allImages) { imgUrl ->
+                        AsyncImage(
+                            model = imgUrl,
+                            contentDescription = "Foto Review Saya",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .width(120.dp)
+                                .height(120.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { onImageClick(imgUrl) }
+                        )
+                    }
+                }
             }
             
             Spacer(modifier = Modifier.height(20.dp))
