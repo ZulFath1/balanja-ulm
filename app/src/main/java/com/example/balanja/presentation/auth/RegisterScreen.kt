@@ -22,6 +22,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.balanja.ui.component.AuthFooter
+import com.example.balanja.ui.component.BalanjaTextField
 
 @Composable
 fun RegisterScreen(
@@ -167,27 +169,6 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Text(
-            text = "HANYA UNTUK CIVITAS AKADEMIKA ULM",
-            fontSize = 10.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "PRIVACY  •  TERMS  •  HELP",
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "© 2024 Balanja ULM. Designed for the Academic Lambung Mangkurat",
-            fontSize = 10.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
+        AuthFooter()
     }
 }

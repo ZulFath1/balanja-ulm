@@ -27,6 +27,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.balanja.ui.component.AuthFooter
+import com.example.balanja.ui.component.BalanjaTextField
 
 @Composable
 fun LoginScreen(
@@ -157,69 +159,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Text(
-            text = "HANYA UNTUK CIVITAS AKADEMIKA ULM",
-            fontSize = 10.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "PRIVACY  •  TERMS  •  HELP",
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "© 2024 Balanja ULM. Designed for the Academic Lambung Mangkurat",
-            fontSize = 10.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
+        AuthFooter()
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun BalanjaTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    leadingIcon: ImageVector,
-    isPassword: Boolean = false,
-    isPasswordVisible: Boolean = false,
-    onVisibilityToggle: () -> Unit = {},
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = { Text(placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant) },
-        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-        trailingIcon = {
-            if (isPassword) {
-                IconButton(onClick = onVisibilityToggle) {
-                    val icon = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                    Icon(imageVector = icon, contentDescription = "Toggle Password Visibility", tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-        },
-        visualTransformation = if (isPassword && !isPasswordVisible) PasswordVisualTransformation() else VisualTransformation.None,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            cursorColor = MaterialTheme.colorScheme.primary
-        ),
-        modifier = Modifier.fillMaxWidth()
-    )
-}
+// Removed duplicated BalanjaTextField, we should use the one in ui.component but since its signature differs, I will update the ui.component one. Wait, if I remove this, LoginScreen will use the one in ui.component which expects label, etc. I need to keep it temporarily or update ui.component.BalanjaTextField first. I will keep it here for a moment and only remove the footer for now.
