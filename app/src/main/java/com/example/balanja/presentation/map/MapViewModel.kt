@@ -36,7 +36,7 @@ class MapViewModel(
                     val selectedStall = stallList.find { it.id == stallId }
                     _uiState.value = MapUiState(
                         isLoading = false,
-                        stalls = stallList,
+                        stalls = if (selectedStall != null) listOf(selectedStall) else stallList,
                         selectedStallLocation = selectedStall
                     )
                 }
