@@ -54,7 +54,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp),
-                contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
+                contentPadding = PaddingValues(top = 16.dp, bottom = 120.dp)
             ) {
                 // Header
                 item {

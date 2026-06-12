@@ -86,7 +86,7 @@ fun SearchScreen(
             when {
                 uiState.isLoading -> {
                     LazyColumn(
-                        contentPadding = PaddingValues(bottom = 80.dp)
+                        contentPadding = PaddingValues(bottom = 120.dp)
                     ) {
                         items(5) {
                             com.example.balanja.ui.component.StallCardSkeleton()
@@ -117,7 +117,7 @@ fun SearchScreen(
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         LazyColumn(
-                            contentPadding = PaddingValues(bottom = 80.dp)
+                            contentPadding = PaddingValues(bottom = 120.dp)
                         ) {
                             items(uiState.recentSearches) { recent ->
                                 val stall = uiState.allStalls.find { it.id == recent.stallId }
@@ -149,7 +149,7 @@ fun SearchScreen(
                 }
                 else -> {
                     LazyColumn(
-                        contentPadding = PaddingValues(bottom = 80.dp)
+                        contentPadding = PaddingValues(bottom = 120.dp)
                     ) {
                         items(uiState.filteredStalls) { stall ->
                             StallCard(

@@ -57,7 +57,7 @@ fun AddStallScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 120.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(24.dp))

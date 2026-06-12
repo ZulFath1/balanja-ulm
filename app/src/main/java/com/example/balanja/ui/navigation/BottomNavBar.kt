@@ -73,9 +73,9 @@ fun BalanjaBottomNav(
                     elevation = 16.dp, 
                     spotColor = Color(0x1A000000), 
                     ambientColor = Color(0x1A000000),
-                    shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+                    shape = RoundedCornerShape(24.dp)
                 )
-                .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                .clip(RoundedCornerShape(24.dp))
                 .background(Color.White)
         )
 

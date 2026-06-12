@@ -71,9 +71,7 @@ fun AppNavigation() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val showBottomBar = screensWithoutBottomNav.none { pattern ->
-        currentRoute?.startsWith(pattern.substringBefore("{")) == true
-    }
+    // showBottomBar no longer needed since navbar is rendered per route
 
     val startDestination = androidx.compose.runtime.remember {
         if (AppContainer.authRepository.isLoggedIn()) Screen.Home.route else Screen.Login.route
@@ -87,15 +85,14 @@ fun AppNavigation() {
     }
 
     Scaffold(
-        containerColor = Color(0xFFFBF9F8),
-        bottomBar = {
-            if (showBottomBar) BalanjaBottomNav(navController)
-        }
+        containerColor = Color(0xFFFBF9F8)
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = innerPadding.calculateTopPadding()),
             enterTransition = {
                 if (isNavbarRoute(targetState.destination.route)) {
                     fadeIn(animationSpec = tween(300))
@@ -185,12 +182,15 @@ fun AppNavigation() {
                         }
                     }
                 )
-                com.example.balanja.presentation.home.HomeScreen(
-                    viewModel = viewModel,
-                    onNavigateToDetail = { stallId ->
-                        navController.navigate(Screen.StallDetail.createRoute(stallId))
-                    }
-                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    com.example.balanja.presentation.home.HomeScreen(
+                        viewModel = viewModel,
+                        onNavigateToDetail = { stallId ->
+                            navController.navigate(Screen.StallDetail.createRoute(stallId))
+                        }
+                    )
+                    BalanjaBottomNav(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+                }
             }
             composable(Screen.Search.route) {
                 val viewModel: com.example.balanja.presentation.search.SearchViewModel = viewModel(
@@ -206,12 +206,15 @@ fun AppNavigation() {
                         }
                     }
                 )
-                com.example.balanja.presentation.search.SearchScreen(
-                    viewModel = viewModel,
-                    onNavigateToDetail = { stallId ->
-                        navController.navigate(Screen.StallDetail.createRoute(stallId))
-                    }
-                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    com.example.balanja.presentation.search.SearchScreen(
+                        viewModel = viewModel,
+                        onNavigateToDetail = { stallId ->
+                            navController.navigate(Screen.StallDetail.createRoute(stallId))
+                        }
+                    )
+                    BalanjaBottomNav(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+                }
             }
             composable(
                 route = Screen.Map.route,
@@ -232,7 +235,13 @@ fun AppNavigation() {
                 )
             }
             composable(Screen.AddStall.route) {
-                AddStallScreen()
+                val viewModel: com.example.balanja.presentation.search.AddStallViewModel = viewModel()
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AddStallScreen(
+                        viewModel = viewModel
+                    )
+                    BalanjaBottomNav(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+                }
             }
             composable(Screen.Profile.route) {
                 val viewModel: ProfileViewModel = viewModel(
@@ -243,7 +252,10 @@ fun AppNavigation() {
                         }
                     }
                 )
-                ProfileScreen(navController, viewModel)
+                Box(modifier = Modifier.fillMaxSize()) {
+                    ProfileScreen(navController, viewModel)
+                    BalanjaBottomNav(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+                }
             }
             composable(Screen.Favorites.route) {
                 val viewModel: FavoriteStallsViewModel = viewModel(
