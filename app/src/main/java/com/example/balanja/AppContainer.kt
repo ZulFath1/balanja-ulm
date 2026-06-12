@@ -64,7 +64,7 @@ object AppContainer {
         private set
 
     fun init(context: android.content.Context) {
-        val database = com.example.balanja.data.local.BalanjaLocalDatabase.getInstance(context)
+        val database = com.example.balanja.data.local.db.BalanjaLocalDatabase.getInstance(context)
         favoriteRepository = FavoriteRepositoryImpl(database.favoriteStallDao())
         recentSearchRepository = RecentSearchRepositoryImpl(database.recentSearchDao())
     }
@@ -94,3 +94,4 @@ object AppContainer {
     val addRecentSearchUseCase by lazy { AddRecentSearchUseCase(recentSearchRepository) }
     val clearRecentSearchesUseCase by lazy { ClearRecentSearchesUseCase(recentSearchRepository) }
 }
+

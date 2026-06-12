@@ -1,4 +1,4 @@
-package com.example.balanja.presentation.detail
+package com.example.balanja.presentation.stall
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

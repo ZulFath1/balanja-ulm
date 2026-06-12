@@ -1,4 +1,4 @@
-package com.example.balanja.data.local
+package com.example.balanja.data.local.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -30,3 +30,4 @@ class ThemePreferenceManager(context: Context) {
         }
     }
 }
+

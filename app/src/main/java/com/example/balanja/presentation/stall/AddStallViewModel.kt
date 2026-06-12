@@ -1,4 +1,4 @@
-package com.example.balanja.presentation.search
+package com.example.balanja.presentation.stall
 
 import android.content.Context
 import android.content.Intent
@@ -23,3 +23,4 @@ class AddStallViewModel : ViewModel() {
         context.startActivity(intent)
     }
 }
+

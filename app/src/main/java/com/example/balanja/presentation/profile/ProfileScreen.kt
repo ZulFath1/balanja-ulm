@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.balanja.data.local.ThemePreferenceManager
+import com.example.balanja.data.local.prefs.ThemePreferenceManager
 import com.example.balanja.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -348,3 +348,4 @@ fun ProfileMenuItem(
         }
     }
 }
+

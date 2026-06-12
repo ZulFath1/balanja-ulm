@@ -61,15 +61,15 @@ import com.example.balanja.presentation.review.WriteReviewScreen
 import com.example.balanja.presentation.review.WriteReviewViewModel
 import com.example.balanja.presentation.review.MyReviewsScreen
 import com.example.balanja.presentation.review.MyReviewsViewModel
-import com.example.balanja.presentation.search.AddStallScreen
+import com.example.balanja.presentation.stall.AddStallScreen
 import com.example.balanja.presentation.map.MapScreen
 import com.example.balanja.presentation.map.MapViewModel
 import com.example.balanja.presentation.profile.ProfileScreen
 import com.example.balanja.presentation.profile.ProfileViewModel
 import com.example.balanja.presentation.favorite.FavoriteStallsScreen
 import com.example.balanja.presentation.favorite.FavoriteStallsViewModel
-import com.example.balanja.presentation.detail.StallDetailScreen
-import com.example.balanja.presentation.detail.StallDetailViewModel
+import com.example.balanja.presentation.stall.StallDetailScreen
+import com.example.balanja.presentation.stall.StallDetailViewModel
 
 // Factory untuk inject SignInUseCase ke AuthViewModel
 class AuthViewModelFactory(
@@ -291,7 +291,7 @@ fun AppNavigation() {
                 )
             }
             composable(Screen.AddStall.route) {
-                val viewModel: com.example.balanja.presentation.search.AddStallViewModel = viewModel()
+                val viewModel: com.example.balanja.presentation.stall.AddStallViewModel = viewModel()
                 Box(modifier = Modifier.fillMaxSize()) {
                     AddStallScreen(
                         viewModel = viewModel
@@ -468,4 +468,5 @@ fun PlaceholderScreen(name: String) {
         Text(name, style = MaterialTheme.typography.titleMedium)
     }
 }
+
 

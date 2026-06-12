@@ -1,4 +1,4 @@
-package com.example.balanja.presentation.detail
+package com.example.balanja.presentation.stall
 
 import com.example.balanja.domain.usecase.review.GetReviewsUseCase
 import com.example.balanja.domain.usecase.favorite.IsFavoriteUseCase
@@ -115,4 +115,5 @@ class StallDetailViewModel(
         }
     }
 }
+
 

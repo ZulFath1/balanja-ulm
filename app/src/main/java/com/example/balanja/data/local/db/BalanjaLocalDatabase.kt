@@ -1,4 +1,4 @@
-package com.example.balanja.data.local
+package com.example.balanja.data.local.db
 
 import android.content.Context
 import androidx.room.Database
@@ -38,3 +38,4 @@ abstract class BalanjaLocalDatabase : RoomDatabase() {
         }
     }
 }
+

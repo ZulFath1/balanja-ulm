@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.example.balanja.data.local.ThemePreferenceManager
+import com.example.balanja.data.local.prefs.ThemePreferenceManager
 import com.example.balanja.ui.navigation.AppNavigation
 import com.example.balanja.ui.theme.BalanjaTheme
 

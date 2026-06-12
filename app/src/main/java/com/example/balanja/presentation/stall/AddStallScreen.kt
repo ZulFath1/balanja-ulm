@@ -1,4 +1,4 @@
-package com.example.balanja.presentation.search
+package com.example.balanja.presentation.stall
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -111,3 +111,4 @@ fun AddStallScreen(
         }
     }
 }
+
