@@ -34,7 +34,7 @@ fun StallCard(
             .padding(vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         onClick = { onClick(stall.id) }
     ) {
         Column {
@@ -82,7 +82,7 @@ fun StallCard(
                         Icon(
                             imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "Favorit",
-                            tint = if (isFavorite) Color.Red else Color.Gray,
+                            tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -102,7 +102,7 @@ fun StallCard(
                         text = stall.name,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF111111),
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
@@ -124,10 +124,10 @@ fun StallCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = stall.rating.toString(),
+                            text = String.format(java.util.Locale.US, "%.1f", stall.rating),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF111111)
+                            color = Color(0xFF111111) // Keep dark on yellow badge
                         )
                     }
                 }
@@ -138,7 +138,7 @@ fun StallCard(
                     text = "Rp${stall.priceMin / 1000}rb - Rp${stall.priceMax / 1000}rb",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF870500)
+                    color = MaterialTheme.colorScheme.primary
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -146,7 +146,7 @@ fun StallCard(
                 Text(
                     text = stall.location.uppercase(),
                     fontSize = 12.sp,
-                    color = Color(0xFF6B7280)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

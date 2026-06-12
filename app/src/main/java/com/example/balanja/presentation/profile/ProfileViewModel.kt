@@ -12,21 +12,24 @@ import kotlinx.coroutines.launch
 data class ProfileUiState(
     val userName: String = "Pengguna",
     val email: String = "",
+    val photoUrl: String? = null,
+    val ownedStalls: List<com.example.balanja.domain.model.Stall> = emptyList(),
     val isLoading: Boolean = true
 )
 
 class ProfileViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val stallRepository: com.example.balanja.domain.repository.StallRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
     init {
-        loadUserProfile()
+        refreshProfile()
     }
 
-    private fun loadUserProfile() {
+    fun refreshProfile() {
         viewModelScope.launch {
             val user = authRepository.getCurrentUser()
             if (user != null) {
@@ -34,8 +37,14 @@ class ProfileViewModel(
                     it.copy(
                         userName = user.name ?: "Pengguna Balanja",
                         email = user.email ?: "",
+                        photoUrl = user.photoUrl,
                         isLoading = false
                     ) 
+                }
+                
+                // Fetch owned stalls
+                stallRepository.getStallsByOwnerId(user.id).collect { stalls ->
+                    _uiState.update { it.copy(ownedStalls = stalls) }
                 }
             } else {
                 _uiState.update { it.copy(isLoading = false) }
@@ -49,4 +58,5 @@ class ProfileViewModel(
             onLogoutComplete()
         }
     }
+
 }

@@ -49,34 +49,44 @@ fun HomeScreen(
         modifier = Modifier.fillMaxSize()
     ) {
             val favoritesList by viewModel.favorites.collectAsStateWithLifecycle()
+            val userName by viewModel.userName.collectAsStateWithLifecycle()
+            val greeting by viewModel.greeting.collectAsStateWithLifecycle()
 
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp),
-                contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
+                contentPadding = PaddingValues(top = 16.dp, bottom = 120.dp)
             ) {
                 // Header
                 item {
-                    Column(modifier = Modifier.padding(bottom = 16.dp)) {
+                    Column(modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)) {
+                        val nameText = if (userName.isNotBlank()) ", ${userName}!" else "!"
                         Text(
-                            text = "Selamat Pagi!",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
+                            text = "${greeting}$nameText",
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            letterSpacing = 0.5.sp
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = buildAnnotatedString {
                                 append("Mau ")
                                 withStyle(
                                     style = SpanStyle(
-                                        color = Color(0xFF870500),
-                                        fontWeight = FontWeight.ExtraBold,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Black,
                                         fontStyle = FontStyle.Italic
                                     )
                                 ) { append("Balanja") }
                                 append(" apa hari ini?")
                             },
-                            fontSize = 20.sp
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            lineHeight = 34.sp,
+                            letterSpacing = (-0.5).sp
                         )
                     }
                 }

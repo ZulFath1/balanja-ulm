@@ -22,6 +22,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.balanja.ui.component.AuthFooter
+import com.example.balanja.ui.component.BalanjaTextField
 
 @Composable
 fun RegisterScreen(
@@ -33,9 +35,9 @@ fun RegisterScreen(
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isConfirmPasswordVisible by remember { mutableStateOf(false) }
 
-    val primaryColor = Color(0xFF870500)
+    val primaryColor = MaterialTheme.colorScheme.primary
     val goldColor = Color(0xFF836F1E)
-    val backgroundColor = Color(0xFFFBF9F8)
+    val backgroundColor = MaterialTheme.colorScheme.background
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
@@ -64,16 +66,16 @@ fun RegisterScreen(
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Email Mahasiswa/Dosen",
+                text = "Masukkan email ULM.",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF555555)
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
             BalanjaTextField(
                 value = uiState.email,
                 onValueChange = { viewModel.updateEmail(it) },
-                placeholder = "@ulm.ac.id atau @mhs.ulm.ac.id",
+                placeholder = "Masukkan email ULM.",
                 leadingIcon = Icons.Default.School,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
             )
@@ -86,7 +88,7 @@ fun RegisterScreen(
                 text = "Kata Sandi",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF555555)
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
             BalanjaTextField(
@@ -108,7 +110,7 @@ fun RegisterScreen(
                 text = "Konfirmasi Kata Sandi",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF555555)
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
             BalanjaTextField(
@@ -133,7 +135,7 @@ fun RegisterScreen(
         if (uiState.error != null) {
             Text(
                 text = uiState.error!!,
-                color = Color.Red,
+                color = MaterialTheme.colorScheme.error,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
                 textAlign = TextAlign.Start
@@ -150,7 +152,7 @@ fun RegisterScreen(
             enabled = !uiState.isLoading && uiState.email.isNotBlank() && uiState.password.isNotBlank() && uiState.confirmPassword.isNotBlank()
         ) {
             if (uiState.isLoading) {
-                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
             } else {
                 Text(text = "Daftar Akun", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
@@ -166,28 +168,5 @@ fun RegisterScreen(
         )
 
         Spacer(modifier = Modifier.weight(1f))
-
-        Text(
-            text = "HANYA UNTUK CIVITAS AKADEMIKA ULM",
-            fontSize = 10.sp,
-            color = Color(0xFFDCA8A6),
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "PRIVACY  •  TERMS  •  HELP",
-            fontSize = 12.sp,
-            color = Color(0xFFDCA8A6),
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "© 2024 Balanja ULM. Designed for the Academic Lambung Mangkurat",
-            fontSize = 10.sp,
-            color = Color.Gray,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
     }
 }

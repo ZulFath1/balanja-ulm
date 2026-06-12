@@ -2,16 +2,14 @@ package com.example.balanja.presentation.search
 
 import android.content.Context
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Store
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.balanja.ui.component.PrimaryButton
@@ -28,11 +27,6 @@ import com.example.balanja.ui.component.PrimaryButton
  * 
  * This screen allows users to propose a new stall/vendor to be added to the platform.
  * The submission is done via an external Google Form instead of direct upload.
- * 
- * Requirements:
- * - Display informational text about submitting stall proposals
- * - Provide a button to open the Google Form in external browser
- * - No GPS tracking, camera, or image uploads required
  */
 @Composable
 fun AddStallScreen(
@@ -40,60 +34,80 @@ fun AddStallScreen(
 ) {
     val context = LocalContext.current
     
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFFBF9F8))
-    ) {
+    Scaffold(
+        topBar = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+            ) {
+                Text(
+                    text = "Tambah Pedagang",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
+                )
+            }
+        },
+        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 120.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Title
-            Text(
-                text = "Tambah Pedagang",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF333333),
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            
             Spacer(modifier = Modifier.height(24.dp))
-            
-            // Information Text
+
+            // Icon Background
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer, shape = CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Store,
+                    contentDescription = "Toko",
+                    tint = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             Text(
-                text = "Ingin menambahkan pedagang atau warung baru di Balanja ULM?",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF555555),
-                modifier = Modifier.padding(bottom = 16.dp)
+                text = "Punya Rekomendasi Warung?",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center
             )
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            Text(
-                text = "Kami mengundang Anda untuk memberikan saran tentang pedagang atau warung makan yang baru di sekitar kampus ULM Banjarmasin. " +
-                        "Saran Anda sangat membantu kami untuk memperluas dan memperbaiki database toko kami.\n\n" +
-                        "Mohon isi formulir di bawah ini dengan informasi lengkap tentang pedagang yang ingin Anda tambahkan. " +
-                        "Tim kami akan meninjau setiap saran dan menggunakannya untuk meningkatkan layanan Balanja ULM.",
-                fontSize = 14.sp,
-                color = Color(0xFF666666),
-                lineHeight = 22.sp,
-                modifier = Modifier.padding(bottom = 32.dp)
-            )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
+            Text(
+                text = "Kami selalu ingin memperluas jangkauan! Jika Anda mengetahui warung atau pedagang kaki lima di sekitar kampus ULM yang belum terdaftar di aplikasi Balanja ULM, ayo beritahu kami.\n\nIsi formulir singkat dengan informasi pedagang tersebut. Tim kami akan segera meninjaunya agar mahasiswa lain juga bisa menikmatinya!",
+                fontSize = 15.sp,
+                lineHeight = 24.sp,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(48.dp))
+
             // Submit Button
             PrimaryButton(
                 text = "Buka Formulir Pengajuan",
                 onClick = { viewModel.openGoogleForm(context) },
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.fillMaxWidth()
             )
+            
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }

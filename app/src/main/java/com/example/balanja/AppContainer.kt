@@ -29,13 +29,23 @@ object AppContainer {
             .build()
     }
 
+    private val weatherRetrofit = Retrofit.Builder()
+        .addConverterFactory(GsonConverterFactory.create())
+        .baseUrl(WeatherApiService.BASE_URL)
+        .client(okHttpClient)
+        .build()
+
+    private val cloudinaryRetrofit = Retrofit.Builder()
+        .addConverterFactory(GsonConverterFactory.create())
+        .baseUrl("https://api.cloudinary.com/v1_1/dfg9q3j5d/")
+        .build()
+
     val weatherApiService: WeatherApiService by lazy {
-        Retrofit.Builder()
-            .baseUrl(WeatherApiService.BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(WeatherApiService::class.java)
+        weatherRetrofit.create(WeatherApiService::class.java)
+    }
+
+    val cloudinaryApiService: com.example.balanja.data.api.cloudinary.CloudinaryApiService by lazy {
+        cloudinaryRetrofit.create(com.example.balanja.data.api.cloudinary.CloudinaryApiService::class.java)
     }
 
 
@@ -45,10 +55,13 @@ object AppContainer {
     val weatherRepository: WeatherRepository by lazy { WeatherRepositoryImpl(weatherApiService) }
     lateinit var favoriteRepository: FavoriteRepository
         private set
+    lateinit var recentSearchRepository: RecentSearchRepository
+        private set
 
     fun init(context: android.content.Context) {
         val database = com.example.balanja.data.local.BalanjaLocalDatabase.getInstance(context)
         favoriteRepository = FavoriteRepositoryImpl(database.favoriteStallDao())
+        recentSearchRepository = RecentSearchRepositoryImpl(database.recentSearchDao())
     }
 
     // ─── Use Cases ────────────────────────────────────────────────────────────
@@ -71,4 +84,8 @@ object AppContainer {
     val getReviewsUseCase by lazy { GetReviewsUseCase(reviewRepository) }
     val getMyReviewsUseCase by lazy { GetMyReviewsUseCase(reviewRepository) }
     val recalculateStallRatingUseCase by lazy { RecalculateStallRatingUseCase(stallRepository, reviewRepository) }
+
+    val getRecentSearchesUseCase by lazy { GetRecentSearchesUseCase(recentSearchRepository) }
+    val addRecentSearchUseCase by lazy { AddRecentSearchUseCase(recentSearchRepository) }
+    val clearRecentSearchesUseCase by lazy { ClearRecentSearchesUseCase(recentSearchRepository) }
 }

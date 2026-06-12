@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface StallRepository {
     fun getAllStalls(): Flow<List<Stall>>
     fun getStallById(stallId: String): Flow<Stall?>
+    fun getStallsByOwnerId(ownerId: String): Flow<List<Stall>>
     suspend fun updateStallStatus(stallId: String, isOpen: Boolean): Result<Unit>
     suspend fun updateStallRating(stallId: String, averageRating: Double, reviewCount: Int): Result<Unit>
 }

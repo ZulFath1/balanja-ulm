@@ -37,6 +37,8 @@ import com.example.balanja.domain.model.MenuItem
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
+import com.example.balanja.ui.component.MenuItemRow
+import com.example.balanja.ui.component.MenuSectionHeader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,12 +65,12 @@ fun StallDetailScreen(
                         text = "Detail Tempat", 
                         fontSize = 18.sp, 
                         fontWeight = FontWeight.Bold, 
-                        color = Color(0xFF870500)
+                        color = MaterialTheme.colorScheme.primary
                     ) 
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali", tint = Color(0xFF870500))
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali", tint = MaterialTheme.colorScheme.primary)
                     }
                 },
                 actions = {
@@ -82,15 +84,15 @@ fun StallDetailScreen(
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         },
         floatingActionButton = {
             if (uiState is StallDetailUiState.Success) {
                 ExtendedFloatingActionButton(
                     onClick = { onNavigateToReview(stallId) },
-                    containerColor = Color(0xFF870500),
-                    contentColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = RoundedCornerShape(12.dp),
                     elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 6.dp),
                     icon = { Icon(Icons.Default.RateReview, "Tulis Ulasan") },
@@ -99,7 +101,7 @@ fun StallDetailScreen(
             }
         },
         floatingActionButtonPosition = FabPosition.Center,
-        containerColor = Color(0xFFFBF9F8)
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
             val currentState = uiState
@@ -107,13 +109,13 @@ fun StallDetailScreen(
                 is StallDetailUiState.Loading -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        color = Color(0xFF870500)
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
                 is StallDetailUiState.Error -> {
                     Text(
                         text = currentState.message,
-                        color = Color.Red,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -159,22 +161,22 @@ fun StallDetailScreen(
                                     Column(
                                         modifier = Modifier
                                             .align(Alignment.BottomStart)
-                                            .padding(start = 24.dp, end = 24.dp, bottom = 80.dp) // Leave space for floating card
+                                            .padding(start = 24.dp, end = 24.dp, bottom = 120.dp) // Leave space for floating card
                                     ) {
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Icon(Icons.Default.Place, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
+                                            Icon(Icons.Default.Place, contentDescription = null, tint = Color.White, modifier = Modifier.size(12.dp))
                                             Spacer(modifier = Modifier.width(4.dp))
-                                            Text(stall.location.uppercase(), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+                                            Text(stall.location.uppercase(), color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
                                         }
                                         Spacer(modifier = Modifier.height(4.dp))
                                         Text(
                                             text = stall.name,
                                             color = Color.White,
-                                            fontSize = 36.sp,
+                                            fontSize = 28.sp,
                                             fontWeight = FontWeight.Bold,
-                                            lineHeight = 40.sp
+                                            lineHeight = 32.sp
                                         )
                                     }
                                 }
@@ -187,7 +189,7 @@ fun StallDetailScreen(
                                         .align(Alignment.BottomCenter)
                                         .offset(y = 40.dp), // Move it down to overlap the bottom edge
                                     shape = RoundedCornerShape(16.dp),
-                                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                                 ) {
                                     Column(modifier = Modifier.padding(20.dp)) {
@@ -200,14 +202,14 @@ fun StallDetailScreen(
                                             Box(
                                                 modifier = Modifier
                                                     .background(
-                                                        color = if (stall.isOpen) Color(0xFFE8F5E9) else Color(0xFFFFEBEE),
+                                                        color = MaterialTheme.colorScheme.surfaceVariant,
                                                         shape = RoundedCornerShape(8.dp)
                                                     )
                                                     .padding(horizontal = 12.dp, vertical = 6.dp)
                                             ) {
                                                 Text(
                                                     text = if (stall.isOpen) "BUKA" else "TUTUP",
-                                                    color = if (stall.isOpen) Color(0xFF2E7D32) else Color(0xFFC62828),
+                                                    color = if (stall.isOpen) com.example.balanja.ui.theme.BalanjaColor.Success else MaterialTheme.colorScheme.error,
                                                     fontWeight = FontWeight.Bold,
                                                     fontSize = 12.sp
                                                 )
@@ -219,14 +221,14 @@ fun StallDetailScreen(
                                             Row(
                                                 verticalAlignment = Alignment.CenterVertically,
                                                 modifier = Modifier
-                                                    .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+                                                    .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
                                                     .clip(RoundedCornerShape(8.dp))
                                                     .clickable { onNavigateToCommunityReview(stall.id) }
                                                     .padding(horizontal = 12.dp, vertical = 6.dp)
                                             ) {
                                                 Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(14.dp))
                                                 Spacer(modifier = Modifier.width(4.dp))
-                                                Text("${stall.rating} (${stall.reviewCount})", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                                Text(String.format(Locale.US, "%.1f", stall.rating) + " (${stall.reviewCount})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                             }
 
                                             Spacer(modifier = Modifier.width(8.dp))
@@ -235,26 +237,26 @@ fun StallDetailScreen(
                                             Row(
                                                 verticalAlignment = Alignment.CenterVertically,
                                                 modifier = Modifier
-                                                    .background(Color(0xFFFFEBEE), RoundedCornerShape(8.dp))
+                                                    .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
                                                     .clip(RoundedCornerShape(8.dp))
                                                     .clickable { onNavigateToMap(stall.id) }
                                                     .padding(horizontal = 12.dp, vertical = 6.dp)
                                             ) {
-                                                Icon(Icons.Default.Place, contentDescription = null, tint = Color(0xFF870500), modifier = Modifier.size(14.dp))
+                                                Icon(Icons.Default.Place, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(14.dp))
                                                 Spacer(modifier = Modifier.width(4.dp))
-                                                Text("Lokasi", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF870500))
+                                                Text("Lokasi", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                                             }
                                         }
 
                                         Spacer(modifier = Modifier.height(16.dp))
-                                        Text("ABOUT THE STALL", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Color.Gray, letterSpacing = 1.sp)
+                                        Text("ABOUT THE STALL", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSurfaceVariant, letterSpacing = 1.sp)
                                         Spacer(modifier = Modifier.height(8.dp))
                                         Text(
                                             text = "\"${stall.description}\"",
                                             fontSize = 14.sp,
                                             fontStyle = FontStyle.Italic,
                                             fontFamily = FontFamily.Serif,
-                                            color = Color(0xFF555555),
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             lineHeight = 20.sp
                                         )
                                     }
@@ -317,101 +319,7 @@ fun StallDetailScreen(
         }
     }
 }
-
-@Composable
-fun MenuSectionHeader(title: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 16.dp)
-    ) {
-        Text(
-            text = title,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color(0xFF111111)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(1.dp)
-                .background(Color.LightGray.copy(alpha = 0.5f))
-        )
-    }
-}
-
-@Composable
-fun MenuItemRow(menuItem: MenuItem, isDrink: Boolean = false) {
-    val priceStr = "Rp" + NumberFormat.getNumberInstance(Locale("id", "ID")).format(menuItem.price)
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Image or Placeholder
-        Box(
-            modifier = Modifier
-                .size(64.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color(0xFFF3F4F6)),
-            contentAlignment = Alignment.Center
-        ) {
-            if (menuItem.imageUrl.isNotBlank()) {
-                AsyncImage(
-                    model = menuItem.imageUrl,
-                    contentDescription = menuItem.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                Icon(
-                    imageVector = if (isDrink) Icons.Outlined.LocalDrink else Icons.Outlined.Restaurant,
-                    contentDescription = null,
-                    tint = Color.LightGray,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        }
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = menuItem.name,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF111111),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            if (menuItem.description.isNotBlank()) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = menuItem.description,
-                    fontSize = 12.sp,
-                    color = Color.Gray,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    lineHeight = 16.sp
-                )
-            }
-        }
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        Text(
-            text = priceStr,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF870500)
-        )
-    }
-}
-
+// MenuItemRow and MenuSectionHeader moved to ui.component
 @Composable
 fun StallStatusToggle(
     isOpen: Boolean,
@@ -423,7 +331,7 @@ fun StallStatusToggle(
             .padding(horizontal = 24.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isOpen) Color(0xFFF1F8E9) else Color(0xFFFFEBEE)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // Subtle flat look
     ) {
@@ -434,13 +342,13 @@ fun StallStatusToggle(
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .background(if (isOpen) Color(0xFFC8E6C9) else Color(0xFFFFCDD2), shape = RoundedCornerShape(8.dp)),
+                    .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Storefront,
                     contentDescription = null,
-                    tint = if (isOpen) Color(0xFF2E7D32) else Color(0xFFC62828),
+                    tint = if (isOpen) com.example.balanja.ui.theme.BalanjaColor.Success else MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -455,7 +363,7 @@ fun StallStatusToggle(
                 Text(
                     text = "Sebagai pemilik, Anda bisa mengubah status warung.",
                     fontSize = 11.sp,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 14.sp
                 )
             }

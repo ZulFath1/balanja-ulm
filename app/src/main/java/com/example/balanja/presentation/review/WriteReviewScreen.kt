@@ -28,10 +28,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.clickable
@@ -39,10 +43,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.PickVisualMediaRequest
+import android.net.Uri
+import coil.compose.AsyncImage
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import com.example.balanja.ui.component.PrimaryButton
 import com.example.balanja.ui.theme.BalanjaColor
+import com.example.balanja.ui.component.LocalSnackbarHostState
+import kotlinx.coroutines.launch
 
 /**
  * BLJA-03: ULASAN/REVIEW Screen (Write Review)
@@ -65,9 +82,24 @@ fun WriteReviewScreen(
     viewModel: WriteReviewViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var selectedImageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 3),
+        onResult = { uris -> 
+            selectedImageUris = (selectedImageUris + uris).distinct().take(3)
+        }
+    )
+
+    val snackbarHostState = LocalSnackbarHostState.current
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
+            launch {
+                snackbarHostState.showSnackbar("Ulasan berhasil dikirim!", withDismissAction = true)
+            }
+            kotlinx.coroutines.delay(1500)
             navController.popBackStack()
         }
     }
@@ -81,13 +113,13 @@ fun WriteReviewScreen(
         "Lokasi Strategis"
     )
 
-    val primaryColor = Color(0xFF870500)
-    val goldStarColor = Color(0xFFFFC107) // Golden yellow stars
-    val lightBackgroundColor = Color(0xFFFCF9F8)
-    val textColor = Color(0xFF222222)
-    val labelColor = Color(0xFF9E847C)
-    val selectedAttributeColor = Color(0xFFD32F2F) // Red secondary color
-    val selectedAttributeBg = Color(0xFFFFEBEE)
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val goldStarColor = Color(0xFFFFC107) // Golden yellow stars stay gold
+    val lightBackgroundColor = MaterialTheme.colorScheme.background
+    val textColor = MaterialTheme.colorScheme.onBackground
+    val labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val selectedAttributeColor = MaterialTheme.colorScheme.primary
+    val selectedAttributeBg = MaterialTheme.colorScheme.primaryContainer
 
     Scaffold(
         topBar = {
@@ -132,7 +164,7 @@ fun WriteReviewScreen(
                 Text(
                     text = "Penilaian anda akan mempermudah orang lain",
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -146,7 +178,7 @@ fun WriteReviewScreen(
                         Icon(
                             imageVector = Icons.Filled.Star,
                             contentDescription = "Star $starRating",
-                            tint = if (isSelected) goldStarColor else Color(0xFFE8C6C3),
+                            tint = if (isSelected) goldStarColor else MaterialTheme.colorScheme.surfaceVariant,
                             modifier = Modifier
                                 .size(48.dp)
                                 .clickable { viewModel.updateRating(starRating) }
@@ -177,9 +209,9 @@ fun WriteReviewScreen(
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = primaryColor,
-                    unfocusedBorderColor = Color(0xFFEFE8E6),
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
                 )
             )
 
@@ -207,12 +239,12 @@ fun WriteReviewScreen(
                         modifier = Modifier
                             .clickable { viewModel.toggleAttribute(attribute) }
                             .background(
-                                color = if (isSelected) selectedAttributeBg else Color.White,
+                                color = if (isSelected) selectedAttributeBg else MaterialTheme.colorScheme.surface,
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
                             )
                             .border(
                                 width = 1.dp,
-                                color = if (isSelected) selectedAttributeColor else Color(0xFFEFE8E6),
+                                color = if (isSelected) selectedAttributeColor else MaterialTheme.colorScheme.outlineVariant,
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
                             )
                             .padding(horizontal = 16.dp, vertical = 10.dp)
@@ -221,8 +253,81 @@ fun WriteReviewScreen(
                             text = attribute,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isSelected) selectedAttributeColor else Color(0xFF333333)
+                            color = if (isSelected) selectedAttributeColor else MaterialTheme.colorScheme.onSurface
                         )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Photo Upload Section
+            Text(
+                text = "TAMBAHKAN FOTO (OPSIONAL)",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = labelColor,
+                letterSpacing = 1.sp,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            androidx.compose.foundation.lazy.LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(selectedImageUris) { uri ->
+                    Box {
+                        AsyncImage(
+                            model = uri,
+                            contentDescription = "Selected Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(120.dp)
+                                .background(Color.LightGray, androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                                .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                        )
+                        IconButton(
+                            onClick = { 
+                                selectedImageUris = selectedImageUris.filter { it != uri }
+                            },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(4.dp)
+                                .size(24.dp)
+                                .background(Color.Black.copy(alpha = 0.5f), androidx.compose.foundation.shape.CircleShape)
+                        ) {
+                            Icon(Icons.Default.Close, contentDescription = "Hapus", tint = Color.White, modifier = Modifier.size(16.dp))
+                        }
+                    }
+                }
+                
+                if (selectedImageUris.size < 3) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .size(120.dp)
+                                .background(Color(0xFFF3F4F6), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                                .border(1.dp, Color(0xFFEFE8E6), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                                .clickable { 
+                                    photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) 
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = "Upload Photo",
+                                    tint = Color.Gray,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = if (selectedImageUris.isEmpty()) "Pilih Foto" else "Tambah Foto", 
+                                    color = Color.Gray, 
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -241,7 +346,14 @@ fun WriteReviewScreen(
 
             // Submit Button
             androidx.compose.material3.Button(
-                onClick = { viewModel.submitReview() },
+                onClick = { 
+                    val images = selectedImageUris.mapNotNull { uri ->
+                        val extension = context.contentResolver.getType(uri)?.split("/")?.lastOrNull() ?: "jpg"
+                        val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                        if (bytes != null) bytes to extension else null
+                    }
+                    viewModel.submitReview(images) 
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

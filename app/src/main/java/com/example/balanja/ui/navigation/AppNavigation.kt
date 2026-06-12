@@ -12,6 +12,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Snackbar
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.CompositionLocalProvider
+import com.example.balanja.ui.component.LocalSnackbarHostState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -21,6 +29,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import com.example.balanja.AppContainer
 import com.example.balanja.domain.usecase.SignInUseCase
 import com.example.balanja.presentation.auth.AuthViewModel
@@ -66,24 +79,90 @@ fun AppNavigation() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val showBottomBar = screensWithoutBottomNav.none { pattern ->
-        currentRoute?.startsWith(pattern.substringBefore("{")) == true
-    }
+    // showBottomBar no longer needed since navbar is rendered per route
 
     val startDestination = androidx.compose.runtime.remember {
         if (AppContainer.authRepository.isLoggedIn()) Screen.Home.route else Screen.Login.route
     }
 
-    Scaffold(
-        containerColor = Color(0xFFFBF9F8),
-        bottomBar = {
-            if (showBottomBar) BalanjaBottomNav(navController)
+    fun isNavbarRoute(route: String?): Boolean {
+        if (route == null) return false
+        return screensWithoutBottomNav.none { pattern ->
+            route.startsWith(pattern.substringBefore("{"))
         }
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding)
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            snackbarHost = { 
+                SnackbarHost(snackbarHostState) { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        containerColor = Color(0xFF10B981), // Success Green
+                        contentColor = Color.White,
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = startDestination,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = innerPadding.calculateTopPadding()),
+            enterTransition = {
+                val isTargetNav = isNavbarRoute(targetState.destination.route)
+                val isInitialNav = isNavbarRoute(initialState.destination.route)
+                if (isTargetNav && isInitialNav) {
+                    fadeIn(animationSpec = tween(300))
+                } else {
+                    slideInHorizontally(
+                        initialOffsetX = { fullWidth -> fullWidth },
+                        animationSpec = tween(300)
+                    )
+                }
+            },
+            exitTransition = {
+                val isTargetNav = isNavbarRoute(targetState.destination.route)
+                val isInitialNav = isNavbarRoute(initialState.destination.route)
+                if (isTargetNav && isInitialNav) {
+                    fadeOut(animationSpec = tween(300))
+                } else {
+                    slideOutHorizontally(
+                        targetOffsetX = { fullWidth -> -fullWidth / 3 },
+                        animationSpec = tween(300)
+                    )
+                }
+            },
+            popEnterTransition = {
+                val isTargetNav = isNavbarRoute(targetState.destination.route)
+                val isInitialNav = isNavbarRoute(initialState.destination.route)
+                if (isTargetNav && isInitialNav) {
+                    fadeIn(animationSpec = tween(300))
+                } else {
+                    slideInHorizontally(
+                        initialOffsetX = { fullWidth -> -fullWidth / 3 },
+                        animationSpec = tween(300)
+                    )
+                }
+            },
+            popExitTransition = {
+                val isTargetNav = isNavbarRoute(targetState.destination.route)
+                val isInitialNav = isNavbarRoute(initialState.destination.route)
+                if (isTargetNav && isInitialNav) {
+                    fadeOut(animationSpec = tween(300))
+                } else {
+                    slideOutHorizontally(
+                        targetOffsetX = { fullWidth -> fullWidth },
+                        animationSpec = tween(300)
+                    )
+                }
+            }
         ) {
             composable(Screen.Login.route) {
                 val authViewModel: AuthViewModel = viewModel(
@@ -134,33 +213,45 @@ fun AppNavigation() {
                                 AppContainer.getCampusWeatherUseCase,
                                 AppContainer.getFavoritesUseCase,
                                 AppContainer.addFavoriteUseCase,
-                                AppContainer.deleteFavoriteUseCase
+                                AppContainer.deleteFavoriteUseCase,
+                                AppContainer.authRepository
                             ) as T
                         }
                     }
                 )
-                com.example.balanja.presentation.home.HomeScreen(
-                    viewModel = viewModel,
-                    onNavigateToDetail = { stallId ->
-                        navController.navigate(Screen.StallDetail.createRoute(stallId))
-                    }
-                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    com.example.balanja.presentation.home.HomeScreen(
+                        viewModel = viewModel,
+                        onNavigateToDetail = { stallId ->
+                            navController.navigate(Screen.StallDetail.createRoute(stallId))
+                        }
+                    )
+                    BalanjaBottomNav(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+                }
             }
             composable(Screen.Search.route) {
                 val viewModel: com.example.balanja.presentation.search.SearchViewModel = viewModel(
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             @Suppress("UNCHECKED_CAST")
-                            return com.example.balanja.presentation.search.SearchViewModel(AppContainer.getAllStallsUseCase) as T
+                            return com.example.balanja.presentation.search.SearchViewModel(
+                                AppContainer.getAllStallsUseCase,
+                                AppContainer.getRecentSearchesUseCase,
+                                AppContainer.addRecentSearchUseCase,
+                                AppContainer.clearRecentSearchesUseCase
+                            ) as T
                         }
                     }
                 )
-                com.example.balanja.presentation.search.SearchScreen(
-                    viewModel = viewModel,
-                    onNavigateToDetail = { stallId ->
-                        navController.navigate(Screen.StallDetail.createRoute(stallId))
-                    }
-                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    com.example.balanja.presentation.search.SearchScreen(
+                        viewModel = viewModel,
+                        onNavigateToDetail = { stallId ->
+                            navController.navigate(Screen.StallDetail.createRoute(stallId))
+                        }
+                    )
+                    BalanjaBottomNav(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+                }
             }
             composable(
                 route = Screen.Map.route,
@@ -181,18 +272,44 @@ fun AppNavigation() {
                 )
             }
             composable(Screen.AddStall.route) {
-                AddStallScreen()
+                val viewModel: com.example.balanja.presentation.search.AddStallViewModel = viewModel()
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AddStallScreen(
+                        viewModel = viewModel
+                    )
+                    BalanjaBottomNav(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+                }
             }
             composable(Screen.Profile.route) {
                 val viewModel: ProfileViewModel = viewModel(
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             @Suppress("UNCHECKED_CAST")
-                            return ProfileViewModel(AppContainer.authRepository) as T
+                            return ProfileViewModel(AppContainer.authRepository, AppContainer.stallRepository) as T
                         }
                     }
                 )
-                ProfileScreen(navController, viewModel)
+                Box(modifier = Modifier.fillMaxSize()) {
+                    ProfileScreen(navController, viewModel)
+                    BalanjaBottomNav(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+                }
+            }
+            composable(Screen.EditProfile.route) {
+                val viewModel: com.example.balanja.presentation.profile.EditProfileViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return com.example.balanja.presentation.profile.EditProfileViewModel(
+                                AppContainer.authRepository,
+                                AppContainer.cloudinaryApiService
+                            ) as T
+                        }
+                    }
+                )
+                com.example.balanja.presentation.profile.EditProfileScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
             composable(Screen.Favorites.route) {
                 val viewModel: FavoriteStallsViewModel = viewModel(
@@ -277,7 +394,8 @@ fun AppNavigation() {
                                 editReviewUseCase = AppContainer.editReviewUseCase,
                                 getReviewsUseCase = AppContainer.getReviewsUseCase,
                                 recalculateStallRatingUseCase = AppContainer.recalculateStallRatingUseCase,
-                                authRepository = AppContainer.authRepository
+                                authRepository = AppContainer.authRepository,
+                                cloudinaryApiService = AppContainer.cloudinaryApiService
                             ) as T
                         }
                     }
@@ -293,15 +411,31 @@ fun AppNavigation() {
                                 getMyReviewsUseCase = AppContainer.getMyReviewsUseCase,
                                 deleteReviewUseCase = AppContainer.deleteReviewUseCase,
                                 recalculateStallRatingUseCase = AppContainer.recalculateStallRatingUseCase,
-                                authRepository = AppContainer.authRepository
+                                authRepository = AppContainer.authRepository,
+                                stallRepository = AppContainer.stallRepository
                             ) as T
                         }
                     }
                 )
                 MyReviewsScreen(navController, viewModel)
             }
+            composable("my_stalls") {
+                val viewModel: com.example.balanja.presentation.profile.MyStallsViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
+                            return com.example.balanja.presentation.profile.MyStallsViewModel(
+                                authRepository = AppContainer.authRepository,
+                                stallRepository = AppContainer.stallRepository
+                            ) as T
+                        }
+                    }
+                )
+                com.example.balanja.presentation.profile.MyStallsScreen(navController, viewModel)
+            }
         }
     }
+}
 }
 
 @Composable

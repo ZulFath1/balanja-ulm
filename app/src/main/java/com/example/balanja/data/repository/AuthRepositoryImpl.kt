@@ -97,11 +97,30 @@ class AuthRepositoryImpl(
             id = fbUser.uid,
             email = fbUser.email ?: "",
             name = fbUser.displayName ?: fbUser.email?.split("@")?.get(0) ?: "Pengguna",
-            createdAt = fbUser.metadata?.creationTimestamp ?: 0L
+            createdAt = fbUser.metadata?.creationTimestamp ?: 0L,
+            photoUrl = fbUser.photoUrl?.toString()
         )
     }
     
     override fun isLoggedIn(): Boolean {
         return firebaseAuth.currentUser != null
+    }
+
+    override suspend fun updateProfile(newName: String, newPhotoUrl: String?): Result<Unit> {
+        val user = firebaseAuth.currentUser ?: return Result.failure(Exception("User not logged in"))
+        return try {
+            val profileUpdatesBuilder = com.google.firebase.auth.UserProfileChangeRequest.Builder()
+                .setDisplayName(newName)
+            
+            if (newPhotoUrl != null) {
+                profileUpdatesBuilder.setPhotoUri(android.net.Uri.parse(newPhotoUrl))
+            }
+            
+            val profileUpdates = profileUpdatesBuilder.build()
+            user.updateProfile(profileUpdates).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(Exception("Gagal memperbarui profil: ${e.message}"))
+        }
     }
 }

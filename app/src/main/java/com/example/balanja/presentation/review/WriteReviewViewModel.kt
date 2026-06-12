@@ -14,7 +14,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 
 data class WriteReviewUiState(
     val rating: Int = 0,
@@ -22,7 +25,8 @@ data class WriteReviewUiState(
     val selectedAttributes: List<String> = emptyList(),
     val isSaving: Boolean = false,
     val error: String? = null,
-    val isSuccess: Boolean = false
+    val isSuccess: Boolean = false,
+    val imageUrls: List<String> = emptyList()
 )
 
 class WriteReviewViewModel(
@@ -32,7 +36,8 @@ class WriteReviewViewModel(
     private val editReviewUseCase: EditReviewUseCase,
     private val getReviewsUseCase: GetReviewsUseCase,
     private val recalculateStallRatingUseCase: RecalculateStallRatingUseCase,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val cloudinaryApiService: com.example.balanja.data.api.cloudinary.CloudinaryApiService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WriteReviewUiState())
@@ -53,7 +58,8 @@ class WriteReviewViewModel(
                     state.copy(
                         rating = it.rating,
                         comment = it.comment,
-                        selectedAttributes = it.attributes
+                        selectedAttributes = it.attributes,
+                        imageUrls = if (it.imageUrls.isNotEmpty()) it.imageUrls else listOfNotNull(it.imageUrl)
                     )
                 }
             }
@@ -80,13 +86,41 @@ class WriteReviewViewModel(
         }
     }
 
-    fun submitReview() {
+    fun submitReview(images: List<Pair<ByteArray, String>>) {
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, error = null) }
             val currentUser = authRepository.getCurrentUser()
             if (currentUser == null) {
                 _uiState.update { it.copy(isSaving = false, error = "User not logged in") }
                 return@launch
+            }
+            
+            val finalImageUrls = _uiState.value.imageUrls.toMutableList()
+            
+            if (images.isNotEmpty()) {
+                try {
+                    // Start uploading all images
+                    val uploadResponses = images.map { (imageBytes, fileExtension) ->
+                        val mediaType = "image/$fileExtension".toMediaTypeOrNull()
+                        val requestBody = imageBytes.toRequestBody(mediaType)
+                        
+                        val multipartBody = okhttp3.MultipartBody.Builder()
+                            .setType(okhttp3.MultipartBody.FORM)
+                            .addFormDataPart("file", "upload.$fileExtension", requestBody)
+                            .addFormDataPart("upload_preset", "balanja_preset")
+                            .build()
+                        
+                        cloudinaryApiService.uploadImage(multipartBody)
+                    }
+                    finalImageUrls.addAll(uploadResponses.map { it.secureUrl })
+                } catch (e: retrofit2.HttpException) {
+                    val errorBody = e.response()?.errorBody()?.string() ?: e.message()
+                    _uiState.update { it.copy(isSaving = false, error = "Gagal mengunggah gambar: $errorBody") }
+                    return@launch
+                } catch (e: Exception) {
+                    _uiState.update { it.copy(isSaving = false, error = "Gagal mengunggah gambar: ${e.message}") }
+                    return@launch
+                }
             }
             
             val userNameToSave = if (currentUser.name.isNotBlank()) currentUser.name else "Mahasiswa ULM"
@@ -97,8 +131,11 @@ class WriteReviewViewModel(
                 rating = _uiState.value.rating,
                 comment = _uiState.value.comment,
                 attributes = _uiState.value.selectedAttributes,
+                imageUrls = finalImageUrls,
+                imageUrl = finalImageUrls.firstOrNull(), // Keep for backward compatibility
                 createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                updatedAt = System.currentTimeMillis(),
+                userPhotoUrl = currentUser.photoUrl
             )
 
             val result = if (reviewId != null) {

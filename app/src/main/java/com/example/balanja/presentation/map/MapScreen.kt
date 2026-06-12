@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -113,7 +114,7 @@ fun MapScreen(viewModel: MapViewModel, onNavigateBack: () -> Unit = {}) {
                         "Peta Lokasi Pedagang", 
                         fontSize = 20.sp, 
                         fontWeight = FontWeight.Bold,
-                        color = BalanjaColor.Primary
+                        color = MaterialTheme.colorScheme.primary
                     ) 
                 },
                 navigationIcon = {
@@ -121,24 +122,24 @@ fun MapScreen(viewModel: MapViewModel, onNavigateBack: () -> Unit = {}) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Kembali",
-                            tint = BalanjaColor.Primary
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             )
         },
-        containerColor = Color(0xFFFBF9F8)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             if (uiState.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = BalanjaColor.Primary)
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = MaterialTheme.colorScheme.primary)
             } else if (uiState.error != null) {
                 Text(
                     text = uiState.error!!,
-                    color = Color.Red,
+                    color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else {
@@ -173,7 +174,7 @@ fun MapScreen(viewModel: MapViewModel, onNavigateBack: () -> Unit = {}) {
                         .fillMaxWidth(),
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
                     colors = androidx.compose.material3.CardDefaults.cardColors(
-                        containerColor = Color.White
+                        containerColor = MaterialTheme.colorScheme.surface
                     ),
                     elevation = androidx.compose.material3.CardDefaults.cardElevation(
                         defaultElevation = 8.dp
@@ -186,13 +187,13 @@ fun MapScreen(viewModel: MapViewModel, onNavigateBack: () -> Unit = {}) {
                         androidx.compose.foundation.layout.Box(
                             modifier = Modifier
                                 .size(40.dp)
-                                .background(Color(0xFFFFEBEE), shape = androidx.compose.foundation.shape.CircleShape),
+                                .background(MaterialTheme.colorScheme.primaryContainer, shape = androidx.compose.foundation.shape.CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             androidx.compose.material3.Icon(
                                 imageVector = androidx.compose.material.icons.Icons.Default.LocationOn,
                                 contentDescription = "Location",
-                                tint = BalanjaColor.Primary
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                         androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(16.dp))
@@ -201,12 +202,12 @@ fun MapScreen(viewModel: MapViewModel, onNavigateBack: () -> Unit = {}) {
                                 text = "Temukan Jajanan",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
-                                color = Color(0xFF333333)
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 text = "${uiState.stalls.count { it.latitude != 0.0 && it.longitude != 0.0 }} pedagang ada di peta",
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }

@@ -32,7 +32,8 @@ class StallRepositoryImpl(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                android.util.Log.e("StallRepository", "Database error: ${error.message}")
+                close()
             }
         }
 
@@ -51,12 +52,37 @@ class StallRepositoryImpl(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                android.util.Log.e("StallRepository", "Database error: ${error.message}")
+                close()
             }
         }
 
         stallRef.addValueEventListener(listener)
         awaitClose { stallRef.removeEventListener(listener) }
+    }
+
+    override fun getStallsByOwnerId(ownerId: String): Flow<List<Stall>> = callbackFlow {
+        val query = stallsRef.orderByChild("ownerId").equalTo(ownerId)
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val stalls = mutableListOf<Stall>()
+                for (childSnapshot in snapshot.children) {
+                    val stall = childSnapshot.getValue(Stall::class.java)
+                    if (stall != null) {
+                        stalls.add(stall.copy(id = childSnapshot.key ?: stall.id))
+                    }
+                }
+                trySend(stalls)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                android.util.Log.e("StallRepository", "Database error: ${error.message}")
+                close()
+            }
+        }
+
+        query.addValueEventListener(listener)
+        awaitClose { query.removeEventListener(listener) }
     }
 
     override suspend fun updateStallStatus(stallId: String, isOpen: Boolean): Result<Unit> {

@@ -24,10 +24,7 @@ import com.example.balanja.domain.model.Weather
 import com.example.balanja.presentation.util.UiState
 
 // ─── Color tokens (sesuai design spec) ───────────────────────────────────────
-private val Primary = Color(0xFF870500)
-private val TextSecondary = Color(0xFF555555)
-private val TextMuted = Color(0xFF9E9E9E)
-private val SurfaceWhite = Color(0xFFFFFFFF)
+// Removed static Primary color
 
 // ─── Public entry point ───────────────────────────────────────────────────────
 
@@ -76,13 +73,13 @@ private fun WeatherContent(
                     text = "${"%.1f".format(weather.temperature)}°C",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Primary
+                    color = MaterialTheme.colorScheme.primary
                 )
                 // Deskripsi — Body, TextSecondary, capitalize huruf pertama
                 Text(
                     text = weather.description.capitalize(Locale.current),
                     fontSize = 14.sp,
-                    color = TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -91,14 +88,14 @@ private fun WeatherContent(
                 Text(
                     text = "📍 ${weather.cityName}",
                     fontSize = 12.sp,
-                    color = TextMuted
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(4.dp))
                 // Kelembaban — Caption, TextMuted
                 Text(
                     text = "💧 ${weather.humidity}%",
                     fontSize = 12.sp,
-                    color = TextMuted
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -212,14 +209,14 @@ private fun WeatherError(modifier: Modifier = Modifier) {
             Icon(
                 imageVector = Icons.Default.CloudOff,
                 contentDescription = null,
-                tint = TextMuted,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(Modifier.width(8.dp))
             Text(
                 text = "Cuaca tidak tersedia",
                 fontSize = 12.sp,
-                color = TextMuted
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -235,7 +232,7 @@ private fun WeatherCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(

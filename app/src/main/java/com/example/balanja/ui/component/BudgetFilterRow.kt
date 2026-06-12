@@ -30,16 +30,16 @@ fun BudgetFilterRow(
                 onClick = { onPriceChange(price) },
                 label = { Text("≤ Rp${price / 1000}k") },
                 colors = FilterChipDefaults.filterChipColors(
-                    containerColor = Color.White,
-                    selectedContainerColor = Color(0xFF870500),
-                    labelColor = Color.Gray,
-                    selectedLabelColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 border = FilterChipDefaults.filterChipBorder(
                     enabled = true,
                     selected = isSelected,
-                    borderColor = Color(0xFFE5E7EB),
-                    selectedBorderColor = Color(0xFF870500)
+                    borderColor = MaterialTheme.colorScheme.outlineVariant,
+                    selectedBorderColor = MaterialTheme.colorScheme.primary
                 ),
                 shape = RoundedCornerShape(100.dp)
             )
