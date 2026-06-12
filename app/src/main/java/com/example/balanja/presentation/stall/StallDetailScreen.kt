@@ -266,7 +266,7 @@ fun StallDetailScreen(
                                         }
 
                                         Spacer(modifier = Modifier.height(16.dp))
-                                        Text("ABOUT THE STALL", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSurfaceVariant, letterSpacing = 1.sp)
+                                        Text("Deskripsi", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSurfaceVariant, letterSpacing = 1.sp)
                                         Spacer(modifier = Modifier.height(8.dp))
                                         Text(
                                             text = "\"${stall.description}\"",
@@ -285,9 +285,9 @@ fun StallDetailScreen(
 
                         // Menu Categories
                         val menuList = stall.menu.values.toList()
-                        val drinkKeywords = listOf("es", "teh", "kopi", "jus", "air", "minuman", "milk", "boba", "nutrisari", "sirup", "soda")
+                        val drinkRegex = Regex("\\b(es|teh|kopi|jus|air|minuman|milk|boba|nutrisari|sirup|soda|matcha|latte|ice|iced)\\b", RegexOption.IGNORE_CASE)
                         val (drinks, foods) = menuList.partition { item -> 
-                            drinkKeywords.any { item.name.lowercase().contains(it) }
+                            drinkRegex.containsMatchIn(item.name)
                         }
 
                         if (foods.isNotEmpty()) {
