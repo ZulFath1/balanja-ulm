@@ -49,7 +49,7 @@ fun MyReviewsScreen(
                         text = "Ulasan Saya",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF111111)
+                        color = MaterialTheme.colorScheme.onBackground
                     ) 
                 },
                 navigationIcon = {
@@ -57,14 +57,14 @@ fun MyReviewsScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack, 
                             contentDescription = "Kembali", 
-                            tint = Color(0xFF111111)
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF9F8))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = Color(0xFFFBF9F8)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             when {
@@ -87,7 +87,7 @@ fun MyReviewsScreen(
                     ) {
                         Text(
                             "Belum ada ulasan yang Anda buat.", 
-                            color = Color(0xFF6B7280),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 16.sp
                         )
                         Spacer(modifier = Modifier.height(24.dp))
@@ -179,7 +179,7 @@ fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit, onIma
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
@@ -195,7 +195,7 @@ fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit, onIma
                     text = "${review.rating} / 5", 
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = Color(0xFF333333)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
             
@@ -204,7 +204,7 @@ fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit, onIma
             Text(
                 text = review.comment,
                 fontSize = 15.sp,
-                color = Color(0xFF555555),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 22.sp
             )
             
@@ -232,7 +232,7 @@ fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit, onIma
             
             Spacer(modifier = Modifier.height(20.dp))
             
-            HorizontalDivider(color = Color(0xFFF3F4F6), thickness = 1.dp)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
             
             Row(
                 horizontalArrangement = Arrangement.End, 
@@ -241,11 +241,11 @@ fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit, onIma
                     .padding(top = 8.dp)
             ) {
                 TextButton(onClick = onEdit) {
-                    Text("Ubah", color = Color(0xFF3B82F6), fontWeight = FontWeight.SemiBold)
+                    Text("Ubah", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 TextButton(onClick = { showDeleteDialog = true }) {
-                    Text("Hapus", color = Color(0xFFEF4444), fontWeight = FontWeight.SemiBold)
+                    Text("Hapus", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
                 }
             }
         }

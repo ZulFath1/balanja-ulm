@@ -57,25 +57,25 @@ fun CommunityReviewScreen(
                         text = "Ulasan", 
                         fontSize = 18.sp, 
                         fontWeight = FontWeight.Bold, 
-                        color = Color(0xFF870500)
+                        color = MaterialTheme.colorScheme.primary
                     ) 
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali", tint = Color(0xFF870500))
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali", tint = MaterialTheme.colorScheme.primary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         },
-        containerColor = Color(0xFFFBF9F8)
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
             when (val state = uiState) {
                 is CommunityReviewUiState.Loading -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        color = Color(0xFF870500)
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
                 is CommunityReviewUiState.Error -> {
@@ -92,7 +92,7 @@ fun CommunityReviewScreen(
                         Text(
                             text = "Belum ada ulasan untuk stan ini.",
                             modifier = Modifier.align(Alignment.Center),
-                            color = Color.Gray
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     } else {
                         val averageRating = if (reviewsList.isNotEmpty()) {
@@ -109,7 +109,7 @@ fun CommunityReviewScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 24.dp, vertical = 8.dp),
-                                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF7ECEB)), // subtle background
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), // subtle background
                                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                                     shape = RoundedCornerShape(16.dp)
                                 ) {
@@ -123,7 +123,7 @@ fun CommunityReviewScreen(
                                             text = "RATING",
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 14.sp,
-                                            color = Color(0xFF870500),
+                                            color = MaterialTheme.colorScheme.primary,
                                             letterSpacing = 2.sp
                                         )
                                         Spacer(modifier = Modifier.height(8.dp))
@@ -139,14 +139,14 @@ fun CommunityReviewScreen(
                                                 text = String.format(Locale.US, "%.1f", averageRating),
                                                 fontSize = 64.sp,
                                                 fontWeight = FontWeight.ExtraBold,
-                                                color = Color(0xFF111111)
+                                                color = MaterialTheme.colorScheme.onSurface
                                             )
                                         }
                                         Spacer(modifier = Modifier.height(16.dp))
                                         Text(
                                             text = "Berdasarkan ${reviewsList.size} ulasan dari mahasiswa ULM",
                                             fontSize = 12.sp,
-                                            color = Color.DarkGray,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             textAlign = TextAlign.Center
                                         )
                                     }
@@ -166,7 +166,7 @@ fun CommunityReviewScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 24.dp, vertical = 8.dp),
-                                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                                 ) {
                                     Box(
@@ -177,7 +177,7 @@ fun CommunityReviewScreen(
                                         Row(verticalAlignment = Alignment.Top) {
                                         // Profile Picture
                                         AsyncImage(
-                                            model = review.userPhotoUrl ?: "https://ui-avatars.com/api/?name=${review.userName.replace(" ", "+")}&background=random",
+                                            model = review.userPhotoUrl.takeIf { !it.isNullOrBlank() } ?: "https://ui-avatars.com/api/?name=${review.userName.replace(" ", "+")}&background=random",
                                             contentDescription = "Profile Picture",
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier
@@ -192,13 +192,13 @@ fun CommunityReviewScreen(
                                                 text = review.userName,
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 16.sp,
-                                                color = Color.Black
+                                                color = MaterialTheme.colorScheme.onSurface
                                             )
                                             Spacer(modifier = Modifier.height(2.dp))
                                             Text(
                                                 text = dateStr,
                                                 fontSize = 12.sp,
-                                                color = Color.Gray,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 fontWeight = FontWeight.Medium
                                             )
                                             
@@ -210,7 +210,7 @@ fun CommunityReviewScreen(
                                                     Icon(
                                                         imageVector = if (i <= review.rating) Icons.Default.Star else Icons.Outlined.StarBorder,
                                                         contentDescription = null,
-                                                        tint = Color(0xFF870500),
+                                                        tint = MaterialTheme.colorScheme.primary,
                                                         modifier = Modifier.size(16.dp)
                                                     )
                                                 }
@@ -222,7 +222,7 @@ fun CommunityReviewScreen(
                                             Text(
                                                 text = "\"${review.comment}\"",
                                                 fontSize = 14.sp,
-                                                color = Color(0xFF555555),
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 lineHeight = 20.sp,
                                                 modifier = Modifier.fillMaxWidth()
                                             )
@@ -255,10 +255,10 @@ fun CommunityReviewScreen(
                                                     review.attributes.forEach { attr ->
                                                         Box(
                                                             modifier = Modifier
-                                                                .background(Color(0xFFFEF3C7), RoundedCornerShape(4.dp))
+                                                                .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(4.dp))
                                                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                                                         ) {
-                                                            Text(text = attr, fontSize = 10.sp, color = Color(0xFF870500), fontWeight = FontWeight.SemiBold)
+                                                            Text(text = attr, fontSize = 10.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
                                                         }
                                                     }
                                                 }

@@ -39,18 +39,18 @@ fun AddStallScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFFBF9F8))
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
                     .padding(horizontal = 16.dp, vertical = 16.dp)
             ) {
                 Text(
                     text = "Tambah Pedagang",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF111111)
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
                 )
             }
         },
-        containerColor = Color(0xFFFBF9F8)
+        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -66,13 +66,13 @@ fun AddStallScreen(
             Box(
                 modifier = Modifier
                     .size(100.dp)
-                    .background(Color(0xFFFEF2F2), shape = CircleShape),
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer, shape = CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Store,
                     contentDescription = "Toko",
-                    tint = Color(0xFF870500),
+                    tint = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(48.dp)
                 )
             }
@@ -83,7 +83,7 @@ fun AddStallScreen(
                 text = "Punya Rekomendasi Warung?",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF111111),
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center
             )
 
@@ -93,7 +93,7 @@ fun AddStallScreen(
                 text = "Kami selalu ingin memperluas jangkauan! Jika Anda mengetahui warung atau pedagang kaki lima di sekitar kampus ULM yang belum terdaftar di aplikasi Balanja ULM, ayo beritahu kami.\n\nIsi formulir singkat dengan informasi pedagang tersebut. Tim kami akan segera meninjaunya agar mahasiswa lain juga bisa menikmatinya!",
                 fontSize = 15.sp,
                 lineHeight = 24.sp,
-                color = Color(0xFF555555),
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 8.dp)
             )

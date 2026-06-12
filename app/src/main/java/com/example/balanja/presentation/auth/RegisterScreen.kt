@@ -33,9 +33,9 @@ fun RegisterScreen(
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isConfirmPasswordVisible by remember { mutableStateOf(false) }
 
-    val primaryColor = Color(0xFF870500)
+    val primaryColor = MaterialTheme.colorScheme.primary
     val goldColor = Color(0xFF836F1E)
-    val backgroundColor = Color(0xFFFBF9F8)
+    val backgroundColor = MaterialTheme.colorScheme.background
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
@@ -67,7 +67,7 @@ fun RegisterScreen(
                 text = "Email Mahasiswa/Dosen",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF555555)
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
             BalanjaTextField(
@@ -86,7 +86,7 @@ fun RegisterScreen(
                 text = "Kata Sandi",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF555555)
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
             BalanjaTextField(
@@ -108,7 +108,7 @@ fun RegisterScreen(
                 text = "Konfirmasi Kata Sandi",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF555555)
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
             BalanjaTextField(
@@ -133,7 +133,7 @@ fun RegisterScreen(
         if (uiState.error != null) {
             Text(
                 text = uiState.error!!,
-                color = Color.Red,
+                color = MaterialTheme.colorScheme.error,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
                 textAlign = TextAlign.Start
@@ -150,7 +150,7 @@ fun RegisterScreen(
             enabled = !uiState.isLoading && uiState.email.isNotBlank() && uiState.password.isNotBlank() && uiState.confirmPassword.isNotBlank()
         ) {
             if (uiState.isLoading) {
-                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
             } else {
                 Text(text = "Daftar Akun", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
@@ -170,7 +170,7 @@ fun RegisterScreen(
         Text(
             text = "HANYA UNTUK CIVITAS AKADEMIKA ULM",
             fontSize = 10.sp,
-            color = Color(0xFFDCA8A6),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.sp
         )
@@ -178,14 +178,14 @@ fun RegisterScreen(
         Text(
             text = "PRIVACY  •  TERMS  •  HELP",
             fontSize = 12.sp,
-            color = Color(0xFFDCA8A6),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "© 2024 Balanja ULM. Designed for the Academic Lambung Mangkurat",
             fontSize = 10.sp,
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 24.dp)
         )

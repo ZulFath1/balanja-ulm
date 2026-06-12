@@ -2,6 +2,7 @@ package com.example.balanja.ui.component
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,7 +32,7 @@ fun EmptyStateComponent(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Color(0xFF9E9E9E),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(64.dp)
         )
         
@@ -41,7 +42,7 @@ fun EmptyStateComponent(
             text = title,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF333333),
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
         
@@ -50,7 +51,7 @@ fun EmptyStateComponent(
         Text(
             text = subtitle,
             fontSize = 14.sp,
-            color = Color(0xFF666666),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             lineHeight = 20.sp
         )

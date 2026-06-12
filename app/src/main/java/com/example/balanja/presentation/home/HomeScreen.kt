@@ -64,7 +64,7 @@ fun HomeScreen(
                             text = "${viewModel.greeting}$nameText",
                             fontWeight = FontWeight.Medium,
                             fontSize = 16.sp,
-                            color = Color.Gray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             letterSpacing = 0.5.sp
                         )
                         Spacer(modifier = Modifier.height(4.dp))
@@ -73,7 +73,7 @@ fun HomeScreen(
                                 append("Mau ")
                                 withStyle(
                                     style = SpanStyle(
-                                        color = Color(0xFF870500),
+                                        color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.Black,
                                         fontStyle = FontStyle.Italic
                                     )
@@ -82,7 +82,7 @@ fun HomeScreen(
                             },
                             fontSize = 28.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF1A1A1A),
+                            color = MaterialTheme.colorScheme.onBackground,
                             lineHeight = 34.sp,
                             letterSpacing = (-0.5).sp
                         )

@@ -61,7 +61,7 @@ fun EditProfileScreen(
                         "Edit Profil", 
                         fontSize = 20.sp, 
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF111111)
+                        color = MaterialTheme.colorScheme.onBackground
                     ) 
                 },
                 navigationIcon = {
@@ -69,10 +69,10 @@ fun EditProfileScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF9F8))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = Color(0xFFFBF9F8)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -101,8 +101,8 @@ fun EditProfileScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(CircleShape)
-                        .background(Color(0xFFE5E7EB))
-                        .border(2.dp, Color.LightGray, CircleShape),
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .border(2.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     val imageToDisplay = uiState.selectedImageUri ?: uiState.existingPhotoUrl
@@ -118,7 +118,7 @@ fun EditProfileScreen(
                             imageVector = Icons.Default.Person,
                             contentDescription = "Default Avatar",
                             modifier = Modifier.size(60.dp),
-                            tint = Color(0xFF9CA3AF)
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -128,14 +128,14 @@ fun EditProfileScreen(
                     modifier = Modifier
                         .size(36.dp)
                         .offset(x = (-4).dp, y = (-4).dp)
-                        .background(Color(0xFF870500), CircleShape)
-                        .border(2.dp, Color.White, CircleShape),
+                        .background(MaterialTheme.colorScheme.primary, CircleShape)
+                        .border(2.dp, MaterialTheme.colorScheme.surface, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
                         contentDescription = "Ganti Foto",
-                        tint = Color.White,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -150,9 +150,9 @@ fun EditProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF870500),
-                    focusedLabelColor = Color(0xFF870500),
-                    cursorColor = Color(0xFF870500)
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.primary
                 )
             )
             

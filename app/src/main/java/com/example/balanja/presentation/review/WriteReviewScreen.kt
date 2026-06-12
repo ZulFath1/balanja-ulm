@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -104,13 +105,13 @@ fun WriteReviewScreen(
         "Lokasi Strategis"
     )
 
-    val primaryColor = Color(0xFF870500)
-    val goldStarColor = Color(0xFFFFC107) // Golden yellow stars
-    val lightBackgroundColor = Color(0xFFFCF9F8)
-    val textColor = Color(0xFF222222)
-    val labelColor = Color(0xFF9E847C)
-    val selectedAttributeColor = Color(0xFFD32F2F) // Red secondary color
-    val selectedAttributeBg = Color(0xFFFFEBEE)
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val goldStarColor = Color(0xFFFFC107) // Golden yellow stars stay gold
+    val lightBackgroundColor = MaterialTheme.colorScheme.background
+    val textColor = MaterialTheme.colorScheme.onBackground
+    val labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val selectedAttributeColor = MaterialTheme.colorScheme.primary
+    val selectedAttributeBg = MaterialTheme.colorScheme.primaryContainer
 
     Scaffold(
         topBar = {
@@ -155,7 +156,7 @@ fun WriteReviewScreen(
                 Text(
                     text = "Penilaian anda akan mempermudah orang lain",
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -169,7 +170,7 @@ fun WriteReviewScreen(
                         Icon(
                             imageVector = Icons.Filled.Star,
                             contentDescription = "Star $starRating",
-                            tint = if (isSelected) goldStarColor else Color(0xFFE8C6C3),
+                            tint = if (isSelected) goldStarColor else MaterialTheme.colorScheme.surfaceVariant,
                             modifier = Modifier
                                 .size(48.dp)
                                 .clickable { viewModel.updateRating(starRating) }
@@ -200,9 +201,9 @@ fun WriteReviewScreen(
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = primaryColor,
-                    unfocusedBorderColor = Color(0xFFEFE8E6),
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
                 )
             )
 
@@ -230,12 +231,12 @@ fun WriteReviewScreen(
                         modifier = Modifier
                             .clickable { viewModel.toggleAttribute(attribute) }
                             .background(
-                                color = if (isSelected) selectedAttributeBg else Color.White,
+                                color = if (isSelected) selectedAttributeBg else MaterialTheme.colorScheme.surface,
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
                             )
                             .border(
                                 width = 1.dp,
-                                color = if (isSelected) selectedAttributeColor else Color(0xFFEFE8E6),
+                                color = if (isSelected) selectedAttributeColor else MaterialTheme.colorScheme.outlineVariant,
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
                             )
                             .padding(horizontal = 16.dp, vertical = 10.dp)
@@ -244,7 +245,7 @@ fun WriteReviewScreen(
                             text = attribute,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isSelected) selectedAttributeColor else Color(0xFF333333)
+                            color = if (isSelected) selectedAttributeColor else MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }

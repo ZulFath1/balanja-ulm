@@ -36,18 +36,18 @@ fun SearchScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFFBF9F8))
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(horizontal = 16.dp, vertical = 16.dp)
             ) {
                 Text(
                     text = "Pencarian",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF111111)
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         },
-        containerColor = Color(0xFFFBF9F8)
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -71,12 +71,12 @@ fun SearchScreen(
                     .padding(vertical = 8.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF870500),
-                    unfocusedBorderColor = Color(0xFFE5E7EB),
-                    focusedLabelColor = Color(0xFF870500),
-                    cursorColor = Color(0xFF870500),
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
                 ),
                 singleLine = true
             )
@@ -109,10 +109,10 @@ fun SearchScreen(
                                 text = "Terakhir Dilihat",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF111111)
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             TextButton(onClick = { viewModel.clearRecentSearches() }) {
-                                Text("Hapus Semua", color = Color(0xFF870500), fontWeight = FontWeight.SemiBold)
+                                Text("Hapus Semua", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
                             }
                         }
                         Spacer(modifier = Modifier.height(8.dp))

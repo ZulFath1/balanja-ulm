@@ -39,9 +39,9 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
 
-    val primaryColor = Color(0xFF870500)
+    val primaryColor = MaterialTheme.colorScheme.primary
     val goldColor = Color(0xFF836F1E)
-    val backgroundColor = Color(0xFFFBF9F8)
+    val backgroundColor = MaterialTheme.colorScheme.background
 
     LaunchedEffect(uiState) {
         if (uiState is AuthUiState.Success) {
@@ -74,7 +74,7 @@ fun LoginScreen(
                 text = "Email Mahasiswa/Dosen",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF555555)
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
             BalanjaTextField(
@@ -88,7 +88,7 @@ fun LoginScreen(
             Text(
                 text = "G U N A K A N  E M A I L  I N S T I T U S I  A K T I F",
                 fontSize = 10.sp,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -100,7 +100,7 @@ fun LoginScreen(
                 text = "Kata Sandi",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF555555)
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
             BalanjaTextField(
@@ -123,7 +123,7 @@ fun LoginScreen(
         if (uiState is AuthUiState.Error) {
             Text(
                 text = (uiState as AuthUiState.Error).message,
-                color = Color.Red,
+                color = MaterialTheme.colorScheme.error,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
                 textAlign = TextAlign.Start
@@ -140,7 +140,7 @@ fun LoginScreen(
             enabled = uiState !is AuthUiState.Loading && email.isNotBlank() && password.isNotBlank()
         ) {
             if (uiState is AuthUiState.Loading) {
-                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
             } else {
                 Text(text = "Login", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
@@ -160,7 +160,7 @@ fun LoginScreen(
         Text(
             text = "HANYA UNTUK CIVITAS AKADEMIKA ULM",
             fontSize = 10.sp,
-            color = Color(0xFFDCA8A6),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.sp
         )
@@ -168,14 +168,14 @@ fun LoginScreen(
         Text(
             text = "PRIVACY  •  TERMS  •  HELP",
             fontSize = 12.sp,
-            color = Color(0xFFDCA8A6),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "© 2024 Balanja ULM. Designed for the Academic Lambung Mangkurat",
             fontSize = 10.sp,
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 24.dp)
         )
@@ -198,13 +198,13 @@ fun BalanjaTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        placeholder = { Text(placeholder, color = Color.LightGray) },
-        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = Color(0xFF870500).copy(alpha = 0.7f)) },
+        placeholder = { Text(placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant) },
+        leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
         trailingIcon = {
             if (isPassword) {
                 IconButton(onClick = onVisibilityToggle) {
                     val icon = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                    Icon(imageVector = icon, contentDescription = "Toggle Password Visibility", tint = Color.Gray)
+                    Icon(imageVector = icon, contentDescription = "Toggle Password Visibility", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         },
@@ -214,11 +214,11 @@ fun BalanjaTextField(
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color(0xFF870500),
-            unfocusedBorderColor = Color(0xFFE8D3D1),
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            cursorColor = Color(0xFF870500)
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            cursorColor = MaterialTheme.colorScheme.primary
         ),
         modifier = Modifier.fillMaxWidth()
     )

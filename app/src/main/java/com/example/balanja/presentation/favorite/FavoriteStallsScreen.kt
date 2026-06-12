@@ -38,7 +38,7 @@ fun FavoriteStallsScreen(
                         text = "Stan Favorit",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF111111)
+                        color = MaterialTheme.colorScheme.onBackground
                     ) 
                 },
                 navigationIcon = {
@@ -46,14 +46,14 @@ fun FavoriteStallsScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack, 
                             contentDescription = "Kembali", 
-                            tint = Color(0xFF111111)
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF9F8))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = Color(0xFFFBF9F8)
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Box(
             modifier = Modifier

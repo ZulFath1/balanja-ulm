@@ -6,7 +6,7 @@ object BalanjaColor {
     // Primary — Deep Crimson ULM
     val Primary        = Color(0xFF870500)
     val PrimaryDark    = Color(0xFF5C0300)
-    val PrimaryLight   = Color(0xFFAD2020)
+    val PrimaryLight   = Color(0xFFFF5252) // More vibrant, readable red on dark
 
     // Gold Accent
     val Gold           = Color(0xFF735C00)
@@ -31,4 +31,13 @@ object BalanjaColor {
     val TextSecondary  = Color(0xFF4B5563)
     val TextMuted      = Color(0xFF9CA3AF)
     val TextCaption    = Color(0xFF6B7280)
+
+    // Dark Mode Neutrals
+    val BackgroundDark = Color(0xFF121212)
+    val SurfaceDark    = Color(0xFF1E1E1E)
+    val SurfaceMutedDark = Color(0xFF2D2D2D)
+    val BorderDark     = Color(0xFF374151)
+    val TextPrimaryDark = Color(0xFFF3F4F6)
+    val TextSecondaryDark = Color(0xFF9CA3AF)
+    val TextMutedDark  = Color(0xFF6B7280)
 }

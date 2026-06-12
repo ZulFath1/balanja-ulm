@@ -76,7 +76,7 @@ fun BalanjaBottomNav(
                     shape = RoundedCornerShape(24.dp)
                 )
                 .clip(RoundedCornerShape(24.dp))
-                .background(Color.White)
+                .background(androidx.compose.material3.MaterialTheme.colorScheme.surface)
         )
 
         // The Navigation Items
@@ -96,7 +96,7 @@ fun BalanjaBottomNav(
                     label = "iconYOffset"
                 )
                 val iconColor by animateColorAsState(
-                    targetValue = if (selected) Color(0xFF870500) else Color(0xFF9CA3AF),
+                    targetValue = if (selected) androidx.compose.material3.MaterialTheme.colorScheme.primary else androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                     label = "iconColor"
                 )
 
@@ -127,7 +127,7 @@ fun BalanjaBottomNav(
                                 .offset(y = iconYOffset)
                                 .size(48.dp)
                                 .shadow(if (selected) 8.dp else 0.dp, CircleShape)
-                                .background(if (selected) Color.White else Color.Transparent, CircleShape),
+                                .background(if (selected) androidx.compose.material3.MaterialTheme.colorScheme.surface else Color.Transparent, CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -146,7 +146,7 @@ fun BalanjaBottomNav(
                         ) {
                             Text(
                                 text = item.label,
-                                color = Color(0xFF870500),
+                                color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 modifier = Modifier.offset(y = (-8).dp)

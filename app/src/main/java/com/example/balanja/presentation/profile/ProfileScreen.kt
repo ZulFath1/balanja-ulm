@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,8 +32,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.balanja.data.local.ThemePreferenceManager
 import com.example.balanja.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,8 +47,21 @@ fun ProfileScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        viewModel.refreshProfile()
+    val context = LocalContext.current
+    val themeManager = remember { ThemePreferenceManager.getInstance(context) }
+    val isDarkMode by themeManager.isDarkMode.collectAsState()
+
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshProfile()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
     if (showLogoutDialog) {
         AlertDialog(
@@ -80,13 +96,13 @@ fun ProfileScreen(
                         text = "Profil Saya", 
                         fontSize = 24.sp, 
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF111111)
+                        color = MaterialTheme.colorScheme.onBackground
                     ) 
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF9F8))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = Color(0xFFFBF9F8)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -102,7 +118,7 @@ fun ProfileScreen(
             Box(
                 modifier = Modifier
                     .size(110.dp)
-                    .background(Color(0xFFE5E7EB), CircleShape),
+                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 if (uiState.photoUrl != null) {
@@ -117,7 +133,7 @@ fun ProfileScreen(
                         imageVector = Icons.Default.Person,
                         contentDescription = "Avatar",
                         modifier = Modifier.size(50.dp),
-                        tint = Color(0xFF9CA3AF)
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -132,24 +148,24 @@ fun ProfileScreen(
                         text = uiState.userName,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF111111)
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = uiState.email,
                     fontSize = 14.sp,
-                    color = Color(0xFF6B7280)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Menu Group 1: Ulasan, Favorit & Warung Saya
+            // Menu Group 1: Edit, Ulasan, Favorit & Warung Saya
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column {
@@ -163,7 +179,7 @@ fun ProfileScreen(
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         thickness = 1.dp,
-                        color = Color(0xFFF3F4F6)
+                        color = MaterialTheme.colorScheme.surfaceVariant
                     )
                     ProfileMenuItem(
                         icon = Icons.Default.Star,
@@ -175,7 +191,7 @@ fun ProfileScreen(
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         thickness = 1.dp,
-                        color = Color(0xFFF3F4F6)
+                        color = MaterialTheme.colorScheme.surfaceVariant
                     )
                     ProfileMenuItem(
                         icon = Icons.Default.Favorite,
@@ -189,7 +205,7 @@ fun ProfileScreen(
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             thickness = 1.dp,
-                            color = Color(0xFFF3F4F6)
+                            color = MaterialTheme.colorScheme.surfaceVariant
                         )
                         ProfileMenuItem(
                             icon = Icons.Default.Settings,
@@ -210,19 +226,44 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Menu Group 2: Keluar
+            // Menu Group 2: Mode Gelap
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                ProfileMenuItem(
+                    icon = Icons.Default.Settings,
+                    iconContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    iconTintColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    title = "Mode Gelap",
+                    showArrow = false,
+                    trailingContent = {
+                        Switch(
+                            checked = isDarkMode,
+                            onCheckedChange = { themeManager.toggleTheme(it) }
+                        )
+                    },
+                    onClick = { themeManager.toggleTheme(!isDarkMode) }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Menu Group 3: Keluar
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 ProfileMenuItem(
                     icon = Icons.AutoMirrored.Filled.ExitToApp,
-                    iconContainerColor = Color(0xFFFEE2E2),
-                    iconTintColor = Color(0xFFEF4444),
+                    iconContainerColor = MaterialTheme.colorScheme.errorContainer,
+                    iconTintColor = MaterialTheme.colorScheme.error,
                     title = "Keluar",
-                    titleColor = Color(0xFFEF4444),
+                    titleColor = MaterialTheme.colorScheme.error,
                     showArrow = false,
                     onClick = { showLogoutDialog = true }
                 )
@@ -237,8 +278,9 @@ fun ProfileMenuItem(
     iconContainerColor: Color,
     iconTintColor: Color,
     title: String,
-    titleColor: Color = Color(0xFF333333),
+    titleColor: Color = MaterialTheme.colorScheme.onSurface,
     showArrow: Boolean = true,
+    trailingContent: @Composable (() -> Unit)? = null,
     onClick: () -> Unit
 ) {
     Row(
@@ -269,11 +311,13 @@ fun ProfileMenuItem(
             color = titleColor,
             modifier = Modifier.weight(1f)
         )
-        if (showArrow) {
+        if (trailingContent != null) {
+            trailingContent()
+        } else if (showArrow) {
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = "Go",
-                tint = Color(0xFF9CA3AF)
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

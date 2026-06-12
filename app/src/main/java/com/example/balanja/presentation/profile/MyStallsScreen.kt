@@ -37,7 +37,7 @@ fun MyStallsScreen(
                         text = "Daftar Warung Saya",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF111111)
+                        color = MaterialTheme.colorScheme.onBackground
                     ) 
                 },
                 navigationIcon = {
@@ -45,14 +45,14 @@ fun MyStallsScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack, 
                             contentDescription = "Kembali", 
-                            tint = Color(0xFF111111)
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF9F8))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = Color(0xFFFBF9F8)
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -73,7 +73,7 @@ fun MyStallsScreen(
                 uiState.error != null -> {
                     Text(
                         text = uiState.error!!,
-                        color = Color.Red,
+                        color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }

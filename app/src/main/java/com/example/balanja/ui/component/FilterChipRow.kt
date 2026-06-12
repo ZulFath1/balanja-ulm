@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -30,16 +31,16 @@ fun FilterChipRow(
                 onClick = { onFilterChange(value) },
                 label = { Text(label) },
                 colors = FilterChipDefaults.filterChipColors(
-                    containerColor = Color.White,
-                    selectedContainerColor = Color(0xFF870500),
-                    labelColor = Color.Gray,
-                    selectedLabelColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 border = FilterChipDefaults.filterChipBorder(
                     enabled = true,
                     selected = isSelected,
-                    borderColor = Color(0xFFE5E7EB),
-                    selectedBorderColor = Color(0xFF870500)
+                    borderColor = MaterialTheme.colorScheme.outlineVariant,
+                    selectedBorderColor = MaterialTheme.colorScheme.primary
                 ),
                 shape = RoundedCornerShape(100.dp)
             )

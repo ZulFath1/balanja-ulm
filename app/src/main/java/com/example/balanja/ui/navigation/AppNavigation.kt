@@ -85,7 +85,7 @@ fun AppNavigation() {
     }
 
     Scaffold(
-        containerColor = Color(0xFFFBF9F8)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -94,7 +94,9 @@ fun AppNavigation() {
                 .fillMaxSize()
                 .padding(top = innerPadding.calculateTopPadding()),
             enterTransition = {
-                if (isNavbarRoute(targetState.destination.route)) {
+                val isTargetNav = isNavbarRoute(targetState.destination.route)
+                val isInitialNav = isNavbarRoute(initialState.destination.route)
+                if (isTargetNav && isInitialNav) {
                     fadeIn(animationSpec = tween(300))
                 } else {
                     slideInHorizontally(
@@ -104,20 +106,33 @@ fun AppNavigation() {
                 }
             },
             exitTransition = {
-                fadeOut(animationSpec = tween(300))
+                val isTargetNav = isNavbarRoute(targetState.destination.route)
+                val isInitialNav = isNavbarRoute(initialState.destination.route)
+                if (isTargetNav && isInitialNav) {
+                    fadeOut(animationSpec = tween(300))
+                } else {
+                    slideOutHorizontally(
+                        targetOffsetX = { fullWidth -> -fullWidth / 3 },
+                        animationSpec = tween(300)
+                    )
+                }
             },
             popEnterTransition = {
-                if (isNavbarRoute(targetState.destination.route)) {
+                val isTargetNav = isNavbarRoute(targetState.destination.route)
+                val isInitialNav = isNavbarRoute(initialState.destination.route)
+                if (isTargetNav && isInitialNav) {
                     fadeIn(animationSpec = tween(300))
                 } else {
                     slideInHorizontally(
-                        initialOffsetX = { fullWidth -> -fullWidth },
+                        initialOffsetX = { fullWidth -> -fullWidth / 3 },
                         animationSpec = tween(300)
                     )
                 }
             },
             popExitTransition = {
-                if (isNavbarRoute(initialState.destination.route)) {
+                val isTargetNav = isNavbarRoute(targetState.destination.route)
+                val isInitialNav = isNavbarRoute(initialState.destination.route)
+                if (isTargetNav && isInitialNav) {
                     fadeOut(animationSpec = tween(300))
                 } else {
                     slideOutHorizontally(
