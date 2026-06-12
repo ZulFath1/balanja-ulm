@@ -21,6 +21,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.navigation.NavController
 import com.example.balanja.domain.model.Review
 import com.example.balanja.ui.component.PrimaryButton
@@ -35,6 +39,7 @@ fun MyReviewsScreen(
     viewModel: MyReviewsViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var showZoomedImage by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         topBar = {
@@ -102,9 +107,43 @@ fun MyReviewsScreen(
                             MyReviewItem(
                                 review = review,
                                 onEdit = { navController.navigate("write_review/${review.stallId}?reviewId=${review.id}") },
-                                onDelete = { viewModel.deleteReview(review.stallId, review.id) }
+                                onDelete = { viewModel.deleteReview(review.stallId, review.id) },
+                                onImageClick = { showZoomedImage = review.imageUrl }
                             )
                         }
+                    }
+                }
+            }
+        }
+        
+        showZoomedImage?.let { imageUrl ->
+            Dialog(
+                onDismissRequest = { showZoomedImage = null },
+                properties = DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.9f))
+                        .clickable { showZoomedImage = null }
+                ) {
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = "Zoomed Image",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                            .align(Alignment.Center)
+                    )
+                    IconButton(
+                        onClick = { showZoomedImage = null },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(16.dp)
+                            .background(Color.White.copy(alpha = 0.2f), CircleShape)
+                    ) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Tutup", tint = Color.White)
                     }
                 }
             }
@@ -113,7 +152,7 @@ fun MyReviewsScreen(
 }
 
 @Composable
-fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit) {
+fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit, onImageClick: () -> Unit) {
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     if (showDeleteDialog) {
@@ -176,9 +215,10 @@ fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit) {
                     contentDescription = "Foto Review Saya",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
+                        .width(120.dp)
+                        .height(120.dp)
                         .clip(RoundedCornerShape(12.dp))
+                        .clickable { onImageClick() }
                 )
             }
             

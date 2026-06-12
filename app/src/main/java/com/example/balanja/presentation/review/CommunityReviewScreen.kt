@@ -14,6 +14,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import java.text.SimpleDateFormat
@@ -37,6 +43,7 @@ fun CommunityReviewScreen(
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var showZoomedImage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(stallId) {
         viewModel.loadReviews(stallId)
@@ -227,9 +234,10 @@ fun CommunityReviewScreen(
                                                     contentDescription = "Foto Review",
                                                     contentScale = ContentScale.Crop,
                                                     modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .height(150.dp)
+                                                        .width(120.dp)
+                                                        .height(120.dp)
                                                         .clip(RoundedCornerShape(12.dp))
+                                                        .clickable { showZoomedImage = review.imageUrl }
                                                 )
                                             }
                                             
@@ -253,6 +261,39 @@ fun CommunityReviewScreen(
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+        
+        showZoomedImage?.let { imageUrl ->
+            Dialog(
+                onDismissRequest = { showZoomedImage = null },
+                properties = DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.9f))
+                        .clickable { showZoomedImage = null }
+                ) {
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = "Zoomed Image",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                            .align(Alignment.Center)
+                    )
+                    IconButton(
+                        onClick = { showZoomedImage = null },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(16.dp)
+                            .background(Color.White.copy(alpha = 0.2f), CircleShape)
+                    ) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Tutup", tint = Color.White)
                     }
                 }
             }

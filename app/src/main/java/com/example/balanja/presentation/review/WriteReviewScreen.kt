@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.draw.clip
@@ -262,10 +263,10 @@ fun WriteReviewScreen(
                     AsyncImage(
                         model = selectedImageUri,
                         contentDescription = "Selected Image",
-                        contentScale = ContentScale.Crop,
+                        contentScale = ContentScale.Fit,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp)
+                            .heightIn(min = 150.dp, max = 300.dp)
                             .background(Color.LightGray, androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
                             .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
                     )
