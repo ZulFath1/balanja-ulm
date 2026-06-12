@@ -2,10 +2,12 @@ package com.example.balanja.presentation.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -196,7 +198,9 @@ fun StallDetailScreen(
                                         // Actions Row
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
-                                            modifier = Modifier.fillMaxWidth()
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .horizontalScroll(rememberScrollState())
                                         ) {
                                             // Tag "BUKA" / "TUTUP"
                                             Box(
@@ -217,18 +221,17 @@ fun StallDetailScreen(
                                             
                                             Spacer(modifier = Modifier.width(8.dp))
                                             
-                                            // Rating Button -> Scroll to bottom
+                                            // Rating Display
                                             Row(
                                                 verticalAlignment = Alignment.CenterVertically,
                                                 modifier = Modifier
                                                     .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
                                                     .clip(RoundedCornerShape(8.dp))
-                                                    .clickable { onNavigateToCommunityReview(stall.id) }
                                                     .padding(horizontal = 12.dp, vertical = 6.dp)
                                             ) {
                                                 Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(14.dp))
                                                 Spacer(modifier = Modifier.width(4.dp))
-                                                Text(String.format(Locale.US, "%.1f", stall.rating) + " (${stall.reviewCount})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                Text(String.format(Locale.US, "%.1f", stall.rating), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                             }
 
                                             Spacer(modifier = Modifier.width(8.dp))
@@ -245,6 +248,20 @@ fun StallDetailScreen(
                                                 Icon(Icons.Default.Place, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(14.dp))
                                                 Spacer(modifier = Modifier.width(4.dp))
                                                 Text("Lokasi", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                            }
+
+                                            Spacer(modifier = Modifier.width(8.dp))
+
+                                            // Review Button
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier
+                                                    .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(8.dp))
+                                                    .clip(RoundedCornerShape(8.dp))
+                                                    .clickable { onNavigateToCommunityReview(stall.id) }
+                                                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                                            ) {
+                                                Text("Ulasan (${stall.reviewCount})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
                                             }
                                         }
 
