@@ -92,6 +92,7 @@ fun WriteReviewScreen(
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
+            android.widget.Toast.makeText(context, "Ulasan berhasil dikirim!", android.widget.Toast.LENGTH_SHORT).show()
             navController.popBackStack()
         }
     }

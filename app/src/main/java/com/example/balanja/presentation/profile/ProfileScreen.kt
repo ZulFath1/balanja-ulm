@@ -73,14 +73,17 @@ fun ProfileScreen(
                     text = "Konfirmasi Logout", 
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 ) 
             },
             text = { 
                 Text(
-                    text = "Apakah Anda yakin ingin keluar dari akun ini? Anda harus masuk kembali untuk mengakses Balanja.", 
+                    text = "Apakah Anda yakin ingin keluar dari akun ini?", 
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth()
                 ) 
             },
             confirmButton = {

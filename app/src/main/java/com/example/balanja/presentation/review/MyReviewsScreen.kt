@@ -158,6 +158,7 @@ fun MyReviewsScreen(
 @Composable
 fun MyReviewItem(reviewWithStall: ReviewWithStall, onEdit: () -> Unit, onDelete: () -> Unit, onImageClick: (String) -> Unit) {
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     val review = reviewWithStall.review
 
@@ -175,6 +176,7 @@ fun MyReviewItem(reviewWithStall: ReviewWithStall, onEdit: () -> Unit, onDelete:
             confirmButton = {
                 TextButton(onClick = {
                     onDelete()
+                    android.widget.Toast.makeText(context, "Ulasan berhasil dihapus!", android.widget.Toast.LENGTH_SHORT).show()
                     showDeleteDialog = false
                 }) {
                     Text("Hapus", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
