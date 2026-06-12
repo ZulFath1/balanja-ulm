@@ -104,4 +104,17 @@ class AuthRepositoryImpl(
     override fun isLoggedIn(): Boolean {
         return firebaseAuth.currentUser != null
     }
+
+    override suspend fun updateProfileName(newName: String): Result<Unit> {
+        val user = firebaseAuth.currentUser ?: return Result.failure(Exception("User not logged in"))
+        return try {
+            val profileUpdates = com.google.firebase.auth.UserProfileChangeRequest.Builder()
+                .setDisplayName(newName)
+                .build()
+            user.updateProfile(profileUpdates).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(Exception("Gagal memperbarui profil: ${e.message}"))
+        }
+    }
 }

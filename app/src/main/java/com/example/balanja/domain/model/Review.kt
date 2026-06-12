@@ -8,6 +8,7 @@ data class Review(
     val rating: Int = 0,
     val comment: String = "",
     val attributes: List<String> = emptyList(),
+    val imageUrl: String? = null,
     val createdAt: Long = 0L,
     val updatedAt: Long = 0L
 )

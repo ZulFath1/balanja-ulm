@@ -56,4 +56,24 @@ class ProfileViewModel(
             onLogoutComplete()
         }
     }
+
+    fun updateProfileName(newName: String, onResult: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val result = authRepository.updateProfileName(newName)
+            if (result.isSuccess) {
+                // Update local UI state
+                _uiState.update { 
+                    it.copy(
+                        userName = newName,
+                        isLoading = false
+                    ) 
+                }
+                onResult(true, null)
+            } else {
+                _uiState.update { it.copy(isLoading = false) }
+                onResult(false, result.exceptionOrNull()?.message)
+            }
+        }
+    }
 }
