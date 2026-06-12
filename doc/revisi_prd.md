@@ -80,12 +80,13 @@ Catatan Revisi:
 • Revision Code: 1.5
 • Revised By: Tim Balanja
 • Date: 12 Juni 2026
-• Description: Implementasi Clean Architecture & Penyelarasan Alur Bisnis Add Stall
+• Description: Implementasi Clean Architecture, Penyelarasan Alur Bisnis, & Penegasan Teknologi Cloud
 
 Catatan Revisi:
 Untuk memastikan kesesuaian antara aplikasi yang dideploy pada saat UAS dengan dokumen PRD, dilakukan perombakan akhir:
 1. Transisi ke Clean Architecture: Melakukan perombakan struktur folder (Refactoring) secara menyeluruh yang memisahkan aplikasi ke dalam tiga lapisan mutlak: Data Layer (Repository/API/Local DB), Domain Layer (Models & UseCases), dan Presentation Layer (Feature-based ViewModels & UI).
-2. Penyesuaian Alur Add Stall (BLJA-05): Mengubah metode penambahan warung dari "Upload native" menjadi "Integrasi via Formulir Pengajuan (Google Form)". Keputusan ini diambil sebagai mitigasi risiko keamanan guna mencegah spam data fiktif. Data pengajuan kini divalidasi oleh tim admin sebelum diterbitkan ke Firebase.
-3. Penyesuaian Manajemen Katalog (BLJA-06): Memodifikasi acceptance criteria menjadi sistem "Read/Browse dinamis", sementara manajemen data (*Write*) ditarik ke wewenang server/admin demi integritas pangkalan data. Pemenuhan BREAD (Browse, Read, Edit, Add, Delete) telah diimplementasikan penuh pada entitas Ulasan, Profil pengguna, dan Favorit.
-4. Penyeragaman Nama Produk: Mengubah draf penamaan lama "JajanTeknik" menjadi "Balanja ULM" di seluruh paragraf dokumen agar selaras dengan hasil rilis aplikasi.
+2. Penegasan Infrastruktur Cloud & Autentikasi: Mendetailkan infrastruktur *backend* utama. Autentikasi pengguna kini dikelola secara aman menggunakan **Firebase Authentication**. Data terstruktur (teks, ulasan, lokasi warung) dikelola menggunakan **Firebase Realtime Database** untuk performa *real-time*. Sementara itu, pengelolaan seluruh aset media berat (foto unggahan pengguna, foto warung) secara eksklusif dilayani menggunakan **Cloudinary** sebagai *Cloud Storage* dan CDN (*Content Delivery Network*) untuk mengoptimalkan kecepatan muat gambar dan menghemat *bandwidth*.
+3. Penyesuaian Alur Add Stall (BLJA-05): Mengubah metode penambahan warung dari "Upload native" menjadi "Integrasi via Formulir Pengajuan (Google Form)". Keputusan ini diambil sebagai mitigasi risiko keamanan guna mencegah spam data fiktif. Data pengajuan kini divalidasi oleh tim admin sebelum diterbitkan ke Firebase.
+4. Penyesuaian Manajemen Katalog (BLJA-06): Memodifikasi acceptance criteria menjadi sistem "Read/Browse dinamis", sementara manajemen data (*Write*) ditarik ke wewenang server/admin demi integritas pangkalan data. Pemenuhan BREAD (Browse, Read, Edit, Add, Delete) telah diimplementasikan penuh pada entitas Ulasan, Profil pengguna, dan Favorit.
+5. Penyeragaman Nama Produk: Mengubah draf penamaan lama "JajanTeknik" menjadi "Balanja ULM" di seluruh paragraf dokumen agar selaras dengan hasil rilis aplikasi.
 ```
