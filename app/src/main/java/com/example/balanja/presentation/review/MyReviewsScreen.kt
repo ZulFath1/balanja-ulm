@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +32,9 @@ import com.example.balanja.ui.component.PrimaryButton
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,11 +107,11 @@ fun MyReviewsScreen(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        items(uiState.reviews) { review ->
+                        items(uiState.reviews) { reviewWithStall ->
                             MyReviewItem(
-                                review = review,
-                                onEdit = { navController.navigate("write_review/${review.stallId}?reviewId=${review.id}") },
-                                onDelete = { viewModel.deleteReview(review.stallId, review.id) },
+                                reviewWithStall = reviewWithStall,
+                                onEdit = { navController.navigate("write_review/${reviewWithStall.review.stallId}?reviewId=${reviewWithStall.review.id}") },
+                                onDelete = { viewModel.deleteReview(reviewWithStall.review.stallId, reviewWithStall.review.id) },
                                 onImageClick = { imageUrl -> showZoomedImage = imageUrl }
                             )
                         }
@@ -152,8 +156,16 @@ fun MyReviewsScreen(
 }
 
 @Composable
-fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit, onImageClick: (String) -> Unit) {
+fun MyReviewItem(reviewWithStall: ReviewWithStall, onEdit: () -> Unit, onDelete: () -> Unit, onImageClick: (String) -> Unit) {
     var showDeleteDialog by remember { mutableStateOf(false) }
+
+    val review = reviewWithStall.review
+
+    val dateStr = if (review.createdAt > 0) {
+        SimpleDateFormat("dd MMM yyyy", Locale("id", "ID")).format(Date(review.createdAt)).uppercase()
+    } else {
+        "01 JAN 2023"
+    }
 
     if (showDeleteDialog) {
         AlertDialog(
@@ -182,70 +194,95 @@ fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit, onIma
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = "Rating",
-                    tint = Color(0xFFF59E0B),
-                    modifier = Modifier.size(20.dp)
+        Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            Row(verticalAlignment = Alignment.Top) {
+                AsyncImage(
+                    model = reviewWithStall.stallImageUrl.takeIf { it.isNotBlank() } ?: "https://ui-avatars.com/api/?name=${reviewWithStall.stallName.replace(" ", "+")}&background=random",
+                    contentDescription = "Foto Toko",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
                 )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "${review.rating} / 5", 
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            Text(
-                text = review.comment,
-                fontSize = 15.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 22.sp
-            )
-            
-            val allImages = if (review.imageUrls.isNotEmpty()) review.imageUrls else listOfNotNull(review.imageUrl).filter { it.isNotBlank() }
-            if (allImages.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
-                androidx.compose.foundation.lazy.LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    items(allImages) { imgUrl ->
-                        AsyncImage(
-                            model = imgUrl,
-                            contentDescription = "Foto Review Saya",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .width(120.dp)
-                                .height(120.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .clickable { onImageClick(imgUrl) }
-                        )
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = reviewWithStall.stallName,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    
+                    Text(
+                        text = dateStr,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Medium
+                    )
+                    
+                    Spacer(modifier = Modifier.height(6.dp))
+                    
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        for (i in 1..5) {
+                            Icon(
+                                imageVector = if (i <= review.rating) Icons.Default.Star else Icons.Outlined.StarBorder,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(20.dp))
-            
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
-            
-            Row(
-                horizontalArrangement = Arrangement.End, 
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-            ) {
-                TextButton(onClick = onEdit) {
-                    Text("Ubah", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                TextButton(onClick = { showDeleteDialog = true }) {
-                    Text("Hapus", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Text(
+                        text = "\"${review.comment}\"",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 20.sp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    
+                    val allImages = if (review.imageUrls.isNotEmpty()) review.imageUrls else listOfNotNull(review.imageUrl).filter { it.isNotBlank() }
+                    if (allImages.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        androidx.compose.foundation.lazy.LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            items(allImages) { imgUrl ->
+                                AsyncImage(
+                                    model = imgUrl,
+                                    contentDescription = "Foto Review",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .width(120.dp)
+                                        .height(120.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .clickable { onImageClick(imgUrl) }
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.End, 
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                    ) {
+                        TextButton(onClick = onEdit) {
+                            Text("Ubah", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        TextButton(onClick = { showDeleteDialog = true }) {
+                            Text("Hapus", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
+                        }
+                    }
                 }
             }
         }

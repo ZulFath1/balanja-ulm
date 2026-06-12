@@ -389,7 +389,8 @@ fun AppNavigation() {
                                 getMyReviewsUseCase = AppContainer.getMyReviewsUseCase,
                                 deleteReviewUseCase = AppContainer.deleteReviewUseCase,
                                 recalculateStallRatingUseCase = AppContainer.recalculateStallRatingUseCase,
-                                authRepository = AppContainer.authRepository
+                                authRepository = AppContainer.authRepository,
+                                stallRepository = AppContainer.stallRepository
                             ) as T
                         }
                     }

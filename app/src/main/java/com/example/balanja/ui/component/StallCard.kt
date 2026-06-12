@@ -124,7 +124,7 @@ fun StallCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = stall.rating.toString(),
+                            text = String.format(java.util.Locale.US, "%.1f", stall.rating),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF111111) // Keep dark on yellow badge

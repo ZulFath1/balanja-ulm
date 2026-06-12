@@ -228,7 +228,7 @@ fun StallDetailScreen(
                                             ) {
                                                 Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(14.dp))
                                                 Spacer(modifier = Modifier.width(4.dp))
-                                                Text("${stall.rating} (${stall.reviewCount})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                Text(String.format(Locale.US, "%.1f", stall.rating) + " (${stall.reviewCount})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                             }
 
                                             Spacer(modifier = Modifier.width(8.dp))

@@ -16,6 +16,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -255,7 +257,7 @@ fun ProfileScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 ProfileMenuItem(
-                    icon = Icons.Default.Settings,
+                    icon = if (isDarkMode) Icons.Default.DarkMode else Icons.Default.LightMode,
                     iconContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     iconTintColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     title = "Mode Gelap",
