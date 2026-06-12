@@ -73,10 +73,16 @@ fun CommunityReviewScreen(
         Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
             when (val state = uiState) {
                 is CommunityReviewUiState.Loading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(top = 16.dp, bottom = 24.dp)
+                    ) {
+                        items(5) {
+                            com.example.balanja.ui.component.ReviewCardSkeleton(
+                                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
                 }
                 is CommunityReviewUiState.Error -> {
                     Text(

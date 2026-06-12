@@ -76,7 +76,14 @@ fun MyReviewsScreen(
         Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             when {
                 uiState.isLoading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    LazyColumn(
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(5) {
+                            com.example.balanja.ui.component.ReviewCardSkeleton()
+                        }
+                    }
                 }
                 uiState.error != null -> {
                     Text(
