@@ -37,7 +37,7 @@ object AppContainer {
 
     private val cloudinaryRetrofit = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
-        .baseUrl("https://api.cloudinary.com/v1_1/dtybg3j5d/")
+        .baseUrl("https://api.cloudinary.com/v1_1/dfg9q3j5d/")
         .build()
 
     val weatherApiService: WeatherApiService by lazy {

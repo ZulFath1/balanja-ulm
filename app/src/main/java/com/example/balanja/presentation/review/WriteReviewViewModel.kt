@@ -102,13 +102,18 @@ class WriteReviewViewModel(
                     val mediaType = "image/$fileExtension".toMediaTypeOrNull()
                     val requestBody = imageBytes.toRequestBody(mediaType)
                     
-                    val multipartBody = okhttp3.MultipartBody.Part.createFormData(
-                        "file", "upload.$fileExtension", requestBody
-                    )
-                    val presetBody = "balanja_preset".toRequestBody("text/plain".toMediaTypeOrNull())
+                    val multipartBody = okhttp3.MultipartBody.Builder()
+                        .setType(okhttp3.MultipartBody.FORM)
+                        .addFormDataPart("file", "upload.$fileExtension", requestBody)
+                        .addFormDataPart("upload_preset", "balanja_preset")
+                        .build()
                     
-                    val response = cloudinaryApiService.uploadImage(multipartBody, presetBody)
+                    val response = cloudinaryApiService.uploadImage(multipartBody)
                     finalImageUrl = response.secureUrl
+                } catch (e: retrofit2.HttpException) {
+                    val errorBody = e.response()?.errorBody()?.string() ?: e.message()
+                    _uiState.update { it.copy(isSaving = false, error = "Gagal mengunggah gambar: $errorBody") }
+                    return@launch
                 } catch (e: Exception) {
                     _uiState.update { it.copy(isSaving = false, error = "Gagal mengunggah gambar: ${e.message}") }
                     return@launch
