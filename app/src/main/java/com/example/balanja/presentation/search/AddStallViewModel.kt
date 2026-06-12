@@ -16,7 +16,7 @@ class AddStallViewModel : ViewModel() {
      * Opens the Google Form for stall proposal submission
      */
     fun openGoogleForm(context: Context) {
-        val googleFormUrl = "https://forms.gle/dummy"
+        val googleFormUrl = "https://forms.gle/QpvDUyHWbRxnjDjc7"
         val intent = Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse(googleFormUrl)
         }

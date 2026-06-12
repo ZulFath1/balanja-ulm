@@ -58,6 +58,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import com.example.balanja.ui.component.PrimaryButton
 import com.example.balanja.ui.theme.BalanjaColor
+import com.example.balanja.ui.component.LocalSnackbarHostState
+import kotlinx.coroutines.launch
 
 /**
  * BLJA-03: ULASAN/REVIEW Screen (Write Review)
@@ -90,9 +92,14 @@ fun WriteReviewScreen(
         }
     )
 
+    val snackbarHostState = LocalSnackbarHostState.current
+
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            android.widget.Toast.makeText(context, "Ulasan berhasil dikirim!", android.widget.Toast.LENGTH_SHORT).show()
+            launch {
+                snackbarHostState.showSnackbar("Ulasan berhasil dikirim!", withDismissAction = true)
+            }
+            kotlinx.coroutines.delay(1500)
             navController.popBackStack()
         }
     }

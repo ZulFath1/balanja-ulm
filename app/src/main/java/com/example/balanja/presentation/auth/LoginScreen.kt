@@ -73,7 +73,7 @@ fun LoginScreen(
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Email Mahasiswa/Dosen",
+                text = "Masukkan email ULM.",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -82,16 +82,9 @@ fun LoginScreen(
             BalanjaTextField(
                 value = email,
                 onValueChange = { email = it },
-                placeholder = "@ulm.ac.id atau @mhs.ulm.ac.id",
+                placeholder = "Masukkan email ULM.",
                 leadingIcon = Icons.Default.School,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "G U N A K A N  E M A I L  I N S T I T U S I  A K T I F",
-                fontSize = 10.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Medium
             )
         }
 
@@ -151,15 +144,13 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Belum punya akun? Daftar di sini",
+            text = "Akun ULM kamu belum terdaftar? Daftar di sini",
             color = primaryColor,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.clickable { onNavigateToRegister() }
         )
 
         Spacer(modifier = Modifier.weight(1f))
-
-        AuthFooter()
     }
 }
 // Removed duplicated BalanjaTextField, we should use the one in ui.component but since its signature differs, I will update the ui.component one. Wait, if I remove this, LoginScreen will use the one in ui.component which expects label, etc. I need to keep it temporarily or update ui.component.BalanjaTextField first. I will keep it here for a moment and only remove the footer for now.

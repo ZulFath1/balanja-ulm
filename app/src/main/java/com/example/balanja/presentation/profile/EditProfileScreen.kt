@@ -28,8 +28,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.balanja.ui.component.PrimaryButton
+import com.example.balanja.ui.component.LocalSnackbarHostState
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,9 +50,14 @@ fun EditProfileScreen(
         }
     )
 
+    val snackbarHostState = LocalSnackbarHostState.current
+
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            android.widget.Toast.makeText(context, "Profil berhasil diperbarui!", android.widget.Toast.LENGTH_SHORT).show()
+            launch {
+                snackbarHostState.showSnackbar("Profil berhasil diperbarui!", withDismissAction = true)
+            }
+            kotlinx.coroutines.delay(1500)
             onNavigateBack()
         }
     }

@@ -35,17 +35,21 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
     
-    val userName: String = authRepository.getCurrentUser()?.name?.takeIf { it.isNotBlank() } ?: ""
-    val greeting: String
-        get() {
-            val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-            return when (hour) {
-                in 0..10 -> "Selamat Pagi"
-                in 11..14 -> "Selamat Siang"
-                in 15..17 -> "Selamat Sore"
-                else -> "Selamat Malam"
-            }
+    private val _userName = MutableStateFlow(authRepository.getCurrentUser()?.name?.takeIf { it.isNotBlank() } ?: "")
+    val userName: StateFlow<String> = _userName.asStateFlow()
+
+    private val _greeting = MutableStateFlow(getGreetingTime())
+    val greeting: StateFlow<String> = _greeting.asStateFlow()
+
+    private fun getGreetingTime(): String {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        return when (hour) {
+            in 0..10 -> "Selamat Pagi"
+            in 11..14 -> "Selamat Siang"
+            in 15..17 -> "Selamat Sore"
+            else -> "Selamat Malam"
         }
+    }
 
     // ─── Weather state ────────────────────────────────────────────────────────
 
@@ -68,7 +72,7 @@ class HomeViewModel(
                     _uiState.value = HomeUiState.Error(exception.message ?: "Gagal memuat data stan")
                 }
                 .collect { stallsList ->
-                    _uiState.value = HomeUiState.Success(stallsList)
+                    _uiState.value = HomeUiState.Success(stallsList.shuffled())
                 }
         }
     }
@@ -128,6 +132,8 @@ class HomeViewModel(
     // ─── Pull-to-refresh ──────────────────────────────────────────────────────
 
     fun onRefresh() {
+        _userName.value = authRepository.getCurrentUser()?.name?.takeIf { it.isNotBlank() } ?: ""
+        _greeting.value = getGreetingTime()
         fetchStalls()
         fetchWeather()
     }

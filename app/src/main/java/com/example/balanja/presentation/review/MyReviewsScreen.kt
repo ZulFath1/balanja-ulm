@@ -35,6 +35,9 @@ import coil.compose.AsyncImage
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.example.balanja.ui.component.LocalSnackbarHostState
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -158,7 +161,8 @@ fun MyReviewsScreen(
 @Composable
 fun MyReviewItem(reviewWithStall: ReviewWithStall, onEdit: () -> Unit, onDelete: () -> Unit, onImageClick: (String) -> Unit) {
     var showDeleteDialog by remember { mutableStateOf(false) }
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val snackbarHostState = LocalSnackbarHostState.current
+    val scope = rememberCoroutineScope()
 
     val review = reviewWithStall.review
 
@@ -175,8 +179,11 @@ fun MyReviewItem(reviewWithStall: ReviewWithStall, onEdit: () -> Unit, onDelete:
             text = { Text("Tindakan ini tidak dapat dibatalkan.") },
             confirmButton = {
                 TextButton(onClick = {
-                    onDelete()
-                    android.widget.Toast.makeText(context, "Ulasan berhasil dihapus!", android.widget.Toast.LENGTH_SHORT).show()
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Ulasan berhasil dihapus!", withDismissAction = true)
+                        kotlinx.coroutines.delay(1500)
+                        onDelete()
+                    }
                     showDeleteDialog = false
                 }) {
                     Text("Hapus", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)

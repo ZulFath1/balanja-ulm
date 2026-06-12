@@ -55,6 +55,7 @@ fun BalanjaBottomNav(
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     Box(
         modifier = modifier

@@ -49,6 +49,8 @@ fun HomeScreen(
         modifier = Modifier.fillMaxSize()
     ) {
             val favoritesList by viewModel.favorites.collectAsStateWithLifecycle()
+            val userName by viewModel.userName.collectAsStateWithLifecycle()
+            val greeting by viewModel.greeting.collectAsStateWithLifecycle()
 
             LazyColumn(
                 modifier = Modifier
@@ -59,9 +61,9 @@ fun HomeScreen(
                 // Header
                 item {
                     Column(modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)) {
-                        val nameText = if (viewModel.userName.isNotBlank()) ", ${viewModel.userName}!" else "!"
+                        val nameText = if (userName.isNotBlank()) ", ${userName}!" else "!"
                         Text(
-                            text = "${viewModel.greeting}$nameText",
+                            text = "${greeting}$nameText",
                             fontWeight = FontWeight.Medium,
                             fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,

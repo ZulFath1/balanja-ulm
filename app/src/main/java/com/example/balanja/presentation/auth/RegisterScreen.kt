@@ -66,7 +66,7 @@ fun RegisterScreen(
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Email Mahasiswa/Dosen",
+                text = "Masukkan email ULM.",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -75,7 +75,7 @@ fun RegisterScreen(
             BalanjaTextField(
                 value = uiState.email,
                 onValueChange = { viewModel.updateEmail(it) },
-                placeholder = "@ulm.ac.id atau @mhs.ulm.ac.id",
+                placeholder = "Masukkan email ULM.",
                 leadingIcon = Icons.Default.School,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
             )
@@ -168,7 +168,5 @@ fun RegisterScreen(
         )
 
         Spacer(modifier = Modifier.weight(1f))
-
-        AuthFooter()
     }
 }
