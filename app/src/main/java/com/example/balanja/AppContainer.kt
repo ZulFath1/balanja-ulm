@@ -29,13 +29,23 @@ object AppContainer {
             .build()
     }
 
+    private val weatherRetrofit = Retrofit.Builder()
+        .addConverterFactory(GsonConverterFactory.create())
+        .baseUrl(WeatherApiService.BASE_URL)
+        .client(okHttpClient)
+        .build()
+
+    private val cloudinaryRetrofit = Retrofit.Builder()
+        .addConverterFactory(GsonConverterFactory.create())
+        .baseUrl("https://api.cloudinary.com/v1_1/dtybg3j5d/")
+        .build()
+
     val weatherApiService: WeatherApiService by lazy {
-        Retrofit.Builder()
-            .baseUrl(WeatherApiService.BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(WeatherApiService::class.java)
+        weatherRetrofit.create(WeatherApiService::class.java)
+    }
+
+    val cloudinaryApiService: com.example.balanja.data.api.cloudinary.CloudinaryApiService by lazy {
+        cloudinaryRetrofit.create(com.example.balanja.data.api.cloudinary.CloudinaryApiService::class.java)
     }
 
 

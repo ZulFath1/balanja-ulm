@@ -24,6 +24,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.balanja.domain.model.Review
 import com.example.balanja.ui.component.PrimaryButton
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -165,6 +168,19 @@ fun MyReviewItem(review: Review, onEdit: () -> Unit, onDelete: () -> Unit) {
                 color = Color(0xFF555555),
                 lineHeight = 22.sp
             )
+            
+            if (review.imageUrl != null && review.imageUrl.isNotBlank()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                AsyncImage(
+                    model = review.imageUrl,
+                    contentDescription = "Foto Review Saya",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                )
+            }
             
             Spacer(modifier = Modifier.height(20.dp))
             

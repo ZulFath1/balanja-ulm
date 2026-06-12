@@ -32,6 +32,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.clickable
@@ -39,6 +42,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.PickVisualMediaRequest
+import android.net.Uri
+import coil.compose.AsyncImage
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import com.example.balanja.ui.component.PrimaryButton
@@ -65,6 +76,13 @@ fun WriteReviewScreen(
     viewModel: WriteReviewViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri -> selectedImageUri = uri }
+    )
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
@@ -227,6 +245,65 @@ fun WriteReviewScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Photo Upload Section
+            Text(
+                text = "TAMBAHKAN FOTO (OPSIONAL)",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = labelColor,
+                letterSpacing = 1.sp,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            if (selectedImageUri != null) {
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    AsyncImage(
+                        model = selectedImageUri,
+                        contentDescription = "Selected Image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .background(Color.LightGray, androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                    )
+                    IconButton(
+                        onClick = { selectedImageUri = null },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                            .background(Color.Black.copy(alpha = 0.5f), androidx.compose.foundation.shape.CircleShape)
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Hapus", tint = Color.White, modifier = Modifier.size(16.dp)) // Using back icon as a placeholder for close, let's use a text or custom shape if needed, actually let's use Icons.Default.Close if imported, otherwise just empty
+                    }
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp)
+                        .background(Color(0xFFF3F4F6), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                        .border(1.dp, Color(0xFFEFE8E6), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                        .clickable { 
+                            photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) 
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Default.Star, // Replace with Add Photo icon if available
+                            contentDescription = "Upload Photo",
+                            tint = Color.Gray,
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Pilih foto dari galeri", color = Color.Gray, fontSize = 14.sp)
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(48.dp))
 
             // Error Message
@@ -241,7 +318,25 @@ fun WriteReviewScreen(
 
             // Submit Button
             androidx.compose.material3.Button(
-                onClick = { viewModel.submitReview() },
+                onClick = { 
+                    var imageBytes: ByteArray? = null
+                    var extension: String? = null
+                    
+                    if (selectedImageUri != null) {
+                        try {
+                            val inputStream = context.contentResolver.openInputStream(selectedImageUri!!)
+                            imageBytes = inputStream?.readBytes()
+                            inputStream?.close()
+                            
+                            val mimeType = context.contentResolver.getType(selectedImageUri!!)
+                            extension = mimeType?.substringAfterLast('/') ?: "jpg"
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                    
+                    viewModel.submitReview(imageBytes, extension) 
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

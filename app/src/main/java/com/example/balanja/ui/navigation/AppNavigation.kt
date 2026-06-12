@@ -283,7 +283,8 @@ fun AppNavigation() {
                                 editReviewUseCase = AppContainer.editReviewUseCase,
                                 getReviewsUseCase = AppContainer.getReviewsUseCase,
                                 recalculateStallRatingUseCase = AppContainer.recalculateStallRatingUseCase,
-                                authRepository = AppContainer.authRepository
+                                authRepository = AppContainer.authRepository,
+                                cloudinaryApiService = AppContainer.cloudinaryApiService
                             ) as T
                         }
                     }

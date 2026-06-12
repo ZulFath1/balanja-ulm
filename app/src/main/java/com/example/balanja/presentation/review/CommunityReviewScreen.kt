@@ -220,6 +220,19 @@ fun CommunityReviewScreen(
                                                 modifier = Modifier.fillMaxWidth()
                                             )
                                             
+                                            if (review.imageUrl != null && review.imageUrl.isNotBlank()) {
+                                                Spacer(modifier = Modifier.height(12.dp))
+                                                AsyncImage(
+                                                    model = review.imageUrl,
+                                                    contentDescription = "Foto Review",
+                                                    contentScale = ContentScale.Crop,
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .height(150.dp)
+                                                        .clip(RoundedCornerShape(12.dp))
+                                                )
+                                            }
+                                            
                                             if (review.attributes.isNotEmpty()) {
                                                 Spacer(modifier = Modifier.height(12.dp))
                                                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
