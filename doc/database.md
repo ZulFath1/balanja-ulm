@@ -1,420 +1,103 @@
-# Database Design — Balanja ULM
+# Struktur Database Balanja ULM
 
-## Versi
+Sistem database pada aplikasi Balanja ULM mengadopsi pendekatan _Hybrid_ menggunakan **Firebase Realtime Database** sebagai sumber data utama (Remote/Cloud) dan **Room Database (SQLite)** sebagai penyimpanan lokal untuk efisiensi dan fitur _offline-first_.
 
-v1.3 — UAS Revision
-
-## Deskripsi
-
-Dokumen ini menjelaskan struktur database aplikasi **Balanja ULM**, meliputi:
-
-* Firebase Realtime Database
-* Room Database (Favorit)
-* Relasi antar entitas
-* Struktur data Clean Architecture
-* ER Diagram
-* Mermaid visualization
-
-Dokumen disusun berdasarkan:
-
-* PRD Balanja ULM v1.3
-* Sprint 3–5 Task Breakdown
-* Firebase Structure Reference
-* Fitur tambahan UAS (Weather API & Room Favorite)
+Berikut adalah penjabaran detail mengenai struktur dan relasi datanya.
 
 ---
 
-# 1. Arsitektur Data
+## 1. Remote Database (Firebase Realtime Database)
 
-Aplikasi menggunakan kombinasi:
+Remote Database dirancang dengan prinsip _NoSQL_ dengan sedikit denormalisasi agar proses pengambilan data (Read) berjalan sangat cepat tanpa _join_ yang berat.
 
-| Komponen              | Teknologi                  |
-| --------------------- | -------------------------- |
-| Backend realtime      | Firebase Realtime Database |
-| Authentication        | Firebase Auth              |
-| Storage gambar        | Firebase Storage           |
-| Offline local storage | Room Database              |
-| External API          | OpenWeatherMap API         |
+### A. Entitas (Collections)
 
----
+#### `users` (Koleksi Pengguna)
+Menyimpan informasi identitas dan profil akun.
+- `id` (String): ID unik pengguna, selaras dengan Firebase Authentication UID.
+- `name` (String): Nama lengkap pengguna.
+- `email` (String): Alamat email.
+- `role` (String): Peran pengguna, contoh: `"buyer"` (pembeli), `"seller"` (penjual).
+- `reviewCount` (Int): Jumlah ulasan yang pernah dikirimkan oleh pengguna ini.
+- `createdAt` (Long): Unix timestamp pendaftaran.
+- `photoUrl` (String, Nullable): URL foto profil dari Firebase Storage.
 
-# 2. Struktur Firebase Realtime Database
+#### `stalls` (Koleksi Warung/Pedagang)
+Menyimpan data detail setiap warung/pedagang kaki lima.
+- `id` (String): ID unik warung.
+- `name` (String): Nama warung/pedagang.
+- `description` (String): Deskripsi singkat jualan.
+- `location` (String): Alamat teks warung.
+- `priceMin` (Int): Estimasi harga menu termurah.
+- `priceMax` (Int): Estimasi harga menu termahal.
+- `rating` (Double): Rata-rata bintang (0.0 - 5.0) hasil kalkulasi _review_.
+- `reviewCount` (Int): Total ulasan yang diterima warung ini.
+- `isOpen` (Boolean): Status operasional (buka/tutup).
+- `imageUrl` (String): URL gambar _banner_ warung.
+- `latitude` (Double): Titik koordinat lokasi di peta.
+- `longitude` (Double): Titik koordinat lokasi di peta.
+- `ownerId` (String): Berisi `userId` dari pengguna yang memiliki/mendaftarkan warung ini.
+- `menu` (Map<String, MenuItem>): _Sub-collection_ berisi menu makanan/minuman yang dijual.
+  - Atribut Menu: `name` (String), `price` (Int), `description` (String), `imageUrl` (String).
 
-```text
-Realtime Database
-├── stalls/
-├── reviews/
-├── stallProposals/
-└── users/
-```
+#### `reviews` (Koleksi Ulasan/Review)
+Menyimpan _feedback_ dari pengguna untuk suatu warung.
+- `id` (String): ID unik ulasan.
+- `stallId` (String): ID warung yang diulas.
+- `userId` (String): ID pengguna yang menulis ulasan.
+- `userName` (String): Nama pengguna (Didenormalisasi agar tidak perlu query tabel `users` saat menampilkan list review).
+- `userPhotoUrl` (String, Nullable): URL foto profil pembuat ulasan (Denormalisasi).
+- `rating` (Int): Skor bintang yang diberikan (1 sampai 5).
+- `comment` (String): Teks komentar/ulasan lengkap.
+- `attributes` (List<String>): Tag atribut opsional (misal: "Bersih", "Murah", "Ramah").
+- `imageUrls` (List<String>): List URL gambar lampiran yang diunggah pengguna.
+- `createdAt` (Long): Waktu pembuatan ulasan.
+- `updatedAt` (Long): Waktu pembaruan ulasan terakhir.
 
----
+### B. Relasi Database (Firebase)
+Meskipun NoSQL tidak memiliki _Foreign Key_ secara kaku, relasi logisnya adalah:
+1. **One-to-Many: User -> Stall**
+   - Satu `User` (berperan sebagai *seller*) dapat mendaftarkan/memiliki banyak `Stall`.
+   - **Relasi:** Kolom `ownerId` di koleksi `stalls` merujuk pada `id` di koleksi `users`.
+2. **One-to-Many: User -> Review**
+   - Satu `User` dapat menulis banyak `Review`.
+   - **Relasi:** Kolom `userId` di koleksi `reviews` merujuk pada `id` di koleksi `users`.
+3. **One-to-Many: Stall -> Review**
+   - Satu `Stall` dapat menerima banyak `Review`.
+   - **Relasi:** Kolom `stallId` di koleksi `reviews` merujuk pada `id` di koleksi `stalls`.
 
-# 3. Struktur Entity Database
-
----
-
-## 3.1 USERS
-
-Menyimpan data pengguna aplikasi.
-
-| Field     | Type        | Keterangan                  |
-| --------- | ----------- | --------------------------- |
-| uid       | String (PK) | Firebase UID                |
-| name      | String      | Nama pengguna               |
-| email     | String      | Email ULM                   |
-| role      | String      | mahasiswa / penjual / admin |
-| photoUrl  | String      | URL foto profil             |
-| createdAt | Long        | Timestamp akun dibuat       |
-
-### Relasi
-
-* User dapat membuat banyak review
-* User dapat mengusulkan banyak pedagang
-* User dapat memiliki banyak favorit
-
----
-
-## 3.2 STALLS
-
-Menyimpan data stan makanan.
-
-| Field         | Type                    | Keterangan         |
-| ------------- | ----------------------- | ------------------ |
-| stallId       | String (PK)             | ID stan            |
-| ownerId       | String (FK → USERS.uid) | Pemilik stan       |
-| name          | String                  | Nama stan          |
-| location      | String                  | Deskripsi lokasi   |
-| description   | String                  | Deskripsi stan     |
-| priceRange    | String                  | Rentang harga      |
-| photoUrl      | String                  | Foto stan          |
-| isOpen        | Boolean                 | Status operasional |
-| averageRating | Double                  | Rating rata-rata   |
-| reviewCount   | Int                     | Jumlah review      |
-| latitude      | Double                  | Latitude GPS       |
-| longitude     | Double                  | Longitude GPS      |
-
-### Relasi
-
-* Stall memiliki banyak menu
-* Stall memiliki banyak review
-* Stall dapat difavoritkan banyak user
+*(Catatan Kalkulasi Otomatis: Setiap kali dokumen `reviews` baru ditambahkan/dihapus, nilai `rating` dan `reviewCount` pada dokumen `stalls` akan dikalkulasi ulang melalui `RecalculateStallRatingUseCase` untuk menjaga konsistensi).*
 
 ---
 
-## 3.3 MENUS
-
-Menyimpan daftar menu tiap stan.
-
-| Field       | Type                         | Keterangan      |
-| ----------- | ---------------------------- | --------------- |
-| menuId      | String (PK)                  | ID menu         |
-| stallId     | String (FK → STALLS.stallId) | Relasi stan     |
-| name        | String                       | Nama menu       |
-| description | String                       | Deskripsi menu  |
-| price       | Int                          | Harga           |
-| imageUrl    | String                       | Foto menu       |
-| isAvailable | Boolean                      | Status tersedia |
-
-### Relasi
-
-* Banyak menu dimiliki satu stall
-
----
-
-## 3.4 REVIEWS
-
-Menyimpan ulasan pengguna.
-
-| Field         | Type                         | Keterangan          |
-| ------------- | ---------------------------- | ------------------- |
-| reviewId      | String (PK)                  | ID review           |
-| stallId       | String (FK → STALLS.stallId) | Stan yang direview  |
-| reviewerUid   | String (FK → USERS.uid)      | User pemberi review |
-| reviewerName  | String                       | Nama reviewer       |
-| reviewerEmail | String                       | Email reviewer      |
-| rating        | Int                          | Nilai 1–5           |
-| comment       | String                       | Isi ulasan          |
-| photoUrl      | String?                      | Foto ulasan         |
-| timestamp     | Long                         | Waktu review        |
-
-### Relasi
-
-* Banyak review dimiliki satu user
-* Banyak review dimiliki satu stall
-
----
-
-## 3.5 REVIEW_ATTRIBUTES
-
-Menyimpan quick attributes review.
-
-| Field         | Type                           | Keterangan     |
-| ------------- | ------------------------------ | -------------- |
-| id            | Int (PK)                       | ID attribute   |
-| reviewId      | String (FK → REVIEWS.reviewId) | Review terkait |
-| attributeName | String                         | Nama attribute |
-
-### Contoh Attribute
-
-* Porsi Banyak
-* Rasa Mantap
-* Cepat
-* Sesuai Harga
-
----
-
-## 3.6 STALL_PROPOSALS
-
-Usulan pedagang baru.
-
-| Field               | Type                    | Keterangan       |
-| ------------------- | ----------------------- | ---------------- |
-| proposalId          | String (PK)             | ID usulan        |
-| stallName           | String                  | Nama pedagang    |
-| locationDescription | String                  | Deskripsi lokasi |
-| photoUrl            | String                  | Foto lokasi      |
-| latitude            | Double                  | Latitude         |
-| longitude           | Double                  | Longitude        |
-| proposedByUid       | String (FK → USERS.uid) | Pengusul         |
-| proposedByName      | String                  | Nama pengusul    |
-| timestamp           | Long                    | Waktu usulan     |
-
----
-
-# 4. Room Database — Favorit
-
-## Tabel: favorite_stalls
-
-| Field      | Type        | Keterangan       |
-| ---------- | ----------- | ---------------- |
-| stallId    | String (PK) | ID stan          |
-| name       | String      | Nama stan        |
-| location   | String      | Lokasi           |
-| imageUrl   | String      | Foto             |
-| priceRange | String      | Harga            |
-| rating     | Double      | Rating           |
-| isOpen     | Boolean     | Status buka      |
-| savedAt    | Long        | Timestamp simpan |
-
-### Fungsi
-
-* Penyimpanan offline
-* Tetap tersedia tanpa internet
-* Sinkronisasi cepat UI
-
----
-
-# 5. Weather Cache (Opsional)
-
-Digunakan untuk cache data OpenWeatherMap API.
-
-| Field       | Type   |
-| ----------- | ------ |
-| id          | Int    |
-| temperature | Double |
-| description | String |
-| humidity    | Int    |
-| windSpeed   | Double |
-| iconCode    | String |
-| fetchedAt   | Long   |
-
----
-
-# 6. ER Diagram (Mermaid)
-
-```mermaid
-erDiagram
-
-    USERS {
-        string uid PK
-        string name
-        string email
-        string role
-        string photoUrl
-        long createdAt
-    }
-
-    STALLS {
-        string stallId PK
-        string ownerId FK
-        string name
-        string location
-        string description
-        string priceRange
-        string photoUrl
-        boolean isOpen
-        double averageRating
-        int reviewCount
-        double latitude
-        double longitude
-    }
-
-    MENUS {
-        string menuId PK
-        string stallId FK
-        string name
-        string description
-        int price
-        string imageUrl
-        boolean isAvailable
-    }
-
-    REVIEWS {
-        string reviewId PK
-        string stallId FK
-        string reviewerUid FK
-        string reviewerName
-        string reviewerEmail
-        int rating
-        string comment
-        string photoUrl
-        long timestamp
-    }
-
-    REVIEW_ATTRIBUTES {
-        int id PK
-        string reviewId FK
-        string attributeName
-    }
-
-    STALL_PROPOSALS {
-        string proposalId PK
-        string stallName
-        string locationDescription
-        string photoUrl
-        double latitude
-        double longitude
-        string proposedByUid FK
-        string proposedByName
-        long timestamp
-    }
-
-    FAVORITE_STALLS {
-        string stallId PK
-        string name
-        string location
-        string imageUrl
-        string priceRange
-        double rating
-        boolean isOpen
-        long savedAt
-    }
-
-    USERS ||--o{ REVIEWS : writes
-    USERS ||--o{ STALL_PROPOSALS : proposes
-    USERS ||--o{ STALLS : owns
-
-    STALLS ||--o{ MENUS : contains
-    STALLS ||--o{ REVIEWS : receives
-
-    REVIEWS ||--o{ REVIEW_ATTRIBUTES : contains
-```
-
----
-
-# 7. Diagram Relasi Sederhana
-
-```mermaid
-graph TD
-
-    USER[USERS]
-    STALL[STALLS]
-    MENU[MENUS]
-    REVIEW[REVIEWS]
-    ATTR[REVIEW_ATTRIBUTES]
-    PROP[STALL_PROPOSALS]
-    FAVORITE[FAVORITE_STALLS]
-
-    USER --> STALL
-    USER --> REVIEW
-    USER --> PROP
-
-    STALL --> MENU
-    STALL --> REVIEW
-
-    REVIEW --> ATTR
-
-    USER --> FAVORITE
-```
-
----
-
-# 8. Struktur Firebase JSON
-
-```json
-{
-  "stalls": {
-    "stall_01": {
-      "name": "Pentol Teknik",
-      "location": "Depan Gedung A",
-      "priceRange": "Rp5.000 - Rp15.000",
-      "isOpen": true,
-      "averageRating": 4.8,
-      "reviewCount": 25
-    }
-  },
-
-  "reviews": {
-    "stall_01": {
-      "review_01": {
-        "reviewerUid": "uid123",
-        "reviewerName": "Fathi",
-        "rating": 5,
-        "comment": "Mantap dan murah"
-      }
-    }
-  }
-}
-```
-
----
-
-# 9. Firebase Storage Structure
-
-```text
-gs://balanja-app.appspot.com/
-
-├── review_photos/
-│   └── {uid}/{reviewId}.jpg
-
-└── stall_proposals/
-    └── {proposalId}.jpg
-```
-
----
-
-# 10. Clean Architecture Mapping
-
-```text
-presentation/
-    ↓
-domain/usecase/
-    ↓
-domain/repository/
-    ↓
-data/repository/
-    ↓
-Firebase / Room / API
-```
-
----
-
-# 11. Kesimpulan
-
-Database Balanja dirancang menggunakan pendekatan:
-
-* Realtime cloud database (Firebase)
-* Offline local persistence (Room)
-* Clean Architecture
-* Modular repository pattern
-
-Desain ini memungkinkan:
-
-* realtime update
-* offline support
-* scalable architecture
-* maintainable codebase
-* integrasi API eksternal
-
----
+## 2. Local Database (Room SQLite)
+
+Local Database berfungsi untuk menyimpan preferensi spesifik yang ada pada *device* pengguna, sehingga menghemat kuota internet dan memberikan respons seketika (*instant response*) saat aplikasi digunakan secara _offline_.
+
+### A. Tabel (Entities)
+
+#### Tabel `favorite_stalls`
+Menyimpan daftar warung yang ditandai (di-klik tombol Hati / _Favorite_) oleh pengguna di *device* tersebut.
+- `stallId` (String, **Primary Key**): Mengacu pada ID warung di Firebase.
+- `name` (String): _Cache_ nama warung.
+- `location` (String): _Cache_ lokasi warung.
+- `priceRange` (String): String rentang harga (digenerate dari `priceMin` - `priceMax`).
+- `photoUrl` (String): URL foto utama warung.
+- `averageRating` (Double): Rata-rata rating warung.
+- `isOpen` (Boolean): Status buka/tutup saat disimpan.
+- `savedAt` (Long): Waktu ketika warung tersebut dimasukkan ke daftar favorit.
+
+#### Tabel `recent_searches`
+Menyimpan riwayat warung yang baru saja dilihat/diklik oleh pengguna, digunakan pada halaman Search.
+- `stallId` (String, **Primary Key**): Mengacu pada ID warung di Firebase.
+- `name` (String): _Cache_ nama warung.
+- `location` (String): _Cache_ lokasi warung.
+- `priceRange` (String): Rentang harga.
+- `photoUrl` (String): URL foto utama.
+- `averageRating` (Double): Rata-rata rating.
+- `isOpen` (Boolean): Status buka/tutup.
+- `timestamp` (Long): Waktu terakhir kali warung ini dikunjungi/dicari. (Data dengan timestamp terlama akan digeser turun dalam _list_ pencarian).
+
+### B. Konfigurasi Preferences (SharedPreferences / DataStore)
+Meskipun bukan tabel relasional, penyimpanan lokal ini mendukung *Local Data*:
+- **Theme Preferences (`ThemePreferenceManager`):** Menyimpan status pilihan tema aplikasi (Sistem / Terang / Gelap) agar layar tidak berkedip ketika aplikasi baru dibuka.
