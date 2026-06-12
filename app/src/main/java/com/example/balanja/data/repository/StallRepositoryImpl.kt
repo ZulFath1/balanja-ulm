@@ -32,7 +32,8 @@ class StallRepositoryImpl(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                android.util.Log.e("StallRepository", "Database error: ${error.message}")
+                close()
             }
         }
 
@@ -51,7 +52,8 @@ class StallRepositoryImpl(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                android.util.Log.e("StallRepository", "Database error: ${error.message}")
+                close()
             }
         }
 
@@ -74,7 +76,8 @@ class StallRepositoryImpl(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                android.util.Log.e("StallRepository", "Database error: ${error.message}")
+                close()
             }
         }
 

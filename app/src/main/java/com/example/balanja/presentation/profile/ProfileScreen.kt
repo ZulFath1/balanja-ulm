@@ -66,25 +66,46 @@ fun ProfileScreen(
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
-            title = { Text("Konfirmasi Logout") },
-            text = { Text("Apakah Anda yakin ingin keluar dari akun ini?") },
+            title = { 
+                Text(
+                    text = "Konfirmasi Logout", 
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                ) 
+            },
+            text = { 
+                Text(
+                    text = "Apakah Anda yakin ingin keluar dari akun ini? Anda harus masuk kembali untuk mengakses Balanja.", 
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                ) 
+            },
             confirmButton = {
-                TextButton(onClick = {
-                    showLogoutDialog = false
-                    viewModel.logout {
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(0) { inclusive = true }
+                Button(
+                    onClick = {
+                        showLogoutDialog = false
+                        viewModel.logout {
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(navController.graph.id) { inclusive = true }
+                            }
                         }
-                    }
-                }) {
-                    Text("Keluar", color = MaterialTheme.colorScheme.error)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFDC2626),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Keluar", fontWeight = FontWeight.Bold, color = Color.White)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showLogoutDialog = false }) {
-                    Text("Batal")
+                OutlinedButton(onClick = { showLogoutDialog = false }) {
+                    Text("Batal", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                 }
-            }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(24.dp)
         )
     }
 
