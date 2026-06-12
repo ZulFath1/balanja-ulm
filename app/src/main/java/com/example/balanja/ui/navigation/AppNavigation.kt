@@ -21,6 +21,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import com.example.balanja.AppContainer
 import com.example.balanja.domain.usecase.SignInUseCase
 import com.example.balanja.presentation.auth.AuthViewModel
@@ -74,6 +79,13 @@ fun AppNavigation() {
         if (AppContainer.authRepository.isLoggedIn()) Screen.Home.route else Screen.Login.route
     }
 
+    fun isNavbarRoute(route: String?): Boolean {
+        if (route == null) return false
+        return screensWithoutBottomNav.none { pattern ->
+            route.startsWith(pattern.substringBefore("{"))
+        }
+    }
+
     Scaffold(
         containerColor = Color(0xFFFBF9F8),
         bottomBar = {
@@ -83,7 +95,40 @@ fun AppNavigation() {
         NavHost(
             navController = navController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            enterTransition = {
+                if (isNavbarRoute(targetState.destination.route)) {
+                    fadeIn(animationSpec = tween(300))
+                } else {
+                    slideInHorizontally(
+                        initialOffsetX = { fullWidth -> fullWidth },
+                        animationSpec = tween(300)
+                    )
+                }
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(300))
+            },
+            popEnterTransition = {
+                if (isNavbarRoute(targetState.destination.route)) {
+                    fadeIn(animationSpec = tween(300))
+                } else {
+                    slideInHorizontally(
+                        initialOffsetX = { fullWidth -> -fullWidth },
+                        animationSpec = tween(300)
+                    )
+                }
+            },
+            popExitTransition = {
+                if (isNavbarRoute(initialState.destination.route)) {
+                    fadeOut(animationSpec = tween(300))
+                } else {
+                    slideOutHorizontally(
+                        targetOffsetX = { fullWidth -> fullWidth },
+                        animationSpec = tween(300)
+                    )
+                }
+            }
         ) {
             composable(Screen.Login.route) {
                 val authViewModel: AuthViewModel = viewModel(
