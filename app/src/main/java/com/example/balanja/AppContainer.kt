@@ -3,7 +3,12 @@ package com.example.balanja
 import com.example.balanja.data.api.WeatherApiService
 import com.example.balanja.data.repository.*
 import com.example.balanja.domain.repository.*
-import com.example.balanja.domain.usecase.*
+import com.example.balanja.domain.usecase.auth.*
+import com.example.balanja.domain.usecase.review.*
+import com.example.balanja.domain.usecase.stall.*
+import com.example.balanja.domain.usecase.favorite.*
+import com.example.balanja.domain.usecase.search.*
+import com.example.balanja.domain.usecase.weather.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -59,7 +64,7 @@ object AppContainer {
         private set
 
     fun init(context: android.content.Context) {
-        val database = com.example.balanja.data.local.BalanjaLocalDatabase.getInstance(context)
+        val database = com.example.balanja.data.local.db.BalanjaLocalDatabase.getInstance(context)
         favoriteRepository = FavoriteRepositoryImpl(database.favoriteStallDao())
         recentSearchRepository = RecentSearchRepositoryImpl(database.recentSearchDao())
     }
@@ -67,8 +72,8 @@ object AppContainer {
     // ─── Use Cases ────────────────────────────────────────────────────────────
 
     val signInUseCase by lazy { SignInUseCase(authRepository) }
-    val signInWithGoogleUseCase by lazy { com.example.balanja.domain.usecase.SignInWithGoogleUseCase(authRepository) }
-    val signUpUseCase by lazy { com.example.balanja.domain.usecase.SignUpUseCase(authRepository) }
+    val signInWithGoogleUseCase by lazy { com.example.balanja.domain.usecase.auth.SignInWithGoogleUseCase(authRepository) }
+    val signUpUseCase by lazy { com.example.balanja.domain.usecase.auth.SignUpUseCase(authRepository) }
     val getAllStallsUseCase by lazy { GetAllStallsUseCase(stallRepository) }
     val getStallDetailUseCase by lazy { GetStallDetailUseCase(stallRepository) }
     val toggleStallStatusUseCase by lazy { ToggleStallStatusUseCase(stallRepository) }
@@ -89,3 +94,4 @@ object AppContainer {
     val addRecentSearchUseCase by lazy { AddRecentSearchUseCase(recentSearchRepository) }
     val clearRecentSearchesUseCase by lazy { ClearRecentSearchesUseCase(recentSearchRepository) }
 }
+

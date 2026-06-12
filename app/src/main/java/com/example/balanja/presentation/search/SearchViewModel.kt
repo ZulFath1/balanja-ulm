@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.balanja.domain.model.Stall
 import com.example.balanja.domain.model.RecentSearch
-import com.example.balanja.domain.usecase.GetAllStallsUseCase
-import com.example.balanja.domain.usecase.GetRecentSearchesUseCase
-import com.example.balanja.domain.usecase.AddRecentSearchUseCase
-import com.example.balanja.domain.usecase.ClearRecentSearchesUseCase
+import com.example.balanja.domain.usecase.stall.GetAllStallsUseCase
+import com.example.balanja.domain.usecase.search.GetRecentSearchesUseCase
+import com.example.balanja.domain.usecase.search.AddRecentSearchUseCase
+import com.example.balanja.domain.usecase.search.ClearRecentSearchesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

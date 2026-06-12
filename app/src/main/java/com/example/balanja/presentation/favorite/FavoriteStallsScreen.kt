@@ -92,20 +92,11 @@ fun FavoriteStallsScreen(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(uiState.favorites, key = { it.stallId }) { fav ->
-                            // Convert FavoriteStall to Stall to use StallCard
-                            val stall = Stall(
-                                id = fav.stallId,
-                                name = fav.name,
-                                location = fav.location,
-                                rating = fav.ratingAverage,
-                                isOpen = fav.isOpen,
-                                imageUrl = fav.imageUrl
-                            )
+                        items(uiState.favorites, key = { it.id }) { stall ->
                             StallCard(
                                 stall = stall,
                                 isFavorite = true,
-                                onToggleFavorite = { viewModel.removeFavorite(fav.stallId) },
+                                onToggleFavorite = { viewModel.removeFavorite(stall.id) },
                                 onClick = { id -> navController.navigate(Screen.StallDetail.createRoute(id)) }
                             )
                         }

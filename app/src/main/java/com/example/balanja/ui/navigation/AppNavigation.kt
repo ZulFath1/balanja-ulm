@@ -1,5 +1,24 @@
 package com.example.balanja.ui.navigation
 
+import com.example.balanja.domain.usecase.search.GetRecentSearchesUseCase
+import com.example.balanja.domain.usecase.weather.GetCampusWeatherUseCase
+import com.example.balanja.domain.usecase.review.DeleteReviewUseCase
+import com.example.balanja.domain.usecase.review.AddReviewUseCase
+import com.example.balanja.domain.usecase.search.AddRecentSearchUseCase
+import com.example.balanja.domain.usecase.review.RecalculateStallRatingUseCase
+import com.example.balanja.domain.usecase.stall.GetAllStallsUseCase
+import com.example.balanja.domain.usecase.review.GetReviewsUseCase
+import com.example.balanja.domain.usecase.favorite.GetFavoritesUseCase
+import com.example.balanja.domain.usecase.search.ClearRecentSearchesUseCase
+import com.example.balanja.domain.usecase.auth.SignUpUseCase
+import com.example.balanja.domain.usecase.review.GetMyReviewsUseCase
+import com.example.balanja.domain.usecase.favorite.IsFavoriteUseCase
+import com.example.balanja.domain.usecase.auth.SignInWithGoogleUseCase
+import com.example.balanja.domain.usecase.stall.ToggleStallStatusUseCase
+import com.example.balanja.domain.usecase.stall.GetStallDetailUseCase
+import com.example.balanja.domain.usecase.favorite.AddFavoriteUseCase
+import com.example.balanja.domain.usecase.favorite.DeleteFavoriteUseCase
+import com.example.balanja.domain.usecase.review.EditReviewUseCase
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,27 +54,27 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import com.example.balanja.AppContainer
-import com.example.balanja.domain.usecase.SignInUseCase
+import com.example.balanja.domain.usecase.auth.SignInUseCase
 import com.example.balanja.presentation.auth.AuthViewModel
 import com.example.balanja.presentation.auth.LoginScreen
 import com.example.balanja.presentation.review.WriteReviewScreen
 import com.example.balanja.presentation.review.WriteReviewViewModel
 import com.example.balanja.presentation.review.MyReviewsScreen
 import com.example.balanja.presentation.review.MyReviewsViewModel
-import com.example.balanja.presentation.search.AddStallScreen
+import com.example.balanja.presentation.stall.AddStallScreen
 import com.example.balanja.presentation.map.MapScreen
 import com.example.balanja.presentation.map.MapViewModel
 import com.example.balanja.presentation.profile.ProfileScreen
 import com.example.balanja.presentation.profile.ProfileViewModel
 import com.example.balanja.presentation.favorite.FavoriteStallsScreen
 import com.example.balanja.presentation.favorite.FavoriteStallsViewModel
-import com.example.balanja.presentation.detail.StallDetailScreen
-import com.example.balanja.presentation.detail.StallDetailViewModel
+import com.example.balanja.presentation.stall.StallDetailScreen
+import com.example.balanja.presentation.stall.StallDetailViewModel
 
 // Factory untuk inject SignInUseCase ke AuthViewModel
 class AuthViewModelFactory(
     private val signInUseCase: SignInUseCase,
-    private val signInWithGoogleUseCase: com.example.balanja.domain.usecase.SignInWithGoogleUseCase
+    private val signInWithGoogleUseCase: com.example.balanja.domain.usecase.auth.SignInWithGoogleUseCase
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
@@ -272,7 +291,7 @@ fun AppNavigation() {
                 )
             }
             composable(Screen.AddStall.route) {
-                val viewModel: com.example.balanja.presentation.search.AddStallViewModel = viewModel()
+                val viewModel: com.example.balanja.presentation.stall.AddStallViewModel = viewModel()
                 Box(modifier = Modifier.fillMaxSize()) {
                     AddStallScreen(
                         viewModel = viewModel
@@ -316,7 +335,11 @@ fun AppNavigation() {
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             @Suppress("UNCHECKED_CAST")
-                            return FavoriteStallsViewModel(AppContainer.getFavoritesUseCase, AppContainer.deleteFavoriteUseCase) as T
+                            return FavoriteStallsViewModel(
+                                AppContainer.getFavoritesUseCase, 
+                                AppContainer.deleteFavoriteUseCase,
+                                AppContainer.getAllStallsUseCase
+                            ) as T
                         }
                     }
                 )
@@ -449,3 +472,5 @@ fun PlaceholderScreen(name: String) {
         Text(name, style = MaterialTheme.typography.titleMedium)
     }
 }
+
+

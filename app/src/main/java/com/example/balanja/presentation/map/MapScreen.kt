@@ -199,13 +199,13 @@ fun MapScreen(viewModel: MapViewModel, onNavigateBack: () -> Unit = {}) {
                         androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(16.dp))
                         androidx.compose.foundation.layout.Column {
                             Text(
-                                text = "Temukan Jajanan",
+                                text = uiState.selectedStallLocation?.name ?: "Temukan Jajanan",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "${uiState.stalls.count { it.latitude != 0.0 && it.longitude != 0.0 }} pedagang ada di peta",
+                                text = uiState.selectedStallLocation?.location ?: "${uiState.stalls.count { it.latitude != 0.0 && it.longitude != 0.0 }} pedagang ada di peta",
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

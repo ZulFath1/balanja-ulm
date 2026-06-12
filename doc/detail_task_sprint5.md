@@ -719,13 +719,13 @@ Mengganti layar kosong saat data sedang dimuat dengan animasi skeleton (shimmer 
 
 **Acceptance Criteria:**
 
-- [ ] Skeleton card tampil di Home Screen selama data stan dimuat.
-- [ ] Skeleton widget tampil di posisi cuaca selama data cuaca dimuat.
-- [ ] Skeleton card tampil di Search Screen saat filter diterapkan ulang.
-- [ ] Skeleton review card tampil di halaman Ulasan Komunitas.
-- [ ] Skeleton tampil di halaman Favorit saat data dimuat.
-- [ ] Animasi shimmer berjalan mulus.
-- [ ] Tidak ada layar putih kosong di kondisi loading manapun.
+- [x] Skeleton card tampil di Home Screen selama data stan dimuat.
+- [x] Skeleton widget tampil di posisi cuaca selama data cuaca dimuat.
+- [x] Skeleton card tampil di Search Screen saat filter diterapkan ulang.
+- [x] Skeleton review card tampil di halaman Ulasan Komunitas.
+- [x] Skeleton tampil di halaman Favorit saat data dimuat.
+- [x] Animasi shimmer berjalan mulus.
+- [x] Tidak ada layar putih kosong di kondisi loading manapun.
 
 **Commit Message:**
 ```
