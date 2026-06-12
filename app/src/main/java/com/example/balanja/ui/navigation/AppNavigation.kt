@@ -134,7 +134,8 @@ fun AppNavigation() {
                                 AppContainer.getCampusWeatherUseCase,
                                 AppContainer.getFavoritesUseCase,
                                 AppContainer.addFavoriteUseCase,
-                                AppContainer.deleteFavoriteUseCase
+                                AppContainer.deleteFavoriteUseCase,
+                                AppContainer.authRepository
                             ) as T
                         }
                     }
@@ -151,7 +152,12 @@ fun AppNavigation() {
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             @Suppress("UNCHECKED_CAST")
-                            return com.example.balanja.presentation.search.SearchViewModel(AppContainer.getAllStallsUseCase) as T
+                            return com.example.balanja.presentation.search.SearchViewModel(
+                                AppContainer.getAllStallsUseCase,
+                                AppContainer.getRecentSearchesUseCase,
+                                AppContainer.addRecentSearchUseCase,
+                                AppContainer.clearRecentSearchesUseCase
+                            ) as T
                         }
                     }
                 )

@@ -159,22 +159,22 @@ fun StallDetailScreen(
                                     Column(
                                         modifier = Modifier
                                             .align(Alignment.BottomStart)
-                                            .padding(start = 24.dp, end = 24.dp, bottom = 80.dp) // Leave space for floating card
+                                            .padding(start = 24.dp, end = 24.dp, bottom = 120.dp) // Leave space for floating card
                                     ) {
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Icon(Icons.Default.Place, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
+                                            Icon(Icons.Default.Place, contentDescription = null, tint = Color.White, modifier = Modifier.size(12.dp))
                                             Spacer(modifier = Modifier.width(4.dp))
-                                            Text(stall.location.uppercase(), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+                                            Text(stall.location.uppercase(), color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
                                         }
                                         Spacer(modifier = Modifier.height(4.dp))
                                         Text(
                                             text = stall.name,
                                             color = Color.White,
-                                            fontSize = 36.sp,
+                                            fontSize = 28.sp,
                                             fontWeight = FontWeight.Bold,
-                                            lineHeight = 40.sp
+                                            lineHeight = 32.sp
                                         )
                                     }
                                 }

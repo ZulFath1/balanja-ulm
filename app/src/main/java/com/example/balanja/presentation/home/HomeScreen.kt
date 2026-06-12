@@ -58,25 +58,33 @@ fun HomeScreen(
             ) {
                 // Header
                 item {
-                    Column(modifier = Modifier.padding(bottom = 16.dp)) {
+                    Column(modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)) {
+                        val nameText = if (viewModel.userName.isNotBlank()) ", ${viewModel.userName}!" else "!"
                         Text(
-                            text = "Selamat Pagi!",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
+                            text = "${viewModel.greeting}$nameText",
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                            color = Color.Gray,
+                            letterSpacing = 0.5.sp
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = buildAnnotatedString {
                                 append("Mau ")
                                 withStyle(
                                     style = SpanStyle(
                                         color = Color(0xFF870500),
-                                        fontWeight = FontWeight.ExtraBold,
+                                        fontWeight = FontWeight.Black,
                                         fontStyle = FontStyle.Italic
                                     )
                                 ) { append("Balanja") }
                                 append(" apa hari ini?")
                             },
-                            fontSize = 20.sp
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFF1A1A1A),
+                            lineHeight = 34.sp,
+                            letterSpacing = (-0.5).sp
                         )
                     }
                 }

@@ -3,7 +3,11 @@ package com.example.balanja.presentation.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.balanja.domain.model.Stall
+import com.example.balanja.domain.model.RecentSearch
 import com.example.balanja.domain.usecase.GetAllStallsUseCase
+import com.example.balanja.domain.usecase.GetRecentSearchesUseCase
+import com.example.balanja.domain.usecase.AddRecentSearchUseCase
+import com.example.balanja.domain.usecase.ClearRecentSearchesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,11 +19,15 @@ data class SearchUiState(
     val searchQuery: String = "",
     val allStalls: List<Stall> = emptyList(),
     val filteredStalls: List<Stall> = emptyList(),
+    val recentSearches: List<RecentSearch> = emptyList(),
     val error: String? = null
 )
 
 class SearchViewModel(
-    private val getAllStallsUseCase: GetAllStallsUseCase
+    private val getAllStallsUseCase: GetAllStallsUseCase,
+    private val getRecentSearchesUseCase: GetRecentSearchesUseCase,
+    private val addRecentSearchUseCase: AddRecentSearchUseCase,
+    private val clearRecentSearchesUseCase: ClearRecentSearchesUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -27,6 +35,15 @@ class SearchViewModel(
 
     init {
         loadStalls()
+        loadRecentSearches()
+    }
+
+    private fun loadRecentSearches() {
+        viewModelScope.launch {
+            getRecentSearchesUseCase().collect { recentList ->
+                _uiState.update { it.copy(recentSearches = recentList) }
+            }
+        }
     }
 
     private fun loadStalls() {
@@ -61,5 +78,27 @@ class SearchViewModel(
         if (query.isBlank()) return emptyList() // or return allStalls if you want to show all initially
         val lowerCaseQuery = query.lowercase()
         return stalls.filter { it.name.lowercase().contains(lowerCaseQuery) }
+    }
+
+    fun onStallClicked(stall: Stall) {
+        viewModelScope.launch {
+            val recentSearch = RecentSearch(
+                stallId = stall.id,
+                name = stall.name,
+                location = stall.location,
+                priceRange = "Rp ${stall.priceMin} - Rp ${stall.priceMax}",
+                photoUrl = stall.imageUrl,
+                averageRating = stall.rating,
+                isOpen = stall.isOpen,
+                timestamp = System.currentTimeMillis()
+            )
+            addRecentSearchUseCase(recentSearch)
+        }
+    }
+
+    fun clearRecentSearches() {
+        viewModelScope.launch {
+            clearRecentSearchesUseCase()
+        }
     }
 }

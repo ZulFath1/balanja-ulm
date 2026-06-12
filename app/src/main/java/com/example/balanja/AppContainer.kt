@@ -45,10 +45,13 @@ object AppContainer {
     val weatherRepository: WeatherRepository by lazy { WeatherRepositoryImpl(weatherApiService) }
     lateinit var favoriteRepository: FavoriteRepository
         private set
+    lateinit var recentSearchRepository: RecentSearchRepository
+        private set
 
     fun init(context: android.content.Context) {
         val database = com.example.balanja.data.local.BalanjaLocalDatabase.getInstance(context)
         favoriteRepository = FavoriteRepositoryImpl(database.favoriteStallDao())
+        recentSearchRepository = RecentSearchRepositoryImpl(database.recentSearchDao())
     }
 
     // ─── Use Cases ────────────────────────────────────────────────────────────
@@ -71,4 +74,8 @@ object AppContainer {
     val getReviewsUseCase by lazy { GetReviewsUseCase(reviewRepository) }
     val getMyReviewsUseCase by lazy { GetMyReviewsUseCase(reviewRepository) }
     val recalculateStallRatingUseCase by lazy { RecalculateStallRatingUseCase(stallRepository, reviewRepository) }
+
+    val getRecentSearchesUseCase by lazy { GetRecentSearchesUseCase(recentSearchRepository) }
+    val addRecentSearchUseCase by lazy { AddRecentSearchUseCase(recentSearchRepository) }
+    val clearRecentSearchesUseCase by lazy { ClearRecentSearchesUseCase(recentSearchRepository) }
 }
