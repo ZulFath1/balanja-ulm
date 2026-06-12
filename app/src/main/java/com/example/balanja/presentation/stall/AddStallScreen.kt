@@ -62,22 +62,7 @@ fun AddStallScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Icon Background
-            Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer, shape = CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Store,
-                    contentDescription = "Toko",
-                    tint = androidx.compose.material3.MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(48.dp)
-                )
-            }
 
-            Spacer(modifier = Modifier.height(32.dp))
 
             Text(
                 text = "Punya Rekomendasi Warung?",
