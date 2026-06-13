@@ -6,84 +6,110 @@
   [![Kotlin](https://img.shields.io/badge/Kotlin-1.9.0-blue.svg?logo=kotlin)](https://kotlinlang.org)
   [![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-Material%203-4CAF50.svg?logo=android)](https://developer.android.com/jetpack/compose)
   [![Firebase](https://img.shields.io/badge/Firebase-Realtime%20DB-FFCA28.svg?logo=firebase)](https://firebase.google.com)
-  [![Room](https://img.shields.io/badge/Room-SQLite-00C5FF.svg?logo=sqlite)](https://developer.android.com/training/data-storage/room)
+  [![Room Database](https://img.shields.io/badge/Room-SQLite-00C5FF.svg?logo=sqlite)](https://developer.android.com/training/data-storage/room)
+  [![Clean Architecture](https://img.shields.io/badge/Architecture-Clean-ff69b4.svg)](#)
 </div>
 
 ---
 
-## 📖 Deskripsi
-**Balanja ULM** adalah aplikasi berbasis Android (Kotlin & Jetpack Compose) yang dirancang khusus untuk memecahkan masalah pencarian makanan bagi mahasiswa Universitas Lambung Mangkurat. Dengan waktu istirahat perkuliahan yang singkat, aplikasi ini menghemat waktu mahasiswa dengan menyediakan informasi **katalog menu**, **status operasional waktu nyata (buka/tutup)**, serta **sistem ulasan/rating jujur** dari sesama mahasiswa.
+## 📖 Latar Belakang & Deskripsi Proyek
+**Balanja ULM** adalah aplikasi seluler berbasis Android (Kotlin & Jetpack Compose) yang dikembangkan untuk memfasilitasi mahasiswa Universitas Lambung Mangkurat (ULM) dalam mengeksplorasi jajanan, kantin, dan pedagang kaki lima di sekitar area kampus.
+
+Mahasiswa seringkali dihadapkan dengan waktu istirahat yang sangat singkat di sela-sela pergantian mata kuliah. Tidak jarang mahasiswa merasa rugi waktu karena mendatangi kantin yang ternyata sedang tutup, atau merasa kebingungan memilih menu makanan karena minimnya referensi harga dan kualitas rasa.
+
+Aplikasi ini hadir sebagai solusi terpadu dengan menyediakan **katalog menu interaktif**, **indikator buka/tutup secara *real-time***, **peta lokasi digital**, dan wadah untuk bertukar **ulasan (rating)** yang dikhususkan bagi ekosistem internal kampus ULM.
+
+---
 
 ## 🏗️ Struktur Arsitektur (Clean Architecture)
-Aplikasi ini mengadopsi **Clean Architecture** berlapis untuk memastikan skalabilitas, kemudahan *testing*, dan separasi *logic* yang bersih:
-- **Presentation Layer (`presentation/`, `ui/`)**: Berisi UI Jetpack Compose, Navigasi, dan *ViewModels* yang memanfaatkan `StateFlow`.
-- **Domain Layer (`domain/`)**: Berisi *Models* murni dan *UseCases* yang membungkus *business logic* (misalnya: `RecalculateStallRatingUseCase`).
-- **Data Layer (`data/`)**: Mengimplementasikan antarmuka dari Domain Layer melalui *Repositories*, mengambil/menulis data dari/ke **Firebase**, **Open-Meteo API**, dan **Room Database**.
+Aplikasi ini diarsiteki dengan prinsip **Clean Architecture**, sebuah standar industri pengembangan perangkat lunak modern untuk memisahkan *logic* aplikasi dari kerangka kerja antarmuka (*UI framework*). Aplikasi dipecah ke dalam 3 lapisan (*layers*) utama:
+
+1. **Presentation Layer (`presentation/`, `ui/`)**
+   Bertanggung jawab menangani UI/UX menggunakan **Jetpack Compose**. Setiap layar (*screen*) dikendalikan oleh *ViewModel* terpisah yang mengelola UI State melalui `StateFlow`.
+2. **Domain Layer (`domain/`)**
+   Lapisan paling murni (*pure Kotlin*) yang tidak memiliki dependensi terhadap Android Framework. Lapisan ini berisikan *Data Models* abstrak dan rentetan *UseCases* untuk setiap *business logic* (contoh: `RecalculateStallRatingUseCase` untuk memastikan rating terhitung otomatis tanpa membebani *view*).
+3. **Data Layer (`data/`)**
+   Mengandung implementasi konkrit (Repository Impl) dari antarmuka yang didefinisikan pada Domain Layer. Lapisan inilah yang langsung berkomunikasi dengan *Data Sources* luar seperti Firebase (API), Open-Meteo (HTTP API), dan Room (Local DB).
 
 ---
 
-## ✨ Fitur Aplikasi
+## ✨ Fitur-Fitur Aplikasi
 
-### 🎯 Fitur Wajib (Syarat UAS)
-1. **Integrasi Local Database (SQLite via Room)**
-   - **Fitur Favorit (*Offline-First*)**: Mahasiswa dapat menyimpan (*bookmark*) warung jajanan favorit mereka. Data ini disimpan murni di memori lokal (*device*), sehingga mahasiswa bisa melihat warung favoritnya secara instan meski tanpa kuota internet.
-   - **Riwayat Pencarian**: Menyimpan jejak kata kunci pencarian terakhir secara lokal untuk akses cepat.
-2. **Integrasi API Pihak Ketiga (Fetching)**
-   - **Cuaca Kampus (Open-Meteo API)**: Mengambil data prakiraan suhu dan cuaca secara _real-time_ tanpa *API Key* di layar Home untuk membantu mahasiswa memutuskan apakah mereka akan berjalan ke kantin luar atau tidak.
+### 🎯 Fitur Wajib (Syarat UAS Mobile Programming)
+Sesuai dengan matriks penilaian Ujian Akhir Semester, proyek ini mengimplementasikan penuh dua elemen fungsionalitas berikut:
 
-### 🚀 Fitur Utama & Tambahan
-- **Katalog Digital Interaktif**: Daftar menu, rentang harga, dan deskripsi warung lengkap di satu layar.
-- **Sistem Ulasan (Rating & Review)**: Mahasiswa dapat memberikan skor Bintang 1-5, menulis komentar, dan mengunggah foto makanan. Peringkat rata-rata warung otomatis dikalkulasi (*Real-time*).
-- **Status Operasional *Real-time***: Label indikator *Buka* (Hijau) atau *Tutup* (Merah) yang langsung disinkronisasi ke semua aplikasi mahasiswa saat penjual mengubah statusnya.
-- **Peta Lokasi Pedagang (Osmdroid)**: Memetakan lokasi gerobak/stan makanan mahasiswa menggunakan *OpenStreetMap* secara 100% gratis.
-- **Crowdsourcing (Usulan Jajanan Baru)**: Mahasiswa dapat mengusulkan warung/pedagang kaki lima baru yang belum terdata di ULM melalui integrasi *Google Form* secara aman.
-- **Autentikasi Firebase**: Proses _Login_ dan _Register_ aman untuk memastikan hanya komunitas ULM yang memberikan ulasan.
+1. **Integrasi Local Database (Room SQLite / Offline-First)**
+   - **Warung Favorit (*Bookmarks*)**: Pengguna dapat menyimpan warung andalan mereka. Data disimpan murni di pangkalan data *smartphone* (`favorite_stalls` table), sehingga pengguna dapat melihat daftar warung favorit mereka secara instan meski ponsel tidak terkoneksi dengan internet.
+   - **Riwayat Pencarian Berwaktu**: Saat pengguna mengetikkan sesuatu di *Search Bar* dan mengklik sebuah warung, rekam jejak tersebut disimpan secara lokal (`recent_searches` table) dan diurutkan berdasarkan parameter waktu terbaru (*timestamp-based sorting*).
+
+2. **Integrasi Jaringan API Pihak Ketiga (*Fetching*)**
+   - **Widget Prakiraan Cuaca Kampus**: Menggunakan **Open-Meteo API** untuk mengambil data suhu dan cuaca di area wilayah Banjarmasin secara *real-time*. Hasil panggil API (*JSON response*) di-*parse* ke layar beranda untuk membantu mahasiswa menentukan apakah mereka harus menunda pergi ke kantin karena kondisi cuaca/hujan.
+
+### 🚀 Fitur Utama & Tambahan (Core Features)
+- **Katalog Digital & Rentang Harga**: Menampilkan detail deskripsi warung, gambar *banner*, dan daftar menu lengkap beserta rentang harga (estimasi minimum-maksimum).
+- **Status Operasional *Real-Time***: Pemilik warung dapat menekan sebuah tombol ("Buka"/"Tutup") yang datanya akan langsung tersinkronisasi (*Real-time listener*) di semua layar ponsel pengguna lain pada detik itu juga, menghemat waktu mahasiswa menuju warung tutup.
+- **Sistem Ulasan (Rating & Review)**: Pengguna dapat memberikan nilai 1 hingga 5 bintang, menulis pengalaman mereka, menambah *tags* (misal: "Rasa Mantap", "Porsi Banyak"), dan melampirkan bukti foto makanan.
+- **Peta Lokasi Terintegrasi (Osmdroid)**: Menampilkan tata letak visual letak gerobak pedagang di atas peta OpenStreetMap secara gratis, tanpa hambatan limitasi _API Key_ berbayar.
+- **Sistem *Crowdsourcing***: Mahasiswa yang menemukan pedagang kaki lima baru di sekitar kampus bisa mengajukan informasi penjual tersebut ke *database* pusat melalui alur **Google Form**, sebuah mitigasi keamanan untuk mencegah *spam* data *dummy*.
+- **Otentikasi Akun (Firebase Auth)**: Sistem gerbang masuk (Login/Register) agar ulasan makanan terjamin keasliannya dan terhindar dari anonimitas *troll*.
 
 ---
 
-## 🛠️ Informasi Teknologi & API yang Digunakan
-1. **Firebase Realtime Database & Authentication** 
-   Sebagai *backend* utama penyimpan profil pengguna, warung, dan ulasan secara *real-time*.
-2. **Cloudinary API** 
-   Sebagai penyedia *Cloud Storage* (CDN) khusus untuk mengelola seluruh aset gambar (foto profil, foto ulasan, foto warung) agar _loading_ aplikasi tetap ringan dan *bandwidth* terhemat.
-3. **Open-Meteo API** 
-   API cuaca open-source untuk _fetching_ prakiraan suhu cuaca di wilayah kampus.
-4. **Osmdroid (OpenStreetMap)** 
-   Pustaka pemetaan sebagai alternatif Google Maps SDK demi menghindari penagihan kartu kredit internasional.
-5. **Room Database (SQLite)** 
-   Manajemen penyimpanan lokal (offline-first) untuk performa tingkat tinggi.
+## 🛠️ Stack Teknologi & Layanan Cloud
+
+| Nama Teknologi | Fungsi Pokok di Aplikasi |
+| --- | --- |
+| **Kotlin & Jetpack Compose** | Pembuatan UI secara deklaratif dan responsif. |
+| **Firebase Authentication** | Manajemen pengguna, hashing kata sandi, sesi login persisten. |
+| **Firebase Realtime Database**| Sinkronisasi NoSQL *cloud database* super cepat (*WebSocket*) untuk data warung, status buka/tutup, dan ulasan komunitas. |
+| **Cloudinary API** | Layanan *Cloud Storage (CDN)* pengelola aset media berat (Foto Profil, Foto Menu). Melakukan *compressing* secara server-side agar irit kuota. |
+| **Open-Meteo API** | HTTP API cuaca publik *open-source* tanpa limitasi *rate-limiting*. |
+| **Osmdroid (OpenStreetMap)**| Pustaka pemetaan alternatif yang 100% *open-source* dan tidak butuh kartu kredit. |
+| **Room Database (SQLite)** | Lapisan persistensi data lokal di atas platform Android. |
+| **Retrofit2 & Coil** | *Client API fetching* (Retrofit) dan pustaka pemuatan gambar asinkron (Coil). |
 
 ---
 
 ## ⚙️ Cara Instalasi & Menjalankan Aplikasi
 
-### Syarat Prasyarat:
-- **Android Studio** (Disarankan versi *Iguana* atau *Jellyfish* ke atas).
-- Perangkat fisik Android atau Emulator berjalan pada API Level 24 (Android 7.0) atau lebih baru.
-- Koneksi Internet untuk sinkronisasi awal.
+> **⚠️ PERHATIAN KEAMANAN PENTING (API KEYS):** 
+> File kredensial proyek seperti `google-services.json` (untuk koneksi Firebase) dan `local.properties` (untuk API Key Cloudinary) **telah dimasukkan ke dalam `.gitignore` dan TIDAK BISA diunggah ke repositori GitHub publik ini** untuk mencegah kebocoran/peretasan *database*. Anda harus mengaturnya secara mandiri.
 
-### Langkah-langkah:
-1. **Clone Repository**
+### Prasyarat Komputer
+- **Android Studio** (Minimum versi *Iguana* / *Jellyfish*).
+- Ponsel fisik atau Android Emulator dengan API Level 24+ (Android 7.0 Nougat ke atas).
+
+### Panduan Instalasi Langkah-demi-Langkah
+1. **Kloning Repositori Git**
    ```bash
    git clone https://github.com/UsernameAnda/Balanja-ULM.git
    ```
 2. **Buka di Android Studio**
-   Buka aplikasi Android Studio, pilih menu **Open**, lalu arahkan ke *folder* repositori yang baru saja di-*clone* (folder `balanja-ulm`).
-3. **Konfigurasi Firebase & Cloudinary**
-   - File `google-services.json` (untuk Firebase) **sudah** disertakan di folder `app/`.
-   - Pastikan *environment variables* / API Key untuk Cloudinary (jika diperlukan) disesuaikan pada file `local.properties`.
-4. **Sinkronisasi Gradle**
-   Tunggu Android Studio selesai mengunduh semua *library/dependencies* (Jetpack Compose, Room, Retrofit, dll).
-5. **Jalankan Aplikasi (Run)**
-   Sambungkan HP Android Anda via kabel USB / Wireless Debugging (atau gunakan Emulator), lalu tekan tombol **Play (▶) Run 'app'** di bagian atas Android Studio.
+   Pilih `File` -> `Open` lalu arahkan ke folder yang baru di-*clone*. Tunggu hingga proses *Gradle Sync* selesai.
+3. **Konfigurasi Firebase Authentication & Realtime Database**
+   - Buat proyek baru di [Firebase Console](https://console.firebase.google.com/).
+   - Daftarkan Android App dengan *package name* `com.example.balanja`.
+   - Unduh file `google-services.json` yang diberikan Firebase.
+   - Pindahkan/Salin file `google-services.json` tersebut langsung ke dalam direktori `app/` di proyek Anda.
+4. **Konfigurasi Cloudinary API (Opsional untuk Fitur Unggah Foto)**
+   - Buat akun gratis di [Cloudinary](https://cloudinary.com).
+   - Dapatkan `Cloud Name`, `API Key`, dan `API Secret` Anda.
+   - Buka file `local.properties` (di *root* proyek) dan tambahkan baris berikut:
+     ```properties
+     CLOUDINARY_CLOUD_NAME=masukkan_nama_cloud_anda
+     CLOUDINARY_API_KEY=masukkan_api_key_anda
+     CLOUDINARY_API_SECRET=masukkan_api_secret_anda
+     ```
+5. **Jalankan Aplikasi**
+   Setelah semua konfigurasi aman, sambungkan *device* / Emulator, dan tekan ikon tombol **Run (▶)** hijau di bilah atas Android Studio.
 
 ---
 
-## 📸 Screenshot Aplikasi
+## 📸 Antarmuka Pengguna (Screenshot UI)
 
-> **Catatan:** Karena gambar _screenshot_ Anda bernama `Screenshot 2026-06-...`, silakan ubah tautan di bawah ini dengan menyalin langsung (_drag and drop_) gambar dari folder `doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/` ke dalam file README ini di GitHub agar gambarnya muncul sempurna.
+> *(Catatan Editor GitHub: Harap sesuaikan URL gambar di bawah ini dengan menyalin langsung screenshot Anda agar tampilannya sesuai.)*
 
-### ☀️ Tampilan Mode Terang (Light Mode)
+### ☀️ Mode Terang (Light Theme)
 
 | Halaman Home (Beranda) | Detail Warung & Menu | Halaman Peta (Map) |
 | :---: | :---: | :---: |
@@ -95,7 +121,7 @@ Aplikasi ini mengadopsi **Clean Architecture** berlapis untuk memastikan skalabi
 
 ---
 
-### 🌙 Tampilan Mode Gelap (Dark Mode)
+### 🌙 Mode Gelap (Dark Theme)
 
 | Halaman Home (Beranda) | Detail Warung & Menu | Daftar Ulasan Komunitas |
 | :---: | :---: | :---: |
@@ -106,4 +132,8 @@ Aplikasi ini mengadopsi **Clean Architecture** berlapis untuk memastikan skalabi
 | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144307.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144315.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144323.png" width="250"/> |
 
 ---
-**Dibuat dengan ❤️ oleh Mahasiswa Universitas Lambung Mangkurat.**
+
+<div align="center">
+  <b>Dibuat dengan ❤️ oleh Mahasiswa Universitas Lambung Mangkurat.</b><br>
+  <i>Hak Cipta © 2026 Tim Balanja ULM. All Rights Reserved.</i>
+</div>
