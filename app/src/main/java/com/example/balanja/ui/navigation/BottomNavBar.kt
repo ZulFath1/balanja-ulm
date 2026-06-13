@@ -60,6 +60,7 @@ fun BalanjaBottomNav(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.navigationBars)
             .padding(horizontal = 24.dp)
             .padding(bottom = 24.dp)
             .height(80.dp)
