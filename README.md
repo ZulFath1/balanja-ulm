@@ -32,25 +32,39 @@ Aplikasi ini diarsiteki dengan prinsip **Clean Architecture**, sebuah standar in
    Mengandung implementasi konkrit (Repository Impl) dari antarmuka yang didefinisikan pada Domain Layer. Lapisan inilah yang langsung berkomunikasi dengan *Data Sources* luar seperti Firebase (API), Open-Meteo (HTTP API), dan Room (Local DB).
 
 **Visualisasi Alur Sistem (Clean Architecture):**
-/nama-aplikasi
-├── /src                   # Kode sumber utama aplikasi
-│   ├── /presentation      # Lapisan antarmuka pengguna (UI/UX)
-│   │   ├── /screens       # Tampilan halaman penuh
-│   │   └── /components    # Komponen UI kecil yang dapat digunakan kembali
-│   ├── /domain            # Lapisan logika bisnis inti
-│   │   ├── /models        # Struktur data / cetak biru objek
-│   │   └── /usecases      # Aturan bisnis dan tindakan yang bisa dilakukan aplikasi
-│   ├── /data              # Lapisan akses data (API, Database)
-│   │   ├── /repositories  # Penghubung antara domain dan sumber data
-│   │   └── /sources       # Eksekusi mentah untuk mengambil atau mengirim data
-│   ├── /core              # Utilitas dan helper global (tema, koneksi, const)
-│   │   ├── /utils
-│   │   └── /theme
-│   └── main.dart / app.js # Titik awal aplikasi (Entry Point)
-├── /assets                # File statis (gambar, font, ikon)
-├── .env                   # Variabel lingkungan (API Key, URL)
-├── pubspec.yaml / package.json # Konfigurasi dependensi aplikasi
-└── README.md              # Dokumentasi proyek
+```text
+com.example.balanja/
+├── data/                                 # Data Layer: Implementasi antarmuka domain & eksekusi API
+│   ├── api/                              # DTO & Service (CloudinaryApiService, WeatherApiService)
+│   ├── local/                            # Room Database (DAO, Config DB, Entity SQLite)
+│   └── repository/                       # Implementasi dari kontrak (misal: StallRepositoryImpl.kt)
+│
+├── domain/                               # Domain Layer: Aturan bisnis murni & Model Data
+│   ├── model/                            # Kelas data murni (Stall.kt, Review.kt, User.kt)
+│   ├── repository/                       # Interface murni (Kontrak akses untuk Data Layer)
+│   └── usecase/                          # Logika spesifik terpisah per aksi (misal: RecalculateStallRating)
+│       ├── auth/                         # (Login/Register/GoogleSignIn)
+│       ├── favorite/                     # (Add/Delete/Get Favorite)
+│       ├── review/                       # (Add/Edit/Get Reviews)
+│       ├── search/                       # (Search & Recent)
+│       ├── stall/                        # (GetStalls)
+│       └── weather/                      # (GetCampusWeather)
+│
+├── presentation/                         # Presentation Layer: Layar UI & Manajemen State (ViewModels)
+│   ├── auth/                             # LoginScreen.kt, RegisterScreen.kt, AuthViewModel.kt
+│   ├── favorite/                         # FavoriteStallsScreen.kt
+│   ├── home/                             # HomeScreen.kt, HomeViewModel.kt
+│   ├── map/                              # MapScreen.kt (Integrasi Peta Osmdroid)
+│   ├── profile/                          # EditProfileScreen.kt, ProfileScreen.kt
+│   ├── review/                           # CommunityReviewScreen.kt, WriteReviewScreen.kt
+│   ├── search/                           # SearchScreen.kt, SearchViewModel.kt
+│   └── stall/                            # StallDetailScreen.kt, AddStallScreen.kt
+│
+└── ui/                                   # UI Layer: Komponen global, navigasi pusat, dan tema
+    ├── component/                        # Composable daur ulang (StallCard.kt, WeatherWidget.kt)
+    ├── navigation/                       # Setup NavHost, Daftar Rute, & BottomNavBar.kt
+    └── theme/                            # Konfigurasi warna (Color.kt), Tipografi, dan Tema Jetpack
+```
 
 ---
 
