@@ -123,11 +123,11 @@ Sesuai dengan matriks penilaian Ujian Akhir Semester, proyek ini mengimplementas
 
 ### 🌙 Mode Gelap (Dark Theme)
 
-| Halaman Home (Beranda) | Detail Warung & Menu | Daftar Ulasan Komunitas |
+| Halaman Pencarian | Tambah Pedagang (Google Form) | Profil Pengguna |
 | :---: | :---: | :---: |
 | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144243.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144251.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144301.png" width="250"/> |
 
-| Warung Favorit (Room DB) | Tambah Warung (Google Form) | Edit Profil |
+| Edit Profil | Ulasan Saya | Warung Favorit (Room DB) |
 | :---: | :---: | :---: |
 | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144307.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144315.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144323.png" width="250"/> |
 
