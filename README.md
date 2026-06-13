@@ -32,41 +32,25 @@ Aplikasi ini diarsiteki dengan prinsip **Clean Architecture**, sebuah standar in
    Mengandung implementasi konkrit (Repository Impl) dari antarmuka yang didefinisikan pada Domain Layer. Lapisan inilah yang langsung berkomunikasi dengan *Data Sources* luar seperti Firebase (API), Open-Meteo (HTTP API), dan Room (Local DB).
 
 **Visualisasi Alur Sistem (Clean Architecture):**
-```mermaid
-graph TD
-    subgraph "Presentation Layer (UI)"
-        UI["Jetpack Compose (Screens)"]
-        VM["ViewModels (StateFlow)"]
-        UI <-->|Observes State & Sends Intents| VM
-    end
-
-    subgraph "Domain Layer (Business Logic)"
-        UC["Use Cases"]
-        Model["Domain Models"]
-        VM -->|Executes| UC
-        UC --> Model
-    end
-
-    subgraph "Data Layer (Data Sources)"
-        Repo["Repository Implementation"]
-        Remote[("Firebase (Remote DB)")]
-        Local[("Room SQLite (Local DB)")]
-        API["Open-Meteo (3rd Party API)"]
-        
-        UC -->|Interfaces via| Repo
-        Repo <--> Remote
-        Repo <--> Local
-        Repo <--> API
-    end
-
-    classDef presentation fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px,color:#000;
-    classDef domain fill:#f1f8e9,stroke:#43a047,stroke-width:2px,color:#000;
-    classDef data fill:#fff3e0,stroke:#fb8c00,stroke-width:2px,color:#000;
-    
-    class UI,VM presentation;
-    class UC,Model domain;
-    class Repo,Remote,Local,API data;
-```
+/nama-aplikasi
+├── /src                   # Kode sumber utama aplikasi
+│   ├── /presentation      # Lapisan antarmuka pengguna (UI/UX)
+│   │   ├── /screens       # Tampilan halaman penuh
+│   │   └── /components    # Komponen UI kecil yang dapat digunakan kembali
+│   ├── /domain            # Lapisan logika bisnis inti
+│   │   ├── /models        # Struktur data / cetak biru objek
+│   │   └── /usecases      # Aturan bisnis dan tindakan yang bisa dilakukan aplikasi
+│   ├── /data              # Lapisan akses data (API, Database)
+│   │   ├── /repositories  # Penghubung antara domain dan sumber data
+│   │   └── /sources       # Eksekusi mentah untuk mengambil atau mengirim data
+│   ├── /core              # Utilitas dan helper global (tema, koneksi, const)
+│   │   ├── /utils
+│   │   └── /theme
+│   └── main.dart / app.js # Titik awal aplikasi (Entry Point)
+├── /assets                # File statis (gambar, font, ikon)
+├── .env                   # Variabel lingkungan (API Key, URL)
+├── pubspec.yaml / package.json # Konfigurasi dependensi aplikasi
+└── README.md              # Dokumentasi proyek
 
 ---
 
