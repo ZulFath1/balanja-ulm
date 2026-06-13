@@ -264,7 +264,12 @@ fun CommunityReviewScreen(
                                             
                                             if (review.attributes.isNotEmpty()) {
                                                 Spacer(modifier = Modifier.height(12.dp))
-                                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+                                                FlowRow(
+                                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                                    modifier = Modifier.fillMaxWidth()
+                                                ) {
                                                     review.attributes.forEach { attr ->
                                                         Box(
                                                             modifier = Modifier
