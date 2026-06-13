@@ -138,7 +138,7 @@ Sesuai dengan matriks penilaian Ujian Akhir Semester, proyek ini mengimplementas
 | **Open-Meteo API** | HTTP API cuaca publik *open-source* tanpa limitasi *rate-limiting*. |
 | **Osmdroid (OpenStreetMap)**| Pustaka pemetaan alternatif yang 100% *open-source* dan tidak butuh kartu kredit. |
 | **Room Database (SQLite)** | Lapisan persistensi data lokal di atas platform Android. |
-| **Retrofit2 & Coil** | *Client API fetching* (Retrofit) dan pustaka pemuatan gambar asinkron (Coil). |
+| **Retrofit2** | *Client API fetching* (Retrofit untuk *request* dan *parsing* HTTP). |
 
 ---
 
