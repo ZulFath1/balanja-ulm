@@ -46,6 +46,22 @@ Silakan **Copy-Paste** bagian-bagian di bawah ini untuk menimpa teks lama di dok
 - **Retrofit & Gson (Open-Meteo API):** Retrofit digunakan sebagai klien HTTP untuk memanggil Open-Meteo API guna mendapatkan info cuaca terkini tanpa perlu API Key. Gson memparsing respons JSON menjadi objek Kotlin.
 - **Room Database:** Pustaka persistensi yang memberikan lapisan abstraksi di atas SQLite, digunakan untuk memfasilitasi fitur aplikasi *offline-first* seperti menyimpan data Favorit dan Riwayat Pencarian secara lokal.
 
+### 7. Teks Lama yang HARUS DIHAPUS dari File Word Anda
+Karena kita sudah beralih menggunakan **Google Form** untuk usulan jajanan baru (demi keamanan data), Anda **WAJIB MENGHAPUS** atau mencoret kalimat-kalimat berikut dari dokumen Word PRD lama Anda agar tidak ada informasi yang tumpang tindih (kontradiksi):
+
+**Di Bab 1.2 (Mobile First Rationale), HAPUS poin 2 dan 3:**
+> *(HAPUS)* "2. Fitur Usulan Jajanan Baru sangat membutuhkan fungsi kamera bawaan ponsel. Mahasiswa bisa memotret stan makanan atau menu baru untuk mereka unggah langsung ke dalam sistem."
+> *(HAPUS)* "3. Perangkat seluler memiliki sensor GPS bawaan untuk mendeteksi lokasi pengguna. Fitur ini membantu mahasiswa menandai titik lokasi pedagang kaki lima baru di sekitar kampus secara akurat."
+
+**Di Bab 1.3 (Product Objectives), HAPUS kalimat terakhir pada poin 5:**
+> *(HAPUS)* "Sebagai contoh, mahasiswa dapat dengan mudah menambahkan titik lokasi gerobak batagor baru menggunakan bantuan fitur kamera dan sensor GPS."
+
+**Di Bab 7 (Functional Requirements), HAPUS baris fitur berikut:**
+> *(HAPUS BARIS INI)* "Dokumentasi Foto Stan | Nice to have | Sistem mengakses fungsi kamera ponsel untuk mengambil gambar kondisi fisik lapak dan mengunggahnya ke penyimpanan awan."
+
+**Di Bab 9.1 & 9.2 (Teknologi yang Digunakan), HAPUS poin nomor 5:**
+> *(HAPUS KESELURUHAN POIN INI)* "5. Android Location Services. Aplikasi memakai sistem bawaan Android untuk mengakses sensor GPS pada ponsel pengguna. Mahasiswa memanfaatkan layanan ini ketika mereka mendaftarkan lokasi jajanan baru ke dalam pangkalan data sistem." (Hapus juga penjelasannya di 9.2)
+
 ---
 
 ## BAGIAN B: Kompilasi Bab 12 (History Revisi Lengkap)
@@ -86,7 +102,7 @@ Catatan Revisi:
 Untuk memastikan kesesuaian antara aplikasi yang dideploy pada saat UAS dengan dokumen PRD, dilakukan perombakan akhir:
 1. Transisi ke Clean Architecture: Melakukan perombakan struktur folder (Refactoring) secara menyeluruh yang memisahkan aplikasi ke dalam tiga lapisan mutlak: Data Layer (Repository/API/Local DB), Domain Layer (Models & UseCases), dan Presentation Layer (Feature-based ViewModels & UI).
 2. Penegasan Infrastruktur Cloud & Autentikasi: Mendetailkan infrastruktur *backend* utama. Autentikasi pengguna kini dikelola secara aman menggunakan **Firebase Authentication**. Data terstruktur (teks, ulasan, lokasi warung) dikelola menggunakan **Firebase Realtime Database** untuk performa *real-time*. Sementara itu, pengelolaan seluruh aset media berat (foto unggahan pengguna, foto warung) secara eksklusif dilayani menggunakan **Cloudinary** sebagai *Cloud Storage* dan CDN (*Content Delivery Network*) untuk mengoptimalkan kecepatan muat gambar dan menghemat *bandwidth*.
-3. Penyesuaian Alur Add Stall (BLJA-05): Mengubah metode penambahan warung dari "Upload native" menjadi "Integrasi via Formulir Pengajuan (Google Form)". Keputusan ini diambil sebagai mitigasi risiko keamanan guna mencegah spam data fiktif. Data pengajuan kini divalidasi oleh tim admin sebelum diterbitkan ke Firebase.
+3. Penghapusan Location Service & Penyesuaian Alur Add Stall (BLJA-05): Menghapus rancangan awal penggunaan Android Location Service (Sensor GPS) dan akses Kamera Bawaan, serta mengubah metode penambahan warung dari "Upload native" menjadi "Integrasi via Formulir Pengajuan (Google Form)". Keputusan ini diambil sebagai mitigasi risiko privasi dan keamanan guna mencegah *spam* data fiktif. Data usulan kini divalidasi oleh tim admin sebelum diterbitkan ke Firebase.
 4. Penyesuaian Manajemen Katalog (BLJA-06): Memodifikasi acceptance criteria menjadi sistem "Read/Browse dinamis", sementara manajemen data (*Write*) ditarik ke wewenang server/admin demi integritas pangkalan data. Pemenuhan BREAD (Browse, Read, Edit, Add, Delete) telah diimplementasikan penuh pada entitas Ulasan, Profil pengguna, dan Favorit.
 5. Penyeragaman Nama Produk: Mengubah draf penamaan lama "JajanTeknik" menjadi "Balanja ULM" di seluruh paragraf dokumen agar selaras dengan hasil rilis aplikasi.
 ```
