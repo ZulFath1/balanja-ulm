@@ -101,6 +101,8 @@ fun WriteReviewScreen(
             }
             kotlinx.coroutines.delay(1500)
             navController.popBackStack()
+            // Setelah berhasil, arahkan langsung ke halaman daftar ulasan komunitas
+            navController.navigate(com.example.balanja.ui.navigation.Screen.CommunityReview.createRoute(stallId))
         }
     }
 
