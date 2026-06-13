@@ -125,11 +125,11 @@ Sesuai dengan matriks penilaian Ujian Akhir Semester, proyek ini mengimplementas
 
 | Halaman Pencarian | Tambah Pedagang (Google Form) | Profil Pengguna |
 | :---: | :---: | :---: |
-| <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144243.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144251.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144301.png" width="250"/> |
+| <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144440dark.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144503dark.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144511dark.png" width="250"/> |
 
 | Edit Profil | Ulasan Saya | Warung Favorit (Room DB) |
 | :---: | :---: | :---: |
-| <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144307.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144315.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144323.png" width="250"/> |
+| <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144522dark.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144533dark.png" width="250"/> | <img src="doc/UTS_Mobile_Sukajajan_Balanja/Screenshot Aplikasi/Screenshot 2026-06-13 144558dark.png" width="250"/> |
 
 ---
 
