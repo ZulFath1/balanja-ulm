@@ -66,6 +66,43 @@ com.example.balanja/
     └── theme/                            # Konfigurasi warna (Color.kt), Tipografi, dan Tema Jetpack
 ```
 
+**Visualisasi Interaksi Antar Layer:**
+```mermaid
+graph TD
+    subgraph "Presentation Layer (UI)"
+        UI["Jetpack Compose (Screens)"]
+        VM["ViewModels (StateFlow)"]
+        UI <-->|Observes State & Sends Intents| VM
+    end
+
+    subgraph "Domain Layer (Business Logic)"
+        UC["Use Cases"]
+        Model["Domain Models"]
+        VM -->|Executes| UC
+        UC --> Model
+    end
+
+    subgraph "Data Layer (Data Sources)"
+        Repo["Repository Implementation"]
+        Remote[("Firebase (Remote DB)")]
+        Local[("Room SQLite (Local DB)")]
+        API["Open-Meteo (3rd Party API)"]
+        
+        UC -->|Interfaces via| Repo
+        Repo <--> Remote
+        Repo <--> Local
+        Repo <--> API
+    end
+
+    classDef presentation fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px,color:#000;
+    classDef domain fill:#f1f8e9,stroke:#43a047,stroke-width:2px,color:#000;
+    classDef data fill:#fff3e0,stroke:#fb8c00,stroke-width:2px,color:#000;
+    
+    class UI,VM presentation;
+    class UC,Model domain;
+    class Repo,Remote,Local,API data;
+```
+
 ---
 
 ## ✨ Fitur-Fitur Aplikasi
