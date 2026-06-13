@@ -62,11 +62,14 @@ object AppContainer {
         private set
     lateinit var recentSearchRepository: RecentSearchRepository
         private set
+    lateinit var appPreferenceManager: com.example.balanja.data.local.prefs.AppPreferenceManager
+        private set
 
     fun init(context: android.content.Context) {
         val database = com.example.balanja.data.local.db.BalanjaLocalDatabase.getInstance(context)
         favoriteRepository = FavoriteRepositoryImpl(database.favoriteStallDao())
         recentSearchRepository = RecentSearchRepositoryImpl(database.recentSearchDao())
+        appPreferenceManager = com.example.balanja.data.local.prefs.AppPreferenceManager(context)
     }
 
     // ─── Use Cases ────────────────────────────────────────────────────────────

@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import com.example.balanja.domain.repository.AuthRepository
 
@@ -53,20 +55,23 @@ class StallDetailViewModel(
                 }
             }
 
-            getStallDetailUseCase(stallId)
-                .catch { exception ->
-                    _uiState.value = StallDetailUiState.Error(exception.message ?: "Gagal memuat detail stan")
+            combine(
+                getStallDetailUseCase(stallId),
+                getReviewsUseCase(stallId).onStart { emit(emptyList()) }
+            ) { stall, reviews ->
+                if (stall != null) {
+                    val isOwner = stall.ownerId.isNotEmpty() && stall.ownerId == authRepository.getCurrentUserId()
+                    StallDetailUiState.Success(stall, reviews, isOwner)
+                } else {
+                    StallDetailUiState.Error("Stan tidak ditemukan.")
                 }
-                .collect { stall ->
-                    if (stall != null) {
-                        getReviewsUseCase(stallId).collect { reviews ->
-                            val isOwner = stall.ownerId.isNotEmpty() && stall.ownerId == authRepository.getCurrentUserId()
-                            _uiState.value = StallDetailUiState.Success(stall, reviews, isOwner)
-                        }
-                    } else {
-                        _uiState.value = StallDetailUiState.Error("Stan tidak ditemukan.")
-                    }
-                }
+            }
+            .catch { exception ->
+                emit(StallDetailUiState.Error(exception.message ?: "Gagal memuat detail stan"))
+            }
+            .collect { state ->
+                _uiState.value = state
+            }
         }
     }
 
