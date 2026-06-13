@@ -22,6 +22,17 @@ Menyimpan informasi identitas dan profil akun.
 - `createdAt` (Long): Unix timestamp pendaftaran.
 - `photoUrl` (String, Nullable): URL foto profil dari Firebase Storage.
 
+**Tabel Atribut `users`:**
+| Atribut | Tipe Data | Keterangan |
+| :--- | :--- | :--- |
+| `id` | String | ID unik pengguna, selaras dengan Firebase Authentication UID. |
+| `name` | String | Nama lengkap pengguna. |
+| `email` | String | Alamat email. |
+| `role` | String | Peran pengguna, contoh: `"buyer"` (pembeli), `"seller"` (penjual). |
+| `reviewCount` | Int | Jumlah ulasan yang pernah dikirimkan oleh pengguna ini. |
+| `createdAt` | Long | Unix timestamp pendaftaran. |
+| `photoUrl` | String (Nullable) | URL foto profil dari Firebase Storage. |
+
 #### `stalls` (Koleksi Warung/Pedagang)
 Menyimpan data detail setiap warung/pedagang kaki lima.
 - `id` (String): ID unik warung.
@@ -40,6 +51,24 @@ Menyimpan data detail setiap warung/pedagang kaki lima.
 - `menu` (Map<String, MenuItem>): _Sub-collection_ berisi menu makanan/minuman yang dijual.
   - Atribut Menu: `name` (String), `price` (Int), `description` (String), `imageUrl` (String).
 
+**Tabel Atribut `stalls`:**
+| Atribut | Tipe Data | Keterangan |
+| :--- | :--- | :--- |
+| `id` | String | ID unik warung. |
+| `name` | String | Nama warung/pedagang. |
+| `description` | String | Deskripsi singkat jualan. |
+| `location` | String | Alamat teks warung. |
+| `priceMin` | Int | Estimasi harga menu termurah. |
+| `priceMax` | Int | Estimasi harga menu termahal. |
+| `rating` | Double | Rata-rata bintang (0.0 - 5.0) hasil kalkulasi *review*. |
+| `reviewCount` | Int | Total ulasan yang diterima warung ini. |
+| `isOpen` | Boolean | Status operasional (buka/tutup). |
+| `imageUrl` | String | URL gambar *banner* warung. |
+| `latitude` | Double | Titik koordinat lokasi di peta. |
+| `longitude` | Double | Titik koordinat lokasi di peta. |
+| `ownerId` | String | Berisi `userId` dari pengguna yang memiliki/mendaftarkan warung ini. |
+| `menu` | Map<String, MenuItem> | *Sub-collection* berisi menu makanan/minuman yang dijual. |
+
 #### `reviews` (Koleksi Ulasan/Review)
 Menyimpan _feedback_ dari pengguna untuk suatu warung.
 - `id` (String): ID unik ulasan.
@@ -53,6 +82,21 @@ Menyimpan _feedback_ dari pengguna untuk suatu warung.
 - `imageUrls` (List<String>): List URL gambar lampiran yang diunggah pengguna.
 - `createdAt` (Long): Waktu pembuatan ulasan.
 - `updatedAt` (Long): Waktu pembaruan ulasan terakhir.
+
+**Tabel Atribut `reviews`:**
+| Atribut | Tipe Data | Keterangan |
+| :--- | :--- | :--- |
+| `id` | String | ID unik ulasan. |
+| `stallId` | String | ID warung yang diulas. |
+| `userId` | String | ID pengguna yang menulis ulasan. |
+| `userName` | String | Nama pengguna (Didenormalisasi agar tidak perlu query tabel `users`). |
+| `userPhotoUrl` | String (Nullable) | URL foto profil pembuat ulasan (Denormalisasi). |
+| `rating` | Int | Skor bintang yang diberikan (1 sampai 5). |
+| `comment` | String | Teks komentar/ulasan lengkap. |
+| `attributes` | List<String> | Tag atribut opsional (misal: "Bersih", "Murah", "Ramah"). |
+| `imageUrls` | List<String> | List URL gambar lampiran yang diunggah pengguna. |
+| `createdAt` | Long | Waktu pembuatan ulasan. |
+| `updatedAt` | Long | Waktu pembaruan ulasan terakhir. |
 
 ### B. Relasi Database (Firebase)
 Meskipun NoSQL tidak memiliki _Foreign Key_ secara kaku, relasi logisnya adalah:
@@ -87,6 +131,18 @@ Menyimpan daftar warung yang ditandai (di-klik tombol Hati / _Favorite_) oleh pe
 - `isOpen` (Boolean): Status buka/tutup saat disimpan.
 - `savedAt` (Long): Waktu ketika warung tersebut dimasukkan ke daftar favorit.
 
+**Tabel Skema `favorite_stalls`:**
+| Kolom | Tipe Data | Keterangan |
+| :--- | :--- | :--- |
+| `stallId` | String (**PK**) | Mengacu pada ID warung di Firebase. |
+| `name` | String | *Cache* nama warung. |
+| `location` | String | *Cache* lokasi warung. |
+| `priceRange` | String | String rentang harga (digenerate dari `priceMin` - `priceMax`). |
+| `photoUrl` | String | URL foto utama warung. |
+| `averageRating` | Double | Rata-rata rating warung. |
+| `isOpen` | Boolean | Status buka/tutup saat disimpan. |
+| `savedAt` | Long | Waktu ketika warung tersebut dimasukkan ke daftar favorit. |
+
 #### Tabel `recent_searches`
 Menyimpan riwayat warung yang baru saja dilihat/diklik oleh pengguna, digunakan pada halaman Search.
 - `stallId` (String, **Primary Key**): Mengacu pada ID warung di Firebase.
@@ -97,6 +153,18 @@ Menyimpan riwayat warung yang baru saja dilihat/diklik oleh pengguna, digunakan 
 - `averageRating` (Double): Rata-rata rating.
 - `isOpen` (Boolean): Status buka/tutup.
 - `timestamp` (Long): Waktu terakhir kali warung ini dikunjungi/dicari. (Data dengan timestamp terlama akan digeser turun dalam _list_ pencarian).
+
+**Tabel Skema `recent_searches`:**
+| Kolom | Tipe Data | Keterangan |
+| :--- | :--- | :--- |
+| `stallId` | String (**PK**) | Mengacu pada ID warung di Firebase. |
+| `name` | String | *Cache* nama warung. |
+| `location` | String | *Cache* lokasi warung. |
+| `priceRange` | String | Rentang harga. |
+| `photoUrl` | String | URL foto utama. |
+| `averageRating` | Double | Rata-rata rating. |
+| `isOpen` | Boolean | Status buka/tutup. |
+| `timestamp` | Long | Waktu terakhir kali warung ini dikunjungi/dicari. |
 
 ### B. Konfigurasi Preferences (SharedPreferences / DataStore)
 Meskipun bukan tabel relasional, penyimpanan lokal ini mendukung *Local Data*:
