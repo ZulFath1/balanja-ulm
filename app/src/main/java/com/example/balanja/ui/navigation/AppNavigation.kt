@@ -83,6 +83,7 @@ class AuthViewModelFactory(
 }
 
 val screensWithoutBottomNav = listOf(
+    Screen.Onboarding.route,
     Screen.Login.route,
     Screen.Register.route,
     Screen.StallDetail.route,
@@ -101,7 +102,9 @@ fun AppNavigation() {
     // showBottomBar no longer needed since navbar is rendered per route
 
     val startDestination = androidx.compose.runtime.remember {
-        if (AppContainer.authRepository.isLoggedIn()) Screen.Home.route else Screen.Login.route
+        if (!AppContainer.appPreferenceManager.isCompletedSync()) Screen.Onboarding.route
+        else if (AppContainer.authRepository.isLoggedIn()) Screen.Home.route
+        else Screen.Login.route
     }
 
     fun isNavbarRoute(route: String?): Boolean {
@@ -183,6 +186,17 @@ fun AppNavigation() {
                 }
             }
         ) {
+            composable(Screen.Onboarding.route) {
+                com.example.balanja.presentation.onboarding.OnboardingScreen(
+                    onFinishOnboarding = {
+                        AppContainer.appPreferenceManager.completeOnboarding()
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Onboarding.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
             composable(Screen.Login.route) {
                 val authViewModel: AuthViewModel = viewModel(
                     factory = AuthViewModelFactory(AppContainer.signInUseCase, AppContainer.signInWithGoogleUseCase)
